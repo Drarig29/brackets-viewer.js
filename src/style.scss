@@ -1,3 +1,15 @@
+$round-margin: 50px;
+$round-width: 200px;
+
+$connector-left-width: $round-margin / 2;
+$connector-right-width: ($round-margin / 2)+2;
+$connector-borders: 2px solid #9e9e9e;
+
+$win-color: #50b649;
+$loss-color: #e61a1a;
+$match-borders: 1px solid #d9d9d9;
+$match-borders-radius: 0.3rem;
+
 section {
     display: flex;
     flex-direction: column;
@@ -14,9 +26,6 @@ h1 {
 .bracket {
     flex: 1;
     display: flex;
-}
-
-.bracket:not(:last-of-type) {
     margin-bottom: 50px;
 }
 
@@ -24,8 +33,8 @@ h1 {
     flex: 1;
     display: flex;
     flex-direction: column;
-    margin-right: 50px;
-    width: 200px;
+    margin-right: $round-margin;
+    width: $round-width;
 }
 
 h2 {
@@ -41,129 +50,133 @@ h2 {
     align-items: center;
     margin: 10px 0;
     position: relative;
-}
 
-.match.connect-next::after {
-    position: absolute;
-    right: -25px;
-    content: '';
-    display: block;
-    width: 25px;
-    height: 50%;
-    border-right: 2px solid #9e9e9e;
-}
+    &.connect-next {
+        &::after {
+            content: '';
+            display: block;
+            position: absolute;
+            right: -$connector-left-width;
+            width: $connector-left-width;
+            height: 50%;
+            border-right: $connector-borders;
+        }
 
-.match.connect-next:nth-of-type(odd)::after {
-    top: 50%;
-    border-top: 2px solid #9e9e9e;
-}
+        &:nth-of-type(odd)::after {
+            top: 50%;
+            border-top: $connector-borders;
+        }
 
-.match.connect-next:nth-of-type(even)::after {
-    top: 0;
-    border-bottom: 2px solid #9e9e9e;
-}
+        &:nth-of-type(even)::after {
+            top: 0;
+            border-bottom: $connector-borders;
+        }
 
-.winner.bracket .round:nth-last-of-type(2) .match.connect-next::after {
-    border-right: none;
-    width: 50px;
-    right: -50px;
-}
+        .winner.bracket .round:nth-last-of-type(2) &::after {
+            border-right: none;
+            width: $round-margin;
+            right: -$round-margin;
+        }
 
-.loser.bracket .round:nth-of-type(odd) .match.connect-next::after {
-    border-right: none;
-    width: 50px;
-    right: -50px;
+        .loser.bracket .round:nth-of-type(odd) &::after {
+            border-right: none;
+            width: $round-margin;
+            right: -$round-margin;
+        }
+    }
 }
 
 .teams {
     width: 100%;
     position: relative;
-}
 
-.teams.connect-previous::before {
-    position: absolute;
-    left: -27px;
-    content: '';
-    display: block;
-    width: 27px;
-    height: 50%;
-    top: 0;
-    border-left: 2px solid #9e9e9e;
-    border-bottom: 2px solid #9e9e9e;
-}
+    &.connect-previous {
+        &::before {
+            content: '';
+            display: block;
+            position: absolute;
+            left: -$connector-right-width;
+            width: $connector-right-width;
+            top: 0;
+            height: 50%;
+            border-left: $connector-borders;
+            border-bottom: $connector-borders;
+        }
 
-.teams.connect-previous::after {
-    position: absolute;
-    left: -27px;
-    content: '';
-    display: block;
-    width: 27px;
-    height: 50%;
-    top: 50%;
-    transform: translateY(-2px);
-    border-left: 2px solid #9e9e9e;
-    border-top: 2px solid #9e9e9e;
-}
+        &::after {
+            content: '';
+            display: block;
+            position: absolute;
+            left: -$connector-right-width;
+            width: $connector-right-width;
+            top: 50%;
+            height: 50%;
+            transform: translateY(-2px);
+            border-left: $connector-borders;
+            border-top: $connector-borders;
+        }
 
-.winner.bracket .round:last-of-type .teams.connect-previous::before {
-    content: unset;
-}
+        .winner.bracket .round:last-of-type &::before {
+            content: unset;
+        }
 
-.winner.bracket .round:last-of-type .teams.connect-previous::after {
-    border-top: none;
-    height: 30%;
-    top: 55%;
-}
+        .winner.bracket .round:last-of-type &::after {
+            border-top: none;
+            height: 30%;
+            top: 55%;
+        }
 
-.loser.bracket .round:nth-of-type(even) .teams.connect-previous::before {
-    border-bottom: none;
-    height: 30%;
-    top: 20%;
-}
+        .loser.bracket .round:nth-of-type(even) &::before {
+            border-bottom: none;
+            height: 30%;
+            top: 20%;
+        }
 
-.loser.bracket .round:nth-of-type(even) .teams.connect-previous::after {
-    content: unset;
+        .loser.bracket .round:nth-of-type(even) &::after {
+            content: unset;
+        }
+    }
 }
 
 .team {
     display: flex;
     justify-content: space-between;
     padding: 3px 12px;
-}
 
-.team:nth-of-type(1) {
-    border: 1px solid #d9d9d9;
-    border-bottom: none;
-    border-top-left-radius: 0.3rem 0.3rem;
-    border-top-right-radius: 0.3rem 0.3rem;
-}
+    &:nth-of-type(1) {
+        border: $match-borders;
+        border-bottom: none;
+        border-top-left-radius: $match-borders-radius;
+        border-top-right-radius: $match-borders-radius;
+    }
 
-.team:nth-of-type(2) {
-    border: 1px solid #d9d9d9;
-    border-top: none;
-    border-bottom-left-radius: 0.3rem 0.3rem;
-    border-bottom-right-radius: 0.3rem 0.3rem;
-}
+    &:nth-of-type(2) {
+        border: $match-borders;
+        border-top: none;
+        border-bottom-left-radius: $match-borders-radius;
+        border-bottom-right-radius: $match-borders-radius;
+    }
 
-.team.hover {
-    background: #ECEFF1;
+    &.hover {
+        background: #ECEFF1;
+    }
 }
 
 .name {
     white-space: nowrap;
     overflow: hidden;
     text-overflow: fade(10px);
-}
 
-.name.win {
-    font-weight: bold;
+    &.win {
+        font-weight: bold;
+    }
 }
 
 .score {
     margin-left: 20px;
-    color: #e61a1a
-}
+    color: $loss-color;
 
-.score.win {
-    color: #50b649;
+    &.win {
+        color: $win-color;
+    }
 }
