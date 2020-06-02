@@ -1,8 +1,8 @@
-import './style.css';
+import './style.scss';
 
 const teamRefsDOM = {};
 
-function renderTournament(data) {
+window.renderTournament = data => {
     switch (data.type) {
         case 'double_elimination':
             renderDoubleElimination(data);
