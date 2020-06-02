@@ -1,18 +1,20 @@
 import './style.scss';
 
-const teamRefsDOM = {};
+const teamRefsDOM: { [key: string]: HTMLElement[] } = {};
 
-window.renderTournament = data => {
-    switch (data.type) {
-        case 'double_elimination':
-            renderDoubleElimination(data);
-            break;
-        default:
-            throw Error(`Unknown bracket type: ${data.type}`);
+(window as any).bracketsViewer = {
+    render: (data: TournamentData) => {
+        switch (data.type) {
+            case 'double_elimination':
+                renderDoubleElimination(data);
+                break;
+            default:
+                throw Error(`Unknown bracket type: ${data.type}`);
+        }
     }
 }
 
-function renderDoubleElimination(data) {
+function renderDoubleElimination(data: TournamentData) {
     checkSizes(data);
     data.teams.map(team => teamRefsDOM[team] = []);
 
@@ -25,16 +27,16 @@ function renderDoubleElimination(data) {
 /**
  * Renders the winner bracket (WB) and returns all the losers and the final winner.
  */
-function renderWinnerBracket(teams, results) {
+function renderWinnerBracket(teams: Teams, results: BracketScores) {
     const winnerBracket = $('<div class="winner bracket">');
-    const losers = [];
+    const losers: Teams[] = [];
 
     // At first, all players play in WB.
     let winners = teams;
-    let players;
+    let players: Teams[];
 
     for (let roundId = 0; roundId < results.length; roundId++) {
-        const round = results[roundId];
+        const roundScores = results[roundId];
 
         // Players of this round are the last one's winners.
         players = makePairs(winners);
@@ -43,19 +45,19 @@ function renderWinnerBracket(teams, results) {
         const roundDOM = $('<div class="round">').append($('<h2>').text(`WB Round ${roundId + 1}`));
         const roundLosers = [];
 
-        for (let matchId = 0; matchId < round.length; matchId++) {
+        for (let matchId = 0; matchId < roundScores.length; matchId++) {
             const opponents = players[matchId];
-            const scores = round[matchId];
+            const matchScores = roundScores[matchId];
 
-            roundDOM.append(renderMatch(opponents, scores, {
+            roundDOM.append(renderMatch(opponents, matchScores, {
                 connectPrevious: roundId > 0,
                 connectNext: true,
             }));
 
-            if (scores[0] > scores[1]) {
+            if (matchScores[0] > matchScores[1]) {
                 winners.push(opponents[0]);
                 roundLosers.push(opponents[1]);
-            } else if (scores[1] > scores[0]) {
+            } else if (matchScores[1] > matchScores[0]) {
                 winners.push(opponents[1]);
                 roundLosers.push(opponents[0]);
             } else {
@@ -75,10 +77,11 @@ function renderWinnerBracket(teams, results) {
     };
 }
 
-function renderLoserBracket(fromWB, results, minorOrdering) {
+function renderLoserBracket(fromWB: Teams[], results: BracketScores, minorOrdering: OrderingType[]) {
     const loserBracket = $('<div class="loser bracket">');
-    let players;
-    let winners;
+
+    let winners: Teams = [];
+    let players: Teams[];
 
     for (let roundId = 0; roundId < results.length; roundId++) {
         const round = results[roundId];
@@ -125,7 +128,7 @@ function renderLoserBracket(fromWB, results, minorOrdering) {
     return winners[0];
 }
 
-function renderGrandFinal(winnerWB, winnerLB, scores) {
+function renderGrandFinal(winnerWB: string, winnerLB: string, scores: number[]) {
     const match = renderMatch([winnerWB, winnerLB], scores, {
         connectPrevious: true,
         connectNext: false,
@@ -137,7 +140,7 @@ function renderGrandFinal(winnerWB, winnerLB, scores) {
     $('.winner.bracket').append(roundDOM);
 }
 
-function renderMatch(opponents, scores, connection) {
+function renderMatch(opponents: string[], scores: number[], connection: Connection) {
     const team1 = renderTeam(opponents[0], scores[0], scores[0] > scores[1]);
     const team2 = renderTeam(opponents[1], scores[1], scores[1] > scores[0]);
 
@@ -155,7 +158,7 @@ function renderMatch(opponents, scores, connection) {
     return match;
 }
 
-function renderTeam(name, score, win) {
+function renderTeam(name: string, score: number, win: boolean) {
     const nameDOM = $('<div class="name">').text(name);
     const scoreDOM = $('<div class="score">').text(score);
 
@@ -173,30 +176,42 @@ function renderTeam(name, score, win) {
     );
 }
 
-function makePairs(leftArray, rightArray) {
-    if (!rightArray) {
-        ensureEvenSized(leftArray);
-        return leftArray.map((current, i) => (i % 2 === 0) ? [current, leftArray[i + 1]] : null)
-            .filter(v => v !== null);
+/**
+ * Makes pairs with each element and its next one.
+ * @example [1, 2, 3, 4] --> [[1, 2], [3, 4]]
+ */
+function makePairs(array: any[]): any[][];
+
+/**
+ * Makes pairs with one element from `left` and the other from `right`.
+ * @example [1, 2] + [3, 4] --> [[1, 3], [2, 4]]
+ */
+function makePairs(left: any[], right: any[]): any[][];
+
+function makePairs(left: any[], right?: any[]): any[][] {
+    if (!right) {
+        ensureEvenSized(left);
+        return left.map((current, i) => (i % 2 === 0) ? [current, left[i + 1]] : [])
+            .filter(v => v.length > 0);
     }
 
-    ensureEquallySized(leftArray, rightArray);
-    return leftArray.map((current, i) => [current, rightArray[i]]);
+    ensureEquallySized(left, right);
+    return left.map((current, i) => [current, right[i]]);
 }
 
-function ensureEvenSized(array) {
+function ensureEvenSized(array: any[]) {
     if (array.length % 2 === 1) {
         throw Error('La taille du tableau doit être paire.');
     }
 }
 
-function ensureEquallySized(leftArray, rightArray) {
-    if (leftArray.length !== rightArray.length) {
+function ensureEquallySized(left: any[], right: any[]) {
+    if (left.length !== right.length) {
         throw Error('La taille des tableaux doit être égale.');
     }
 }
 
-function checkSizes(data) {
+function checkSizes(data: TournamentData) {
     if (!Number.isInteger(Math.log2(data.teams.length))) {
         throw Error('Le nombre d\'équipes doit être une puissance de deux.');
     }
@@ -209,18 +224,18 @@ function checkSizes(data) {
 // https://web.archive.org/web/20200601102344/https://tl.net/forum/sc2-tournaments/202139-superior-double-elimination-losers-bracket-seeding
 
 const ordering = {
-    natural: array => [...array],
-    reverse: array => array.reverse(),
-    half_shift: array => [...array.slice(array.length / 2), ...array.slice(0, array.length / 2)],
-    reverse_half_shift: array => [...array.slice(array.length / 2).reverse(), ...array.slice(0, array.length / 2).reverse()],
-    pair_flip: array => {
+    natural: (array: any[]) => [...array],
+    reverse: (array: any[]) => array.reverse(),
+    half_shift: (array: any[]) => [...array.slice(array.length / 2), ...array.slice(0, array.length / 2)],
+    reverse_half_shift: (array: any[]) => [...array.slice(array.length / 2).reverse(), ...array.slice(0, array.length / 2).reverse()],
+    pair_flip: (array: any[]) => {
         const result = [];
         for (let i = 0; i < array.length; i += 2) result.push(array[i + 1], array[i]);
         return result;
     },
 }
 
-const defaultMinorOrdering = {
+const defaultMinorOrdering: { [key: number]: OrderingType[] } = {
     8: ['natural', 'reverse', 'natural'],
     16: ['natural', 'reverse_half_shift', 'reverse', 'natural'],
     32: ['natural', 'reverse', 'half_shift', 'natural', 'natural'],
