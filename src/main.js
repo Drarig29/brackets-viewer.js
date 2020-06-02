@@ -8,7 +8,7 @@ window.renderTournament = data => {
             renderDoubleElimination(data);
             break;
         default:
-            throw Error('Type d\'arbre inconnu.');
+            throw Error(`Unknown bracket type: ${data.type}`);
     }
 }
 
@@ -23,20 +23,20 @@ function renderDoubleElimination(data) {
 }
 
 /**
- * Affiche le winner bracket (WB) et renvoie les équipes sorties à chaque round.
+ * Renders the winner bracket (WB) and returns all the losers and the final winner.
  */
 function renderWinnerBracket(teams, results) {
     const winnerBracket = $('<div class="winner bracket">');
     const losers = [];
 
-    // Au début, tous les participants sont en WB.
+    // At first, all players play in WB.
     let winners = teams;
     let players;
 
     for (let roundId = 0; roundId < results.length; roundId++) {
         const round = results[roundId];
 
-        // Les joueurs de ce round sont les gagnants du précédent.
+        // Players of this round are the last one's winners.
         players = makePairs(winners);
         winners = [];
 
@@ -53,11 +53,9 @@ function renderWinnerBracket(teams, results) {
             }));
 
             if (scores[0] > scores[1]) {
-                // Première équipe gagne. L'autre passe en LB.
                 winners.push(opponents[0]);
                 roundLosers.push(opponents[1]);
             } else if (scores[1] > scores[0]) {
-                // Deuxième équipe gagne. L'autre passe en LB.
                 winners.push(opponents[1]);
                 roundLosers.push(opponents[0]);
             } else {
@@ -86,14 +84,14 @@ function renderLoserBracket(fromWB, results, minorOrdering) {
         const round = results[roundId];
 
         if (roundId === 0) {
-            // Le premier tour LB fait s'affronter tous les perdants du premier tour WB.
+            // In the first LB round are the losers from the first WB round.
             players = makePairs(ordering[minorOrdering[0]](fromWB[0]));
         } else if (roundId % 2 === 1) {
-            // Chaque tour LB mineur fait s'affronter les gagnant du tour LB majeur précédent contre les perdants du tour WB correspondant.
+            // Each minor LB round matches the winners of the previous major LB round against the losers of the corresponding WB round. 
             const roundWB = Math.ceil(roundId / 2);
             players = makePairs(ordering[minorOrdering[roundWB]](fromWB[roundWB]), winners);
         } else {
-            // Chaque tour LB majeur fait s'affronter les gagnants du tour précédent.
+            // Each major LB round matches the winners of the previous round.
             players = makePairs(winners);
         }
 
@@ -111,10 +109,8 @@ function renderLoserBracket(fromWB, results, minorOrdering) {
             }));
 
             if (scores[0] > scores[1]) {
-                // Première équipe gagne.
                 winners.push(opponents[0]);
             } else if (scores[1] > scores[0]) {
-                // Deuxième équipe gagne.
                 winners.push(opponents[1]);
             } else {
                 throw Error(`${opponents[matchId][0]} et ${opponents[matchId][1]} sont à égalité !`);
@@ -135,7 +131,7 @@ function renderGrandFinal(winnerWB, winnerLB, scores) {
         connectNext: false,
     });
 
-    const roundDOM = $('<div class="round">').append($('<h2>').text("Grande Finale"));
+    const roundDOM = $('<div class="round">').append($('<h2>').text("Grand Final"));
     roundDOM.append(match);
 
     $('.winner.bracket').append(roundDOM);
