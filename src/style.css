@@ -1,0 +1,169 @@
+section {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    width: max-content;
+    margin: 0 auto;
+}
+
+h1 {
+    font-size: 26px;
+    margin-bottom: 40px;
+}
+
+.bracket {
+    flex: 1;
+    display: flex;
+}
+
+.bracket:not(:last-of-type) {
+    margin-bottom: 50px;
+}
+
+.round {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    margin-right: 50px;
+    width: 200px;
+}
+
+h2 {
+    text-align: center;
+    background: #ECEFF1;
+    font-size: 16px;
+    padding: 10px;
+}
+
+.match {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    margin: 10px 0;
+    position: relative;
+}
+
+.match.connect-next::after {
+    position: absolute;
+    right: -25px;
+    content: '';
+    display: block;
+    width: 25px;
+    height: 50%;
+    border-right: 2px solid #9e9e9e;
+}
+
+.match.connect-next:nth-of-type(odd)::after {
+    top: 50%;
+    border-top: 2px solid #9e9e9e;
+}
+
+.match.connect-next:nth-of-type(even)::after {
+    top: 0;
+    border-bottom: 2px solid #9e9e9e;
+}
+
+.winner.bracket .round:nth-last-of-type(2) .match.connect-next::after {
+    border-right: none;
+    width: 50px;
+    right: -50px;
+}
+
+.loser.bracket .round:nth-of-type(odd) .match.connect-next::after {
+    border-right: none;
+    width: 50px;
+    right: -50px;
+}
+
+.teams {
+    width: 100%;
+    position: relative;
+}
+
+.teams.connect-previous::before {
+    position: absolute;
+    left: -27px;
+    content: '';
+    display: block;
+    width: 27px;
+    height: 50%;
+    top: 0;
+    border-left: 2px solid #9e9e9e;
+    border-bottom: 2px solid #9e9e9e;
+}
+
+.teams.connect-previous::after {
+    position: absolute;
+    left: -27px;
+    content: '';
+    display: block;
+    width: 27px;
+    height: 50%;
+    top: 50%;
+    transform: translateY(-2px);
+    border-left: 2px solid #9e9e9e;
+    border-top: 2px solid #9e9e9e;
+}
+
+.winner.bracket .round:last-of-type .teams.connect-previous::before {
+    content: unset;
+}
+
+.winner.bracket .round:last-of-type .teams.connect-previous::after {
+    border-top: none;
+    height: 30%;
+    top: 55%;
+}
+
+.loser.bracket .round:nth-of-type(even) .teams.connect-previous::before {
+    border-bottom: none;
+    height: 30%;
+    top: 20%;
+}
+
+.loser.bracket .round:nth-of-type(even) .teams.connect-previous::after {
+    content: unset;
+}
+
+.team {
+    display: flex;
+    justify-content: space-between;
+    padding: 3px 12px;
+}
+
+.team:nth-of-type(1) {
+    border: 1px solid #d9d9d9;
+    border-bottom: none;
+    border-top-left-radius: 0.3rem 0.3rem;
+    border-top-right-radius: 0.3rem 0.3rem;
+}
+
+.team:nth-of-type(2) {
+    border: 1px solid #d9d9d9;
+    border-top: none;
+    border-bottom-left-radius: 0.3rem 0.3rem;
+    border-bottom-right-radius: 0.3rem 0.3rem;
+}
+
+.team.hover {
+    background: #ECEFF1;
+}
+
+.name {
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: fade(10px);
+}
+
+.name.win {
+    font-weight: bold;
+}
+
+.score {
+    margin-left: 20px;
+    color: #e61a1a
+}
+
+.score.win {
+    color: #50b649;
+}
