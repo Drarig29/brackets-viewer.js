@@ -10,6 +10,12 @@ $loss-color: #e61a1a;
 $match-borders: 1px solid #d9d9d9;
 $match-borders-radius: 0.3rem;
 
+*,
+::after,
+::before {
+    box-sizing: border-box;
+}
+
 section {
     display: flex;
     flex-direction: column;
