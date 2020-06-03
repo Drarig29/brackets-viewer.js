@@ -1,14 +1,6 @@
-type TournamentType = "pools" | "single_elimination" | "double_elimination";
-type OrderingType = "natural" | "reverse" | "half_shift" | "reverse_half_shift" | "pair_flip";
+import { TournamentType, OrderingType, Teams, TournamentResults } from "brackets-model/dist/types";
 
-type Teams = string[];
-
-type MatchScores = [number, number];
-type RoundScores = MatchScores[];
-type BracketScores = RoundScores[];
-type TournamentResults = BracketScores[];
-
-interface TournamentData {
+export interface TournamentData {
     name: string,
     type: TournamentType,
     minorOrdering: OrderingType[],
@@ -16,7 +8,7 @@ interface TournamentData {
     results: TournamentResults,
 }
 
-interface Connection {
+export interface Connection {
     connectPrevious: boolean,
     connectNext: boolean,
 }

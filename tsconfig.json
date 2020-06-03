@@ -4,11 +4,12 @@
         "module": "CommonJS",
         "moduleResolution": "node",
         "strict": true,
+        "types": [
+            "brackets-model",
+            "jquery"
+        ],
         "esModuleInterop": true,
         "allowSyntheticDefaultImports": true,
         "noImplicitAny": true
-    },
-    "include": [
-        "src/**/*.ts"
-    ]
+    }
 }
