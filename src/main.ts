@@ -1,17 +1,18 @@
 import './style.scss';
 
 const teamRefsDOM: { [key: string]: HTMLElement[] } = {};
-const root = $('.tournament');
 
 (window as any).bracketsViewer = {
     render: (data: TournamentData) => {
+        const root = $('.tournament');
+
         if (root.length === 0) {
             throw Error('Root not found. You must have a root element with class ".tournament"')
         }
 
         switch (data.type) {
             case 'double_elimination':
-                renderDoubleElimination(data);
+                renderDoubleElimination(root, data);
                 break;
             default:
                 throw Error(`Unknown bracket type: ${data.type}`);
@@ -19,20 +20,20 @@ const root = $('.tournament');
     }
 }
 
-function renderDoubleElimination(data: TournamentData) {
+function renderDoubleElimination(root: JQuery, data: TournamentData) {
     checkSizes(data);
     data.teams.map(team => teamRefsDOM[team] = []);
 
     root.append($('<h1>').text(data.name));
-    const { losersWB, winnerWB } = renderWinnerBracket(data.teams, data.results[0]);
-    const winnerLB = renderLoserBracket(losersWB, data.results[1], data.minorOrdering || defaultMinorOrdering[data.teams.length]);
+    const { losersWB, winnerWB } = renderWinnerBracket(root, data.teams, data.results[0]);
+    const winnerLB = renderLoserBracket(root, losersWB, data.results[1], data.minorOrdering || defaultMinorOrdering[data.teams.length]);
     renderGrandFinal(winnerWB, winnerLB, data.results[2][0][0]);
 }
 
 /**
  * Renders the winner bracket (WB) and returns all the losers and the final winner.
  */
-function renderWinnerBracket(teams: Teams, results: BracketScores) {
+function renderWinnerBracket(root: JQuery, teams: Teams, results: BracketScores) {
     const winnerBracket = $('<div class="winner bracket">');
     const losers: Teams[] = [];
 
@@ -82,7 +83,7 @@ function renderWinnerBracket(teams: Teams, results: BracketScores) {
     };
 }
 
-function renderLoserBracket(fromWB: Teams[], results: BracketScores, minorOrdering: OrderingType[]) {
+function renderLoserBracket(root: JQuery, fromWB: Teams[], results: BracketScores, minorOrdering: OrderingType[]) {
     const loserBracket = $('<div class="loser bracket">');
 
     let winners: Teams = [];
