@@ -12,6 +12,8 @@ Import the library using [jsDelivr](https://www.jsdelivr.com/):
 
 It'll also be available on npm later.
 
+The render will happen in any DOM element with class `.tournament`. Therefore, **it must exist**.
+
 Now, you can use it like this:
 
 ```js
