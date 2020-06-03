@@ -1,8 +1,12 @@
 import './style.scss';
 
 import { defaultMinorOrdering, makePairs, ensureNotTied, ordering, ensurePowerOfTwoSized } from 'brackets-model';
-import { OrderingType, Teams, BracketScores } from "brackets-model/dist/types";
-import { TournamentData, Connection } from './types';
+import { OrderingType, Teams, BracketScores, TournamentData } from "brackets-model/dist/types";
+
+interface Connection {
+    connectPrevious: boolean,
+    connectNext: boolean,
+}
 
 const teamRefsDOM: { [key: string]: HTMLElement[] } = {};
 
