@@ -1,9 +1,14 @@
 import './style.scss';
 
 const teamRefsDOM: { [key: string]: HTMLElement[] } = {};
+const root = $('.tournament');
 
 (window as any).bracketsViewer = {
     render: (data: TournamentData) => {
+        if (root.length === 0) {
+            throw Error('Root not found. You must have a root element with class ".tournament"')
+        }
+
         switch (data.type) {
             case 'double_elimination':
                 renderDoubleElimination(data);
@@ -18,7 +23,7 @@ function renderDoubleElimination(data: TournamentData) {
     checkSizes(data);
     data.teams.map(team => teamRefsDOM[team] = []);
 
-    $('section').append($('<h1>').text(data.name));
+    root.append($('<h1>').text(data.name));
     const { losersWB, winnerWB } = renderWinnerBracket(data.teams, data.results[0]);
     const winnerLB = renderLoserBracket(losersWB, data.results[1], data.minorOrdering || defaultMinorOrdering[data.teams.length]);
     renderGrandFinal(winnerWB, winnerLB, data.results[2][0][0]);
@@ -54,14 +59,14 @@ function renderWinnerBracket(teams: Teams, results: BracketScores) {
                 connectNext: true,
             }));
 
+            ensureNotTied(matchScores);
+
             if (matchScores[0] > matchScores[1]) {
                 winners.push(opponents[0]);
                 roundLosers.push(opponents[1]);
             } else if (matchScores[1] > matchScores[0]) {
                 winners.push(opponents[1]);
                 roundLosers.push(opponents[0]);
-            } else {
-                throw Error(`${opponents[matchId][0]} et ${opponents[matchId][1]} sont à égalité !`);
             }
         }
 
@@ -69,7 +74,7 @@ function renderWinnerBracket(teams: Teams, results: BracketScores) {
         losers.push(roundLosers);
     }
 
-    $('section').append(winnerBracket);
+    root.append(winnerBracket);
 
     return {
         losersWB: losers,
@@ -84,7 +89,7 @@ function renderLoserBracket(fromWB: Teams[], results: BracketScores, minorOrderi
     let players: Teams[];
 
     for (let roundId = 0; roundId < results.length; roundId++) {
-        const round = results[roundId];
+        const roundScores = results[roundId];
 
         if (roundId === 0) {
             // In the first LB round are the losers from the first WB round.
@@ -102,28 +107,28 @@ function renderLoserBracket(fromWB: Teams[], results: BracketScores, minorOrderi
 
         const roundDOM = $('<div class="round">').append($('<h2>').text(`LB Round ${roundId + 1}`));
 
-        for (let matchId = 0; matchId < round.length; matchId++) {
+        for (let matchId = 0; matchId < roundScores.length; matchId++) {
             const opponents = players[matchId];
-            const scores = round[matchId];
+            const matchScores = roundScores[matchId];
 
-            roundDOM.append(renderMatch(opponents, scores, {
+            roundDOM.append(renderMatch(opponents, matchScores, {
                 connectPrevious: roundId > 0,
                 connectNext: roundId < results.length - 1,
             }));
 
-            if (scores[0] > scores[1]) {
+            ensureNotTied(matchScores);
+
+            if (matchScores[0] > matchScores[1]) {
                 winners.push(opponents[0]);
-            } else if (scores[1] > scores[0]) {
+            } else if (matchScores[1] > matchScores[0]) {
                 winners.push(opponents[1]);
-            } else {
-                throw Error(`${opponents[matchId][0]} et ${opponents[matchId][1]} sont à égalité !`);
             }
         }
 
         loserBracket.append(roundDOM);
     }
 
-    $('section').append(loserBracket);
+    root.append(loserBracket);
 
     return winners[0];
 }
@@ -201,23 +206,29 @@ function makePairs(left: any[], right?: any[]): any[][] {
 
 function ensureEvenSized(array: any[]) {
     if (array.length % 2 === 1) {
-        throw Error('La taille du tableau doit être paire.');
+        throw Error('Array size must be even.');
     }
 }
 
 function ensureEquallySized(left: any[], right: any[]) {
     if (left.length !== right.length) {
-        throw Error('La taille des tableaux doit être égale.');
+        throw Error('Arrays size must be equal.');
     }
 }
 
 function checkSizes(data: TournamentData) {
     if (!Number.isInteger(Math.log2(data.teams.length))) {
-        throw Error('Le nombre d\'équipes doit être une puissance de deux.');
+        throw Error('Teams count must be a power of 2.');
     }
 
     if (data.minorOrdering && data.minorOrdering.length !== Math.log2(data.teams.length)) {
-        throw Error('Le nombre d\'éléments dans minorOrdering doit correspondre au nombre de tours mineurs dans le loser bracket.');
+        throw Error('Elements count in `minorOrdering` must be the same as the number of looser bracket\'s minor rounds.');
+    }
+}
+
+function ensureNotTied(scores: MatchScores) {
+    if (scores[0] === scores[1]) {
+        throw Error(`${scores[0]} and ${scores[1]} are tied. It cannot be.`);
     }
 }
 
