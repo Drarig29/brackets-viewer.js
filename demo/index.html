@@ -3,24 +3,24 @@
 <link rel="stylesheet" href="../dist/brackets-viewer.min.css" />
 <script type="text/javascript" src="../dist/brackets-viewer.min.js"></script>
 
-<section>
+<section class="tournament">
     <noscript>Oops! Something went wrong.</noscript>
 </section>
 
 <script>
     bracketsViewer.render({
-        name: "Example",
-        type: "double_elimination",
+        name: 'Example',
+        type: 'double_elimination',
         minorOrdering: ['reverse', 'pair_flip', 'reverse', 'natural'],
         teams: [
-            "Team 1", "Team 2",
-            "Team 3", "Team 4",
-            "Team 5", "Team 6",
-            "Team 7", "Team 8",
-            "Team 9", "Team 10",
-            "Team 11", "Team 12",
-            "Team 13", "Team 14",
-            "Team 15", "Team 16",
+            'Team 1', 'Team 2',
+            'Team 3', 'Team 4',
+            'Team 5', 'Team 6',
+            'Team 7', 'Team 8',
+            'Team 9', 'Team 10',
+            'Team 11', 'Team 12',
+            'Team 13', 'Team 14',
+            'Team 15', 'Team 16',
         ],
         results: [[ /* Winner Bracket */
             [[1, 5], [2, 4], [6, 3], [2, 3], [1, 5], [5, 3], [7, 2], [1, 2]],
