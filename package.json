@@ -6,6 +6,8 @@
         "dist/"
     ],
     "scripts": {
+        "db-simple": "json-server --watch demo/simple.json",
+        "db-double": "json-server --watch demo/double.json",
         "build": "npx webpack --mode production",
         "start": "npx webpack --watch --mode development",
         "test": "echo \"Error: no test specified\" && exit 1"
@@ -33,6 +35,7 @@
         "@types/jquery": "^3.3.38",
         "babel-loader": "^8.1.0",
         "css-loader": "^3.5.3",
+        "json-server": "^0.16.1",
         "mini-css-extract-plugin": "^0.9.0",
         "node-sass": "^4.14.1",
         "sass-loader": "^8.0.2",
@@ -42,6 +45,6 @@
         "webpack-cli": "^3.3.11"
     },
     "dependencies": {
-        "brackets-model": "^0.1.8"
+        "brackets-model": "^0.2.9"
     }
 }

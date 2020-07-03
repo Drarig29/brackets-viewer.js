@@ -1,162 +1,119 @@
 import './style.scss';
-
-import { defaultMinorOrdering, makePairs, ensureNotTied, ordering, ensurePowerOfTwoSized } from 'brackets-model';
-import { OrderingType, Teams, BracketScores, TournamentData } from "brackets-model/dist/types";
+import { Participant, Stage, Group, Round, Match, MatchGame, MatchResults, ParticipantResult } from "brackets-model";
 
 interface Connection {
     connectPrevious: boolean,
     connectNext: boolean,
 }
 
-const teamRefsDOM: { [key: string]: HTMLElement[] } = {};
+interface TournamentData {
+    group: Group[],
+    round: Round[],
+    match: Match[],
+    match_game: MatchGame[],
+    participant: Participant[],
+}
+
+const teamRefsDOM: { [key: number]: HTMLElement[] } = {};
+let participants: Participant[];
+
+// TODO: make a Viewer class
 
 (window as any).bracketsViewer = {
-    render: (data: TournamentData) => {
+    render: (stage: Stage, data: TournamentData) => {
         const root = $('.tournament');
 
         if (root.length === 0) {
             throw Error('Root not found. You must have a root element with class ".tournament"')
         }
 
-        switch (data.type) {
+        switch (stage.type) {
             case 'double_elimination':
-                renderDoubleElimination(root, data);
+                renderDoubleElimination(root, stage, data);
                 break;
             default:
-                throw Error(`Unknown bracket type: ${data.type}`);
+                throw Error(`Unknown bracket type: ${stage.type}`);
         }
     }
 }
 
-function renderDoubleElimination(root: JQuery, data: TournamentData) {
-    checkSizes(data);
-    data.teams.map(team => teamRefsDOM[team] = []);
+function renderDoubleElimination(root: JQuery, stage: Stage, data: TournamentData) {
+    data.participant.map(participant => teamRefsDOM[participant.id] = []);
 
-    root.append($('<h1>').text(data.name));
-    const { losersWB, winnerWB } = renderWinnerBracket(root, data.teams, data.results[0]);
-    const winnerLB = renderLoserBracket(root, losersWB, data.results[1], data.minorOrdering || defaultMinorOrdering[data.teams.length]);
-    renderGrandFinal(winnerWB, winnerLB, data.results[2][0][0]);
+    const matches = splitBy(data.match, 'group_id');
+    participants = data.participant;
+
+    root.append($('<h1>').text(stage.name));
+    renderWinnerBracket(root, data.round, matches[0]);
+    renderLoserBracket(root, data.round, matches[1]);
+
+    renderGrandFinal(matches[2][0]);
 }
 
 /**
  * Renders the winner bracket (WB) and returns all the losers and the final winner.
  */
-function renderWinnerBracket(root: JQuery, teams: Teams, results: BracketScores) {
+function renderWinnerBracket(root: JQuery, rounds: Round[], matches: Match[]) {
     const winnerBracket = $('<div class="winner bracket">');
-    const losers: Teams[] = [];
+    const splitted = splitBy(matches, "round_id");
 
-    // At first, all players play in WB.
-    let winners = teams;
-    let players: Teams[];
+    for (const roundMatches of splitted) {
+        const round = rounds.find(round => round.id === roundMatches[0].round_id);
+        if (!round) throw Error('Round not found.');
 
-    for (let roundId = 0; roundId < results.length; roundId++) {
-        const roundScores = results[roundId];
+        const roundDOM = $('<div class="round">').append($('<h2>').text(`WB Round ${round.number}`));
 
-        // Players of this round are the last one's winners.
-        players = makePairs(winners);
-        winners = [];
-
-        const roundDOM = $('<div class="round">').append($('<h2>').text(`WB Round ${roundId + 1}`));
-        const roundLosers = [];
-
-        for (let matchId = 0; matchId < roundScores.length; matchId++) {
-            const opponents = players[matchId];
-            const matchScores = roundScores[matchId];
-
-            roundDOM.append(renderMatch(opponents, matchScores, {
-                connectPrevious: roundId > 0,
+        for (const match of roundMatches) {
+            roundDOM.append(renderMatch(match, {
+                connectPrevious: round.number > 1,
                 connectNext: true,
             }));
-
-            ensureNotTied(matchScores);
-
-            if (matchScores[0] > matchScores[1]) {
-                winners.push(opponents[0]);
-                roundLosers.push(opponents[1]);
-            } else if (matchScores[1] > matchScores[0]) {
-                winners.push(opponents[1]);
-                roundLosers.push(opponents[0]);
-            }
         }
 
         winnerBracket.append(roundDOM);
-        losers.push(roundLosers);
     }
 
     root.append(winnerBracket);
-
-    return {
-        losersWB: losers,
-        winnerWB: winners[0]
-    };
 }
 
-function renderLoserBracket(root: JQuery, fromWB: Teams[], results: BracketScores, minorOrdering: OrderingType[]) {
+function renderLoserBracket(root: JQuery, rounds: Round[], matches: Match[]) {
     const loserBracket = $('<div class="loser bracket">');
+    const splitted = splitBy(matches, "round_id");
 
-    let winners: Teams = [];
-    let players: Teams[];
+    for (const roundMatches of splitted) {
+        const round = rounds.find(round => round.id === roundMatches[0].round_id);
+        if (!round) throw Error('Round not found.');
 
-    for (let roundId = 0; roundId < results.length; roundId++) {
-        const roundScores = results[roundId];
+        const roundDOM = $('<div class="round">').append($('<h2>').text(`LB Round ${round.number}`));
 
-        if (roundId === 0) {
-            // In the first LB round are the losers from the first WB round.
-            players = makePairs(ordering[minorOrdering[0]](fromWB[0]));
-        } else if (roundId % 2 === 1) {
-            // Each minor LB round matches the winners of the previous major LB round against the losers of the corresponding WB round. 
-            const roundWB = Math.ceil(roundId / 2);
-            players = makePairs(ordering[minorOrdering[roundWB]](fromWB[roundWB]), winners);
-        } else {
-            // Each major LB round matches the winners of the previous round.
-            players = makePairs(winners);
-        }
-
-        winners = [];
-
-        const roundDOM = $('<div class="round">').append($('<h2>').text(`LB Round ${roundId + 1}`));
-
-        for (let matchId = 0; matchId < roundScores.length; matchId++) {
-            const opponents = players[matchId];
-            const matchScores = roundScores[matchId];
-
-            roundDOM.append(renderMatch(opponents, matchScores, {
-                connectPrevious: roundId > 0,
-                connectNext: roundId < results.length - 1,
+        for (const match of roundMatches) {
+            roundDOM.append(renderMatch(match, {
+                connectPrevious: round.number > 1,
+                connectNext: round.number < splitted.length,
             }));
-
-            ensureNotTied(matchScores);
-
-            if (matchScores[0] > matchScores[1]) {
-                winners.push(opponents[0]);
-            } else if (matchScores[1] > matchScores[0]) {
-                winners.push(opponents[1]);
-            }
         }
 
         loserBracket.append(roundDOM);
     }
 
     root.append(loserBracket);
-
-    return winners[0];
 }
 
-function renderGrandFinal(winnerWB: string, winnerLB: string, scores: number[]) {
-    const match = renderMatch([winnerWB, winnerLB], scores, {
+function renderGrandFinal(match: Match) {
+    const matchDOM = renderMatch(match, {
         connectPrevious: true,
         connectNext: false,
     });
 
     const roundDOM = $('<div class="round">').append($('<h2>').text("Grand Final"));
-    roundDOM.append(match);
+    roundDOM.append(matchDOM);
 
     $('.winner.bracket').append(roundDOM);
 }
 
-function renderMatch(opponents: string[], scores: number[], connection: Connection) {
-    const team1 = renderTeam(opponents[0], scores[0], scores[0] > scores[1]);
-    const team2 = renderTeam(opponents[1], scores[1], scores[1] > scores[0]);
+function renderMatch(results: MatchResults, connection: Connection) {
+    const team1 = renderTeam(results.opponent1);
+    const team2 = renderTeam(results.opponent2);
 
     const teams = $('<div class="teams">').append(team1).append(team2);
     const match = $('<div class="match">').append(teams);
@@ -172,28 +129,47 @@ function renderMatch(opponents: string[], scores: number[], connection: Connecti
     return match;
 }
 
-function renderTeam(name: string, score: number, win: boolean) {
-    const nameDOM = $('<div class="name">').text(name);
-    const scoreDOM = $('<div class="score">').text(score);
+function renderTeam(team: ParticipantResult | null) {
+    const teamDOM = $(`<div class="team">`);
+    const nameDOM = $('<div class="name">');
+    const scoreDOM = $('<div class="score">');
 
-    if (win) {
-        nameDOM.addClass('win');
-        scoreDOM.addClass('win');
+    if (team === null) {
+        nameDOM.text('BYE');
+    } else {
+        const participant = participants.find(participant => participant.id === team.id);
+        nameDOM.text(participant === undefined ? 'TBD' : participant.name);
+        scoreDOM.text(team.score || '');
+
+        if (team.result && team.result === 'win') {
+            nameDOM.addClass('win');
+            scoreDOM.addClass('win');
+        }
     }
 
-    const team = $(`<div class="team">`).append(nameDOM).append(scoreDOM);
-    teamRefsDOM[name].push(team.get(0));
+    teamDOM.append(nameDOM).append(scoreDOM);
 
-    return team.hover(
-        () => $(teamRefsDOM[name]).addClass('hover'),
-        () => $(teamRefsDOM[name]).removeClass('hover'),
-    );
+    if (team && team.id !== null) {
+        const id = team.id;
+        teamRefsDOM[id].push(teamDOM.get(0));
+        teamDOM.hover(
+            () => $(teamRefsDOM[id]).addClass('hover'),
+            () => $(teamRefsDOM[id]).removeClass('hover'),
+        );
+    }
+
+    return teamDOM;
 }
 
-function checkSizes(data: TournamentData) {
-    ensurePowerOfTwoSized(data.teams);
+function splitBy<T>(array: T[], key: keyof T): T[][] {
+    const obj = Object();
 
-    if (data.minorOrdering && data.minorOrdering.length !== Math.log2(data.teams.length)) {
-        throw Error('Elements count in `minorOrdering` must be the same as the number of looser bracket\'s minor rounds.');
+    for (const value of array) {
+        if (!obj[value[key]])
+            obj[value[key]] = [];
+
+        obj[value[key]].push(value);
     }
+
+    return Object.values(obj);
 }
