@@ -13,187 +13,192 @@ $match-borders-radius: 0.3rem;
 *,
 ::after,
 ::before {
-    box-sizing: border-box;
+  box-sizing: border-box;
 }
 
 .tournament {
-    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, "Noto Sans", sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";
-    color: #212529;
-    text-align: left;
-    background-color: #fff;
-    display: flex;
-    flex-direction: column;
-    align-items: flex-start;
-    width: max-content;
-    margin: 0 auto;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
+    "Helvetica Neue", Arial, "Noto Sans", sans-serif, "Apple Color Emoji",
+    "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";
+  color: #212529;
+  text-align: left;
+  background-color: #fff;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  width: max-content;
+  margin: 0 auto;
 }
 
 h1,
 h2 {
-    margin-bottom: .5rem;
-    font-weight: 500;
-    line-height: 1.2;
+  margin-bottom: 0.5rem;
+  font-weight: 500;
+  line-height: 1.2;
 }
 
 h1 {
-    font-size: 26px;
-    margin-bottom: 40px;
+  font-size: 26px;
+  margin-bottom: 40px;
 }
 
 .bracket {
-    flex: 1;
-    display: flex;
-    margin-bottom: 50px;
+  flex: 1;
+  display: flex;
+  margin-bottom: 50px;
 }
 
 .round {
-    flex: 1;
-    display: flex;
-    flex-direction: column;
-    margin-right: $round-margin;
-    width: $round-width;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  margin-right: $round-margin;
+  width: $round-width;
 }
 
 h2 {
-    text-align: center;
-    background: #ECEFF1;
-    font-size: 16px;
-    padding: 10px;
+  text-align: center;
+  background: #eceff1;
+  font-size: 16px;
+  padding: 10px;
 }
 
 .match {
-    flex: 1;
-    display: flex;
-    align-items: center;
-    margin: 10px 0;
-    position: relative;
+  flex: 1;
+  display: flex;
+  align-items: center;
+  margin: 10px 0;
+  position: relative;
 
-    &.connect-next {
-        &::after {
-            content: '';
-            display: block;
-            position: absolute;
-            right: -$connector-left-width;
-            width: $connector-left-width;
-            height: 50%;
-            border-right: $connector-borders;
-        }
-
-        &:nth-of-type(odd)::after {
-            top: 50%;
-            border-top: $connector-borders;
-        }
-
-        &:nth-of-type(even)::after {
-            top: 0;
-            border-bottom: $connector-borders;
-        }
-
-        .winner.bracket .round:nth-last-of-type(2) &::after {
-            border-right: none;
-            width: $round-margin;
-            right: -$round-margin;
-        }
-
-        .loser.bracket .round:nth-of-type(odd) &::after {
-            border-right: none;
-            width: $round-margin;
-            right: -$round-margin;
-        }
+  &.connect-next {
+    &::after {
+      content: "";
+      display: block;
+      position: absolute;
+      right: -$connector-left-width;
+      width: $connector-left-width;
+      height: 50%;
+      border-right: $connector-borders;
     }
+
+    &:nth-of-type(odd)::after {
+      top: 50%;
+      border-top: $connector-borders;
+    }
+
+    &:nth-of-type(even)::after {
+      top: 0;
+      border-bottom: $connector-borders;
+    }
+
+    .winner.bracket .round:nth-last-of-type(2) &::after {
+      border-right: none;
+      width: $round-margin;
+      right: -$round-margin;
+    }
+
+    .loser.bracket .round:nth-of-type(odd) &::after {
+      border-right: none;
+      width: $round-margin;
+      right: -$round-margin;
+    }
+  }
 }
 
 .teams {
-    width: 100%;
-    position: relative;
+  width: 100%;
+  position: relative;
 
-    &.connect-previous {
-        &::before {
-            content: '';
-            display: block;
-            position: absolute;
-            left: -$connector-right-width;
-            width: $connector-right-width;
-            top: 0;
-            height: 50%;
-            border-left: $connector-borders;
-            border-bottom: $connector-borders;
-        }
-
-        &::after {
-            content: '';
-            display: block;
-            position: absolute;
-            left: -$connector-right-width;
-            width: $connector-right-width;
-            top: 50%;
-            height: 50%;
-            transform: translateY(-2px);
-            border-left: $connector-borders;
-            border-top: $connector-borders;
-        }
-
-        .winner.bracket .round:last-of-type &::before {
-            content: unset;
-        }
-
-        .winner.bracket .round:last-of-type &::after {
-            border-top: none;
-            height: 30%;
-            top: 55%;
-        }
-
-        .loser.bracket .round:nth-of-type(even) &::before {
-            border-bottom: none;
-            height: 30%;
-            top: 20%;
-        }
-
-        .loser.bracket .round:nth-of-type(even) &::after {
-            content: unset;
-        }
+  &.connect-previous {
+    &::before {
+      content: "";
+      display: block;
+      position: absolute;
+      left: -$connector-right-width;
+      width: $connector-right-width;
+      top: 0;
+      height: 50%;
+      border-left: $connector-borders;
+      border-bottom: $connector-borders;
     }
+
+    &::after {
+      content: "";
+      display: block;
+      position: absolute;
+      left: -$connector-right-width;
+      width: $connector-right-width;
+      top: 50%;
+      height: 50%;
+      transform: translateY(-2px);
+      border-left: $connector-borders;
+      border-top: $connector-borders;
+    }
+
+    .winner.bracket .round:last-of-type &::before {
+      content: unset;
+    }
+
+    .winner.bracket .round:last-of-type &::after {
+      border-top: none;
+      height: 30%;
+      top: 55%;
+    }
+
+    .loser.bracket .round:nth-of-type(even) &::before {
+      border-bottom: none;
+      height: 30%;
+      top: 20%;
+    }
+
+    .loser.bracket .round:nth-of-type(even) &::after {
+      content: unset;
+    }
+  }
 }
 
 .team {
-    display: flex;
-    justify-content: space-between;
-    padding: 3px 12px;
+  display: flex;
+  justify-content: space-between;
+  padding: 3px 12px;
 
-    &:nth-of-type(1) {
-        border: $match-borders;
-        border-bottom: none;
-        border-top-left-radius: $match-borders-radius;
-        border-top-right-radius: $match-borders-radius;
-    }
+  &:nth-of-type(1) {
+    border: $match-borders;
+    border-bottom: none;
+    border-top-left-radius: $match-borders-radius;
+    border-top-right-radius: $match-borders-radius;
+  }
 
-    &:nth-of-type(2) {
-        border: $match-borders;
-        border-top: none;
-        border-bottom-left-radius: $match-borders-radius;
-        border-bottom-right-radius: $match-borders-radius;
-    }
+  &:nth-of-type(2) {
+    border: $match-borders;
+    border-top: none;
+    border-bottom-left-radius: $match-borders-radius;
+    border-bottom-right-radius: $match-borders-radius;
+  }
 
-    &.hover {
-        background: #ECEFF1;
-    }
+  &.hover {
+    background: #eceff1;
+  }
 }
 
 .name {
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: fade(10px);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: fade(10px);
 
-    &.win {
-        font-weight: bold;
-    }
+  &.win {
+    font-weight: bold;
+  }
 }
 
 .score {
-    margin-left: 20px;
-    color: $loss-color;
+  margin-left: 20px;
 
-    &.win {
-        color: $win-color;
-    }
+  &.win {
+    color: $win-color;
+  }
+
+  &.loss {
+    color: $loss-color;
+  }
 }

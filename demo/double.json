@@ -193,11 +193,13 @@
             "end_datetime": null,
             "opponent1": {
                 "id": 0,
-                "position": 1
+                "position": 1,
+                "score": 8
             },
             "opponent2": {
                 "id": 1,
-                "position": 2
+                "position": 2,
+                "score": 6
             }
         },
         {
