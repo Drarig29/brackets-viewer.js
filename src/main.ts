@@ -1,37 +1,41 @@
 import './style.scss';
-import { Participant, Stage, Round, Match, MatchResults, ParticipantResult } from "brackets-model";
-import { TournamentData, Connection } from './types';
+import { Participant, Stage, Round, Match, MatchResults, ParticipantResult, ViewerData } from "brackets-model";
+
+interface Connection {
+    connectPrevious: boolean,
+    connectNext: boolean,
+}
 
 class BracketsViewer {
-    
+
     readonly teamRefsDOM: { [key: number]: HTMLElement[] } = {};
     private participants!: Participant[];
 
-    public render(stage: Stage, data: TournamentData) {
+    public render(data: ViewerData) {
         const root = $('.tournament');
 
         if (root.length === 0) {
             throw Error('Root not found. You must have a root element with class ".tournament"')
         }
 
-        switch (stage.type) {
+        switch (data.stage.type) {
             case 'double_elimination':
-                this.renderDoubleElimination(root, stage, data);
+                this.renderDoubleElimination(root, data);
                 break;
             default:
-                throw Error(`Unknown bracket type: ${stage.type}`);
+                throw Error(`Unknown bracket type: ${data.stage.type}`);
         }
     }
 
-    private renderDoubleElimination(root: JQuery, stage: Stage, data: TournamentData) {
-        data.participant.map(participant => this.teamRefsDOM[participant.id] = []);
+    private renderDoubleElimination(root: JQuery, data: ViewerData) {
+        data.participants.map(participant => this.teamRefsDOM[participant.id] = []);
 
-        const matches = splitBy(data.match, 'group_id');
-        this.participants = data.participant;
+        const matches = splitBy(data.matches, 'group_id');
+        this.participants = data.participants;
 
-        root.append($('<h1>').text(stage.name));
-        this.renderWinnerBracket(root, data.round, matches[0]);
-        this.renderLoserBracket(root, data.round, matches[1]);
+        root.append($('<h1>').text(data.stage.name));
+        this.renderWinnerBracket(root, data.rounds, matches[0]);
+        this.renderLoserBracket(root, data.rounds, matches[1]);
 
         this.renderGrandFinal(matches[2][0]);
     }
@@ -130,6 +134,11 @@ class BracketsViewer {
             if (team.result && team.result === 'win') {
                 nameDOM.addClass('win');
                 scoreDOM.addClass('win');
+            }
+
+            if (team.result && team.result === 'loss') {
+                nameDOM.addClass('loss');
+                scoreDOM.addClass('loss');
             }
         }
 
