@@ -6,8 +6,7 @@
         "dist/"
     ],
     "scripts": {
-        "db-simple": "json-server --watch demo/simple.json",
-        "db-double": "json-server --watch demo/double.json",
+        "db": "json-server --watch demo/db.json",
         "build": "npx webpack --mode production",
         "start": "npx webpack --watch --mode development",
         "test": "echo \"Error: no test specified\" && exit 1"
@@ -45,6 +44,6 @@
         "webpack-cli": "^3.3.11"
     },
     "dependencies": {
-        "brackets-model": "^0.2.9"
+        "brackets-model": "^0.2.10"
     }
 }
