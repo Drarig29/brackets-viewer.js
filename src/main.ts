@@ -1,9 +1,11 @@
 import './style.scss';
-import { Participant, Stage, Round, Match, MatchResults, ParticipantResult, ViewerData } from "brackets-model";
+import { Participant, Stage, Round, Match, MatchResults, ParticipantResult, ViewerData, GrandFinalType } from "brackets-model";
+
+type ConnectionType = 'square' | 'straight' | false;
 
 interface Connection {
-    connectPrevious: boolean,
-    connectNext: boolean,
+    connectPrevious?: ConnectionType,
+    connectNext?: ConnectionType,
 }
 
 class BracketsViewer {
@@ -19,86 +21,92 @@ class BracketsViewer {
         }
 
         switch (data.stage.type) {
+            case 'single_elimination':
             case 'double_elimination':
-                this.renderDoubleElimination(root, data);
+                this.renderElimination(root, data);
                 break;
             default:
                 throw Error(`Unknown bracket type: ${data.stage.type}`);
         }
     }
 
-    private renderDoubleElimination(root: JQuery, data: ViewerData) {
+    private renderElimination(root: JQuery, data: ViewerData) {
         data.participants.map(participant => this.teamRefsDOM[participant.id] = []);
 
-        const matches = splitBy(data.matches, 'group_id');
+        const matchesByGroup = splitBy(data.matches, 'group_id');
         this.participants = data.participants;
 
         root.append($('<h1>').text(data.stage.name));
-        this.renderWinnerBracket(root, data.rounds, matches[0]);
-        this.renderLoserBracket(root, data.rounds, matches[1]);
 
-        this.renderGrandFinal(matches[2][0]);
+        if (data.stage.type === 'single_elimination') {
+            const hasFinal = !!matchesByGroup[1];
+            this.renderGroup(root, data.rounds, splitBy(matchesByGroup[0], "round_id"), round => `Round ${round.number}`);
+
+            if (hasFinal) {
+                this.renderFinal('consolation_final', matchesByGroup[1]);
+            }
+        } else if (data.stage.type === 'double_elimination') {
+            const hasFinal = !!matchesByGroup[2];
+            this.renderGroup(root, data.rounds, splitBy(matchesByGroup[0], "round_id"), round => `WB Round ${round.number}`, false, hasFinal);
+            this.renderGroup(root, data.rounds, splitBy(matchesByGroup[1], "round_id"), round => `LB Round ${round.number}`, true);
+
+            if (hasFinal) {
+                this.renderFinal('grand_final', matchesByGroup[2]);
+            }
+        }
     }
 
     /**
-     * Renders the winner bracket (WB) and returns all the losers and the final winner.
+     * Renders a bracket.
      */
-    private renderWinnerBracket(root: JQuery, rounds: Round[], matches: Match[]) {
-        const winnerBracket = $('<div class="winner bracket">');
-        const splitted = splitBy(matches, "round_id");
+    private renderGroup(root: JQuery, rounds: Round[], matchesByRound: Match[][], roundName: (round: Round) => string, lowerBracket?: boolean, connectFinal?: boolean) {
+        const bracket = $('<div class="bracket">');
 
-        for (const roundMatches of splitted) {
-            const round = rounds.find(round => round.id === roundMatches[0].round_id);
+        for (const matches of matchesByRound) {
+            const round = rounds.find(round => round.id === matches[0].round_id);
             if (!round) throw Error('Round not found.');
 
-            const roundDOM = $('<div class="round">').append($('<h2>').text(`WB Round ${round.number}`));
+            const roundDOM = $('<div class="round">').append($('<h2>').text(roundName(round)));
 
-            for (const match of roundMatches) {
-                roundDOM.append(this.renderMatch(match, {
-                    connectPrevious: round.number > 1,
-                    connectNext: true,
-                }));
+            for (const match of matches) {
+                let connection: Connection;
+
+                if (lowerBracket) {
+                    connection = {
+                        connectPrevious: round.number > 1 && (round.number % 2 === 1 ? 'square' : 'straight'),
+                        connectNext: round.number < matchesByRound.length && (round.number % 2 === 0 ? 'square' : 'straight'),
+                    };
+                } else {
+                    connection = {
+                        connectPrevious: round.number > 1 && 'square',
+                        connectNext: round.number < matchesByRound.length ? 'square' : (connectFinal ? 'straight' : false),
+                    };
+                }
+
+                roundDOM.append(this.renderMatch(match, connection));
             }
 
-            winnerBracket.append(roundDOM);
+            bracket.append(roundDOM);
         }
 
-        root.append(winnerBracket);
+        root.append(bracket);
     }
 
-    private renderLoserBracket(root: JQuery, rounds: Round[], matches: Match[]) {
-        const loserBracket = $('<div class="loser bracket">');
-        const splitted = splitBy(matches, "round_id");
+    private renderFinal(type: 'consolation_final' | 'grand_final', matches: Match[]) {
+        const upperBracket = $('.bracket').eq(0);
+        const grandFinalName = matches.length === 1 ? () => 'Grand Final' : (i: number) => `Grand Final R${i + 1}`;
 
-        for (const roundMatches of splitted) {
-            const round = rounds.find(round => round.id === roundMatches[0].round_id);
-            if (!round) throw Error('Round not found.');
+        for (let i = 0; i < matches.length; i++) {
+            const matchDOM = this.renderMatch(matches[i], {
+                connectPrevious: type === 'grand_final' && (i === 0 && 'straight'),
+                connectNext: matches.length === 2 && i === 0 && 'straight',
+            });
 
-            const roundDOM = $('<div class="round">').append($('<h2>').text(`LB Round ${round.number}`));
+            const roundDOM = $('<div class="round">').append($('<h2>').text(type === 'grand_final' ? grandFinalName(i) : 'Consolation Final'));
+            roundDOM.append(matchDOM);
 
-            for (const match of roundMatches) {
-                roundDOM.append(this.renderMatch(match, {
-                    connectPrevious: round.number > 1,
-                    connectNext: round.number < splitted.length,
-                }));
-            }
-
-            loserBracket.append(roundDOM);
+            upperBracket.append(roundDOM);
         }
-
-        root.append(loserBracket);
-    }
-
-    private renderGrandFinal(match: Match) {
-        const matchDOM = this.renderMatch(match, {
-            connectPrevious: true,
-            connectNext: false,
-        });
-
-        const roundDOM = $('<div class="round">').append($('<h2>').text("Grand Final"));
-        roundDOM.append(matchDOM);
-
-        $('.winner.bracket').append(roundDOM);
     }
 
     private renderMatch(results: MatchResults, connection: Connection) {
@@ -108,13 +116,19 @@ class BracketsViewer {
         const teams = $('<div class="teams">').append(team1).append(team2);
         const match = $('<div class="match">').append(teams);
 
-        if (connection && connection.connectPrevious) {
-            teams.addClass('connect-previous');
-        }
+        if (!connection) return match;
 
-        if (connection && connection.connectNext) {
+        if (connection.connectPrevious)
+            teams.addClass('connect-previous');
+
+        if (connection.connectNext)
             match.addClass('connect-next');
-        }
+
+        if (connection.connectPrevious === 'straight')
+            teams.addClass('straight');
+
+        if (connection.connectNext === 'straight')
+            match.addClass('straight');
 
         return match;
     }
