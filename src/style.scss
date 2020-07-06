@@ -91,16 +91,13 @@ h2 {
       border-bottom: $connector-borders;
     }
 
-    .winner.bracket .round:nth-last-of-type(2) &::after {
-      border-right: none;
+    &.straight::after {
       width: $round-margin;
       right: -$round-margin;
-    }
-
-    .loser.bracket .round:nth-of-type(odd) &::after {
-      border-right: none;
-      width: $round-margin;
-      right: -$round-margin;
+      top: 0;
+      border-bottom: $connector-borders;
+      border-top: unset;
+      border-right: unset;
     }
   }
 }
@@ -135,23 +132,25 @@ h2 {
       border-top: $connector-borders;
     }
 
-    .winner.bracket .round:last-of-type &::before {
+    %straight {
+      border-left: unset;
+      left: -$round-margin;
+      width: $round-margin;
+    }
+
+    .bracket:nth-of-type(1) &.straight::before {
       content: unset;
     }
 
-    .winner.bracket .round:last-of-type &::after {
-      border-top: none;
-      height: 30%;
-      top: 55%;
+    .bracket:nth-of-type(1) &.straight::after {
+      @extend %straight;
     }
 
-    .loser.bracket .round:nth-of-type(even) &::before {
-      border-bottom: none;
-      height: 30%;
-      top: 20%;
+    .bracket:nth-of-type(2) &.straight::before {
+      @extend %straight;
     }
 
-    .loser.bracket .round:nth-of-type(even) &::after {
+    .bracket:nth-of-type(2) &.straight::after {
       content: unset;
     }
   }
