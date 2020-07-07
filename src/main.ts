@@ -15,13 +15,16 @@ class BracketsViewer {
     private participants!: Participant[];
 
     public render(data: ViewerData) {
-        const root = $('.tournament');
+        const root = $('#root');
 
         if (root.length === 0) {
-            throw Error('Root not found. You must have a root element with class ".tournament"')
+            throw Error('Root not found. You must have a root element with id "root"')
         }
 
         switch (data.stage.type) {
+            case 'round_robin':
+                this.renderRoundRobin(root, data);
+                break;
             case 'single_elimination':
             case 'double_elimination':
                 this.renderElimination(root, data);
@@ -29,6 +32,37 @@ class BracketsViewer {
             default:
                 throw Error(`Unknown bracket type: ${data.stage.type}`);
         }
+    }
+
+    private renderRoundRobin(root: JQuery, data: ViewerData) {
+        data.participants.map(participant => this.teamRefsDOM[participant.id] = []);
+
+        this.participants = data.participants;
+
+        const container = $('<div class="round-robin">');
+        let groupNumber = 1;
+
+        for (const group of splitBy(data.matches, 'group_id')) {
+            const groupDOM = $('<div class="group">').append($('<h2>').text(`Group ${groupNumber++}`));;
+
+            let roundNumber = 1;
+
+            for (const round of splitBy(group, 'round_id')) {
+                const roundDOM = $('<div>').append($('<h3>').text(`Round ${roundNumber}`));
+
+                for (const match of round) {
+                    roundDOM.append(this.renderMatch(match));
+                }
+
+                groupDOM.append(roundDOM);
+                roundNumber++;
+            }
+
+            container.append(groupDOM);
+        }
+
+        root.append($('<h1>').text(data.stage.name));
+        root.append(container);
     }
 
     private renderElimination(root: JQuery, data: ViewerData) {
@@ -41,15 +75,15 @@ class BracketsViewer {
 
         if (data.stage.type === 'single_elimination') {
             const hasFinal = !!matchesByGroup[1];
-            this.renderGroup(root, data.rounds, splitBy(matchesByGroup[0], "round_id"), round => `Round ${round.number}`);
+            this.renderGroup(root, splitBy(matchesByGroup[0], "round_id"), number => `Round ${number}`);
 
             if (hasFinal) {
                 this.renderFinal('consolation_final', matchesByGroup[1]);
             }
         } else if (data.stage.type === 'double_elimination') {
             const hasFinal = !!matchesByGroup[2];
-            this.renderGroup(root, data.rounds, splitBy(matchesByGroup[0], "round_id"), round => `WB Round ${round.number}`, false, hasFinal);
-            this.renderGroup(root, data.rounds, splitBy(matchesByGroup[1], "round_id"), round => `LB Round ${round.number}`, true);
+            this.renderGroup(root, splitBy(matchesByGroup[0], "round_id"), number => `WB Round ${number}`, false, hasFinal);
+            this.renderGroup(root, splitBy(matchesByGroup[1], "round_id"), number => `LB Round ${number}`, true);
 
             if (hasFinal) {
                 this.renderFinal('grand_final', matchesByGroup[2]);
@@ -60,27 +94,26 @@ class BracketsViewer {
     /**
      * Renders a bracket.
      */
-    private renderGroup(root: JQuery, rounds: Round[], matchesByRound: Match[][], roundName: (round: Round) => string, lowerBracket?: boolean, connectFinal?: boolean) {
+    private renderGroup(root: JQuery, matchesByRound: Match[][], roundName: (roundNumber: number) => string, lowerBracket?: boolean, connectFinal?: boolean) {
         const bracket = $('<div class="bracket">');
 
-        for (const matches of matchesByRound) {
-            const round = rounds.find(round => round.id === matches[0].round_id);
-            if (!round) throw Error('Round not found.');
+        let roundNumber = 1;
 
-            const roundDOM = $('<div class="round">').append($('<h2>').text(roundName(round)));
+        for (const matches of matchesByRound) {
+            const roundDOM = $('<div class="round">').append($('<h3>').text(roundName(roundNumber)));
 
             for (const match of matches) {
                 let connection: Connection;
 
                 if (lowerBracket) {
                     connection = {
-                        connectPrevious: round.number > 1 && (round.number % 2 === 1 ? 'square' : 'straight'),
-                        connectNext: round.number < matchesByRound.length && (round.number % 2 === 0 ? 'square' : 'straight'),
+                        connectPrevious: roundNumber > 1 && (roundNumber % 2 === 1 ? 'square' : 'straight'),
+                        connectNext: roundNumber < matchesByRound.length && (roundNumber % 2 === 0 ? 'square' : 'straight'),
                     };
                 } else {
                     connection = {
-                        connectPrevious: round.number > 1 && 'square',
-                        connectNext: round.number < matchesByRound.length ? 'square' : (connectFinal ? 'straight' : false),
+                        connectPrevious: roundNumber > 1 && 'square',
+                        connectNext: roundNumber < matchesByRound.length ? 'square' : (connectFinal ? 'straight' : false),
                     };
                 }
 
@@ -88,6 +121,7 @@ class BracketsViewer {
             }
 
             bracket.append(roundDOM);
+            roundNumber++;
         }
 
         root.append(bracket);
@@ -103,14 +137,14 @@ class BracketsViewer {
                 connectNext: matches.length === 2 && i === 0 && 'straight',
             });
 
-            const roundDOM = $('<div class="round">').append($('<h2>').text(type === 'grand_final' ? grandFinalName(i) : 'Consolation Final'));
+            const roundDOM = $('<div class="round">').append($('<h3>').text(type === 'grand_final' ? grandFinalName(i) : 'Consolation Final'));
             roundDOM.append(matchDOM);
 
             upperBracket.append(roundDOM);
         }
     }
 
-    private renderMatch(results: MatchResults, connection: Connection) {
+    private renderMatch(results: MatchResults, connection?: Connection) {
         const team1 = this.renderTeam(results.opponent1);
         const team2 = this.renderTeam(results.opponent2);
 
@@ -144,7 +178,7 @@ class BracketsViewer {
         } else {
             const participant = this.participants.find(participant => participant.id === team.id);
             nameDOM.text(participant === undefined ? 'TBD' : participant.name);
-            scoreDOM.text(team.score || '');
+            scoreDOM.text(team.score || '-');
 
             if (team.result && team.result === 'win') {
                 nameDOM.addClass('win');
@@ -170,19 +204,6 @@ class BracketsViewer {
 
         return teamDOM;
     }
-}
-
-function splitBy<T>(array: T[], key: keyof T): T[][] {
-    const obj = Object();
-
-    for (const value of array) {
-        if (!obj[value[key]])
-            obj[value[key]] = [];
-
-        obj[value[key]].push(value);
-    }
-
-    return Object.values(obj);
 }
 
 (window as any).bracketsViewer = new BracketsViewer();

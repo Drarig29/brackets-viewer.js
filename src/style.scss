@@ -1,5 +1,5 @@
 $round-margin: 50px;
-$round-width: 200px;
+$match-width: 200px;
 
 $connector-left-width: $round-margin / 2;
 $connector-right-width: ($round-margin / 2)+2;
@@ -16,7 +16,7 @@ $match-borders-radius: 0.3rem;
   box-sizing: border-box;
 }
 
-.tournament {
+#root {
   font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
     "Helvetica Neue", Arial, "Noto Sans", sans-serif, "Apple Color Emoji",
     "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";
@@ -31,7 +31,8 @@ $match-borders-radius: 0.3rem;
 }
 
 h1,
-h2 {
+h2,
+h3 {
   margin-bottom: 0.5rem;
   font-weight: 500;
   line-height: 1.2;
@@ -42,10 +43,27 @@ h1 {
   margin-bottom: 40px;
 }
 
+.round-robin {
+  display: flex;
+
+  .group {
+    text-align: center;
+    margin-right: $round-margin;
+
+    h2 {
+      margin-bottom: 25px;
+    }
+  }
+}
+
 .bracket {
   flex: 1;
   display: flex;
   margin-bottom: 50px;
+}
+
+h2 {
+  font-size: 23px;
 }
 
 .round {
@@ -53,10 +71,9 @@ h1 {
   display: flex;
   flex-direction: column;
   margin-right: $round-margin;
-  width: $round-width;
 }
 
-h2 {
+h3 {
   text-align: center;
   background: #eceff1;
   font-size: 16px;
@@ -68,6 +85,7 @@ h2 {
   display: flex;
   align-items: center;
   margin: 10px 0;
+  width: $match-width;
   position: relative;
 
   &.connect-next {
