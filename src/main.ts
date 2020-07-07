@@ -1,5 +1,6 @@
 import './style.scss';
-import { Participant, Stage, Round, Match, MatchResults, ParticipantResult, ViewerData, GrandFinalType } from "brackets-model";
+import { Participant, Round, Match, MatchResults, ParticipantResult, ViewerData } from "brackets-model";
+import { splitBy } from "./helpers";
 
 type ConnectionType = 'square' | 'straight' | false;
 

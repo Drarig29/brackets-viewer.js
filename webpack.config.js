@@ -7,6 +7,9 @@ module.exports = {
             filename: 'brackets-viewer.min.css'
         }),
     ],
+    resolve: {
+        extensions: ['.ts'],
+    },
     entry: './src/main.ts',
     output: {
         path: path.resolve(__dirname, 'dist'),
