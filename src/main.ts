@@ -1,6 +1,6 @@
 import './style.scss';
-import { Participant, Round, Match, MatchResults, ParticipantResult, ViewerData } from "brackets-model";
-import { splitBy } from "./helpers";
+import { Participant, Match, MatchResults, ParticipantResult, ViewerData } from "brackets-model";
+import { splitBy, getRanking, rankingHeader } from "./helpers";
 
 type ConnectionType = 'square' | 'straight' | false;
 
@@ -44,7 +44,6 @@ class BracketsViewer {
 
         for (const group of splitBy(data.matches, 'group_id')) {
             const groupDOM = $('<div class="group">').append($('<h2>').text(`Group ${groupNumber++}`));;
-
             let roundNumber = 1;
 
             for (const round of splitBy(group, 'round_id')) {
@@ -58,11 +57,43 @@ class BracketsViewer {
                 roundNumber++;
             }
 
+            groupDOM.append(this.renderTable(group));
             container.append(groupDOM);
         }
 
         root.append($('<h1>').text(data.stage.name));
         root.append(container);
+    }
+
+    private renderTable(matches: Match[]) {
+        const rankings = getRanking(matches);
+        const table = $('<table>');
+        const headers = $('<tr>');
+
+        for (const prop in rankings[0])
+            headers.append($('<th>').text(rankingHeader(prop as any)));
+
+        table.append(headers);
+
+        for (const ranking of rankings) {
+            const row = $('<tr>');
+
+            for (const prop in ranking) {
+                let data: number | string = ranking[prop];
+
+                if (prop === 'id') {
+                    const participant = this.participants.find(team => team.id === data);
+                    if (participant !== undefined)
+                        data = participant.name;
+                }
+
+                table.append($('<td>').text(data));
+            }
+
+            table.append(row);
+        }
+
+        return table;
     }
 
     private renderElimination(root: JQuery, data: ViewerData) {
@@ -177,8 +208,9 @@ class BracketsViewer {
             nameDOM.text('BYE');
         } else {
             const participant = this.participants.find(participant => participant.id === team.id);
+
             nameDOM.text(participant === undefined ? 'TBD' : participant.name);
-            scoreDOM.text(team.score || '-');
+            scoreDOM.text(team.score === undefined ? '-' : team.score);
 
             if (team.result && team.result === 'win') {
                 nameDOM.addClass('win');
