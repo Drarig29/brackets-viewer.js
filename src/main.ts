@@ -85,8 +85,20 @@ class BracketsViewer {
 
                 if (prop === 'id') {
                     const participant = this.participants.find(team => team.id === data);
-                    if (participant !== undefined)
-                        data = participant.name;
+
+                    if (participant !== undefined) {
+                        const cell = $('<td>').text(participant.name);
+                        const id = participant.id;
+                        
+                        this.teamRefsDOM[id].push(cell.get(0));
+                        cell.hover(
+                            () => $(this.teamRefsDOM[id]).addClass('hover'),
+                            () => $(this.teamRefsDOM[id]).removeClass('hover'),
+                        );
+
+                        row.append(cell);
+                        continue;
+                    }
                 }
 
                 row.append($('<td>').text(data));
