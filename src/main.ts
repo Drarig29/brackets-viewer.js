@@ -70,8 +70,10 @@ class BracketsViewer {
         const table = $('<table>');
         const headers = $('<tr>');
 
-        for (const prop in rankings[0])
-            headers.append($('<th>').text(rankingHeader(prop as any)));
+        for (const prop in rankings[0]) {
+            const header = rankingHeader(prop as any);
+            headers.append($('<th>').text(header.value).attr('title', header.tooltip));
+        }
 
         table.append(headers);
 

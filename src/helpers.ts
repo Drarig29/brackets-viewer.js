@@ -28,21 +28,61 @@ interface Ranking {
     points: number,
 }
 
-const headers: { [name in keyof Ranking]: string } = {
-    'rank': '#',
-    'id': 'Name',
-    'played': 'P',
-    'wins': 'W',
-    'draws': 'D',
-    'losses': 'L',
-    'forfeits': 'F',
-    'scoreFor': 'SF',
-    'scoreAgainst': 'SA',
-    'scoreDifference': '+/-',
-    'points': 'Pts',
+interface Header {
+    value: string,
+    tooltip: string,
 }
 
-export function rankingHeader(name: keyof Ranking): string {
+type Headers = { [name in keyof Ranking]: Header };
+
+const headers: Headers = {
+    'rank': {
+        value: '#',
+        tooltip: 'Rank',
+    },
+    'id': {
+        value: 'Name',
+        tooltip: 'Name',
+    },
+    'played': {
+        value: 'P',
+        tooltip: 'Played',
+    },
+    'wins': {
+        value: 'W',
+        tooltip: 'Wins',
+    },
+    'draws': {
+        value: 'D',
+        tooltip: 'Draws',
+    },
+    'losses': {
+        value: 'L',
+        tooltip: 'Losses',
+    },
+    'forfeits': {
+        value: 'F',
+        tooltip: 'Forfeits',
+    },
+    'scoreFor': {
+        value: 'SF',
+        tooltip: 'Score For',
+    },
+    'scoreAgainst': {
+        value: 'SA',
+        tooltip: 'Score Against',
+    },
+    'scoreDifference': {
+        value: '+/-',
+        tooltip: 'Score Difference',
+    },
+    'points': {
+        value: 'Pts',
+        tooltip: 'Points',
+    },
+}
+
+export function rankingHeader(name: keyof Ranking): Header {
     return headers[name];
 }
 
