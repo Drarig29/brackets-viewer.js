@@ -1,5 +1,9 @@
 # brackets-viewer.js
-A simple library to display tournament brackets (pools, single elimination, double elimination)
+
+A simple library to display tournament brackets (round-robin, single elimination, double elimination)
+
+[![npm](https://img.shields.io/npm/v/brackets-viewer.svg)](https://www.npmjs.com/package/brackets-viewer)
+
 
 ## How to use?
 
@@ -17,7 +21,7 @@ Or using [npm](https://www.npmjs.com/package/brackets-viewer):
 <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/brackets-viewer/dist/brackets-viewer.min.js"></script>
 ```
 
-Now, you can use it with data generated using [brackets-manager](https://www.npmjs.com/package/brackets-manager) just like in the `/demo` folder.
+Now, you can use it with data generated using [brackets-manager](https://github.com/Drarig29/brackets-manager.js) just like in the `/demo` folder.
 
 To quickly test, you can use `json-server`:
 - Run the npm script named `db` to serve the static database file `/demo/db.json`
