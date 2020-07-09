@@ -8,8 +8,7 @@
     "scripts": {
         "db": "json-server --watch demo/db.json",
         "build": "npx webpack --mode production",
-        "start": "npx webpack --watch --mode development",
-        "test": "echo \"Error: no test specified\" && exit 1"
+        "start": "npx webpack --watch --mode development"
     },
     "repository": {
         "type": "git",
