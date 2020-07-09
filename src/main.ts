@@ -43,11 +43,11 @@ class BracketsViewer {
         let groupNumber = 1;
 
         for (const group of splitBy(data.matches, 'group_id')) {
-            const groupDOM = $('<div class="group">').append($('<h2>').text(`Group ${groupNumber++}`));;
+            const groupDOM = $('<section class="group">').append($('<h2>').text(`Group ${groupNumber++}`));;
             let roundNumber = 1;
 
             for (const round of splitBy(group, 'round_id')) {
-                const roundDOM = $('<div>').append($('<h3>').text(`Round ${roundNumber}`));
+                const roundDOM = $('<article class="round">').append($('<h3>').text(`Round ${roundNumber}`));
 
                 for (const match of round) {
                     roundDOM.append(this.renderMatch(match));
@@ -87,7 +87,7 @@ class BracketsViewer {
                         data = participant.name;
                 }
 
-                table.append($('<td>').text(data));
+                row.append($('<td>').text(data));
             }
 
             table.append(row);
@@ -106,15 +106,15 @@ class BracketsViewer {
 
         if (data.stage.type === 'single_elimination') {
             const hasFinal = !!matchesByGroup[1];
-            this.renderGroup(root, splitBy(matchesByGroup[0], "round_id"), number => `Round ${number}`);
+            this.renderBracket(root, splitBy(matchesByGroup[0], "round_id"), number => `Round ${number}`);
 
             if (hasFinal) {
                 this.renderFinal('consolation_final', matchesByGroup[1]);
             }
         } else if (data.stage.type === 'double_elimination') {
             const hasFinal = !!matchesByGroup[2];
-            this.renderGroup(root, splitBy(matchesByGroup[0], "round_id"), number => `WB Round ${number}`, false, hasFinal);
-            this.renderGroup(root, splitBy(matchesByGroup[1], "round_id"), number => `LB Round ${number}`, true);
+            this.renderBracket(root, splitBy(matchesByGroup[0], "round_id"), number => `WB Round ${number}`, false, hasFinal);
+            this.renderBracket(root, splitBy(matchesByGroup[1], "round_id"), number => `LB Round ${number}`, true);
 
             if (hasFinal) {
                 this.renderFinal('grand_final', matchesByGroup[2]);
@@ -125,13 +125,13 @@ class BracketsViewer {
     /**
      * Renders a bracket.
      */
-    private renderGroup(root: JQuery, matchesByRound: Match[][], roundName: (roundNumber: number) => string, lowerBracket?: boolean, connectFinal?: boolean) {
-        const bracket = $('<div class="bracket">');
+    private renderBracket(root: JQuery, matchesByRound: Match[][], roundName: (roundNumber: number) => string, lowerBracket?: boolean, connectFinal?: boolean) {
+        const bracket = $('<section class="bracket">');
 
         let roundNumber = 1;
 
         for (const matches of matchesByRound) {
-            const roundDOM = $('<div class="round">').append($('<h3>').text(roundName(roundNumber)));
+            const roundDOM = $('<article class="round">').append($('<h3>').text(roundName(roundNumber)));
 
             for (const match of matches) {
                 let connection: Connection;
@@ -168,7 +168,7 @@ class BracketsViewer {
                 connectNext: matches.length === 2 && i === 0 && 'straight',
             });
 
-            const roundDOM = $('<div class="round">').append($('<h3>').text(type === 'grand_final' ? grandFinalName(i) : 'Consolation Final'));
+            const roundDOM = $('<article class="round">').append($('<h3>').text(type === 'grand_final' ? grandFinalName(i) : 'Consolation Final'));
             roundDOM.append(matchDOM);
 
             upperBracket.append(roundDOM);
