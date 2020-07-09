@@ -75,14 +75,15 @@ h3 {
       border-collapse: collapse;
     }
 
-    td {
-      border: none;
-      border-top: $match-borders;
-    }
-
     th {
       font-weight: normal;
       text-align: start;
+      cursor: help;
+    }
+
+    td {
+      border: none;
+      border-top: $match-borders;
     }
 
     th,
