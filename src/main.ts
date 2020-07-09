@@ -14,8 +14,8 @@ class BracketsViewer {
     readonly teamRefsDOM: { [key: number]: HTMLElement[] } = {};
     private participants!: Participant[];
 
-    public render(data: ViewerData) {
-        const root = $('#root');
+    public render(rootSelector: string, data: ViewerData) {
+        const root = $(rootSelector);
 
         if (root.length === 0) {
             throw Error('Root not found. You must have a root element with id "root"')

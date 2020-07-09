@@ -1,7 +1,7 @@
 {
-    "name": "brackets-viewer.js",
+    "name": "brackets-viewer",
     "version": "1.0.0",
-    "description": "A simple library to display tournament brackets (pools, single elimination, double elimination)",
+    "description": "A simple library to display tournament brackets (round-robin, single elimination, double elimination)",
     "files": [
         "dist/"
     ],

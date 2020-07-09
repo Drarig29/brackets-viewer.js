@@ -12,7 +12,7 @@
         const stage = (await fetch('http://localhost:3000/stage?number=1').then(res => res.json()))[0];
         const data = await fetch('http://localhost:3000/db').then(res => res.json());
 
-        bracketsViewer.render({
+        bracketsViewer.render('#root', {
             stage,
             groups: data.group,
             rounds: data.round,
