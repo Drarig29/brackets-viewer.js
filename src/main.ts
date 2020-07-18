@@ -89,7 +89,7 @@ class BracketsViewer {
                     if (participant !== undefined) {
                         const cell = $('<td>').text(participant.name);
                         const id = participant.id;
-                        
+
                         this.teamRefsDOM[id].push(cell.get(0));
                         cell.hover(
                             () => $(this.teamRefsDOM[id]).addClass('hover'),
@@ -225,6 +225,9 @@ class BracketsViewer {
 
             nameDOM.text(participant === undefined ? 'TBD' : participant.name);
             scoreDOM.text(team.score === undefined ? '-' : team.score);
+
+            if (team.position !== undefined)
+                nameDOM.append($('<span>').text(` (#${team.position})`));
 
             if (team.result && team.result === 'win') {
                 nameDOM.addClass('win');

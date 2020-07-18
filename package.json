@@ -8,7 +8,8 @@
     "scripts": {
         "db": "json-server --watch demo/db.json",
         "build": "npx webpack --mode production",
-        "start": "npx webpack --watch --mode development"
+        "start": "npx webpack --watch --mode development",
+        "prepublishOnly": "npm run build"
     },
     "repository": {
         "type": "git",

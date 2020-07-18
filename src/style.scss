@@ -241,6 +241,10 @@ h3 {
   &.win {
     font-weight: bold;
   }
+
+  & > span {
+    color: rgb(170, 170, 170);
+  }
 }
 
 .score {
