@@ -162,7 +162,7 @@ class BracketsViewer {
                     };
                 }
 
-                roundDOM.append(this.renderMatch(match, connection));
+                roundDOM.append(this.renderMatch(match, connection, `M ${roundNumber}.${match.number}`));
             }
 
             bracket.append(roundDOM);
@@ -189,13 +189,14 @@ class BracketsViewer {
         }
     }
 
-    private renderMatch(results: MatchResults, connection?: Connection) {
+    private renderMatch(results: MatchResults, connection?: Connection, label?: string) {
         const team1 = this.renderTeam(results.opponent1);
         const team2 = this.renderTeam(results.opponent2);
 
         const teams = $('<div class="teams">').append(team1).append(team2);
-        const match = $('<div class="match">').append(teams);
+        if (label) teams.append($('<span>').text(label));
 
+        const match = $('<div class="match">').append(teams);
         if (!connection) return match;
 
         if (connection.connectPrevious)
