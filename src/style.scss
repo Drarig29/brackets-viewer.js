@@ -109,7 +109,7 @@ h3 {
 .bracket {
   flex: 1;
   display: flex;
-  margin-bottom: 50px;
+  margin-bottom: 30px;
 
   .round {
     flex: 1;
@@ -162,6 +162,16 @@ h3 {
 .teams {
   width: 100%;
   position: relative;
+
+  & > span {
+    position: absolute;
+    top: -10px;
+    left: 3px;
+    font-size: 0.8rem;
+    background: white;
+    padding: 0 5px;
+    color: #a7a7a7;
+  }
 
   &.connect-previous {
     &::before {
@@ -223,6 +233,7 @@ h3 {
     border-bottom: none;
     border-top-left-radius: $match-borders-radius;
     border-top-right-radius: $match-borders-radius;
+    padding-top: 8px;
   }
 
   &:nth-of-type(2) {
@@ -230,6 +241,7 @@ h3 {
     border-top: none;
     border-bottom-left-radius: $match-borders-radius;
     border-bottom-right-radius: $match-borders-radius;
+    padding-bottom: 8px;
   }
 }
 
@@ -243,7 +255,7 @@ h3 {
   }
 
   & > span {
-    color: rgb(170, 170, 170);
+    color: #a7a7a7;
   }
 }
 
