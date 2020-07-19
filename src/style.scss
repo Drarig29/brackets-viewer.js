@@ -260,8 +260,10 @@ h3 {
   }
 }
 
-.score {
+.result {
   margin-left: 20px;
+  width: 10%;
+  text-align: center;
 
   &.win {
     color: $win-color;
