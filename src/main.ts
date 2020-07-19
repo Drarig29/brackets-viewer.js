@@ -218,7 +218,7 @@ class BracketsViewer {
     private renderTeam(team: ParticipantResult | null) {
         const teamDOM = $(`<div class="team">`);
         const nameDOM = $('<div class="name">');
-        const scoreDOM = $('<div class="score">');
+        const resultDOM = $('<div class="result">');
 
         if (team === null) {
             nameDOM.text('BYE');
@@ -226,31 +226,31 @@ class BracketsViewer {
             const participant = this.participants.find(participant => participant.id === team.id);
 
             nameDOM.text(participant === undefined ? 'TBD' : participant.name);
-            scoreDOM.text(team.score === undefined ? '-' : team.score);
+            resultDOM.text(team.score === undefined ? '-' : team.score);
 
             if (team.position !== undefined)
                 nameDOM.append($('<span>').text(` (#${team.position})`));
 
             if (team.result && team.result === 'win') {
                 nameDOM.addClass('win');
-                scoreDOM.addClass('win');
+                resultDOM.addClass('win');
 
                 if (team.score === undefined)
-                    scoreDOM.text('W'); // Win.
+                    resultDOM.text('W'); // Win.
             }
 
             if (team.result && team.result === 'loss' || team.forfeit) {
                 nameDOM.addClass('loss');
-                scoreDOM.addClass('loss');
+                resultDOM.addClass('loss');
 
                 if (team.forfeit)
-                    scoreDOM.text('F'); // Forfeit.
+                    resultDOM.text('F'); // Forfeit.
                 else if (team.score === undefined)
-                    scoreDOM.text('L'); // Loss.
+                    resultDOM.text('L'); // Loss.
             }
         }
 
-        teamDOM.append(nameDOM).append(scoreDOM);
+        teamDOM.append(nameDOM).append(resultDOM);
 
         if (team && team.id !== null) {
             const id = team.id;
