@@ -193,8 +193,9 @@ class BracketsViewer {
         const team1 = this.renderTeam(results.opponent1);
         const team2 = this.renderTeam(results.opponent2);
 
-        const teams = $('<div class="teams">').append(team1).append(team2);
+        const teams = $('<div class="teams">');
         if (label) teams.append($('<span>').text(label));
+        teams.append(team1).append(team2);
 
         const match = $('<div class="match">').append(teams);
         if (!connection) return match;
@@ -233,11 +234,19 @@ class BracketsViewer {
             if (team.result && team.result === 'win') {
                 nameDOM.addClass('win');
                 scoreDOM.addClass('win');
+
+                if (team.score === undefined)
+                    scoreDOM.text('W'); // Win.
             }
 
-            if (team.result && team.result === 'loss') {
+            if (team.result && team.result === 'loss' || team.forfeit) {
                 nameDOM.addClass('loss');
                 scoreDOM.addClass('loss');
+
+                if (team.forfeit)
+                    scoreDOM.text('F'); // Forfeit.
+                else if (team.score === undefined)
+                    scoreDOM.text('L'); // Loss.
             }
         }
 
