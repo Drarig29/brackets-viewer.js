@@ -2,8 +2,9 @@
 
 A simple library to display tournament brackets (round-robin, single elimination, double elimination)
 
-[![npm](https://img.shields.io/npm/v/brackets-viewer.svg)](https://www.npmjs.com/package/brackets-viewer)
+It contains all the logic needed to display tournaments.
 
+[![npm](https://img.shields.io/npm/v/brackets-viewer.svg)](https://www.npmjs.com/package/brackets-viewer)
 
 ## How to use?
 
@@ -47,3 +48,12 @@ Build with webpack:
 ```bash
 npm run build
 ```
+
+## Credits
+
+This library has been created to be used by the [Nantarena](https://nantarena.net/).
+
+It has been inspired by:
+
+- [Toornament](https://www.toornament.com/en_US/) (design inspiration)
+- [Responsive Tournament Bracket](https://codepen.io/jimmyhayek/full/yJkdEB) (connection between matches in plain CSS)
