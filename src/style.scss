@@ -109,13 +109,19 @@ h3 {
 .bracket {
   flex: 1;
   display: flex;
-  margin-bottom: 30px;
+
+  &:not(:last-of-type) {
+    margin-bottom: 30px;
+  }
 
   .round {
     flex: 1;
     display: flex;
     flex-direction: column;
-    margin-right: $round-margin;
+
+    &:not(:last-of-type) {
+      margin-right: $round-margin;
+    }
   }
 }
 
@@ -228,6 +234,7 @@ h3 {
   display: flex;
   justify-content: space-between;
   padding: 3px 12px;
+  background: white;
 
   &:nth-of-type(1) {
     border: $match-borders;
