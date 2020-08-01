@@ -8,7 +8,7 @@ module.exports = {
         }),
     ],
     resolve: {
-        extensions: ['.ts'],
+        extensions: ['.ts', '.js'],
     },
     entry: './src/main.ts',
     output: {
