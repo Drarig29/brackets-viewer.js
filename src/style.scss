@@ -63,7 +63,10 @@ h3 {
 
   .group {
     text-align: center;
-    margin-right: $round-margin;
+    
+    &:not(:last-of-type) {
+        margin-right: $round-margin;
+    }
 
     h2 {
       margin-bottom: 25px;
