@@ -44,6 +44,6 @@
         "webpack-cli": "^3.3.11"
     },
     "dependencies": {
-        "brackets-model": "^0.2.10"
+        "brackets-model": "^1.0.1"
     }
 }
