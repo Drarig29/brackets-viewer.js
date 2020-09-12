@@ -194,12 +194,14 @@
             "opponent1": {
                 "id": 0,
                 "position": 1,
-                "score": 8
+                "score": 16,
+                "result": "win"
             },
             "opponent2": {
                 "id": 1,
                 "position": 2,
-                "score": 6
+                "score": 12,
+                "result": "loss"
             }
         },
         {
@@ -216,11 +218,13 @@
             "end_datetime": null,
             "opponent1": {
                 "id": 2,
-                "position": 3
+                "position": 3,
+                "score": 8
             },
             "opponent2": {
                 "id": 3,
-                "position": 4
+                "position": 4,
+                "score": 4
             }
         },
         {
@@ -235,10 +239,7 @@
             "scheduled_datetime": null,
             "start_datetime": null,
             "end_datetime": null,
-            "opponent1": {
-                "id": 4,
-                "position": 5
-            },
+            "opponent1": null,
             "opponent2": {
                 "id": 5,
                 "position": 6
@@ -345,7 +346,7 @@
                 "position": 15
             },
             "opponent2": {
-                "id": 15,
+                "id": null,
                 "position": 16
             }
         },
@@ -362,7 +363,7 @@
             "start_datetime": null,
             "end_datetime": null,
             "opponent1": {
-                "id": null
+                "id": 0
             },
             "opponent2": {
                 "id": null
@@ -381,7 +382,7 @@
             "start_datetime": null,
             "end_datetime": null,
             "opponent1": {
-                "id": null
+                "id": 5
             },
             "opponent2": {
                 "id": null
@@ -495,7 +496,7 @@
             "start_datetime": null,
             "end_datetime": null,
             "opponent1": {
-                "id": null,
+                "id": 1,
                 "position": 1
             },
             "opponent2": {
@@ -515,10 +516,7 @@
             "scheduled_datetime": null,
             "start_datetime": null,
             "end_datetime": null,
-            "opponent1": {
-                "id": null,
-                "position": 3
-            },
+            "opponent1": null,
             "opponent2": {
                 "id": null,
                 "position": 4
