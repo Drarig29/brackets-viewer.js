@@ -82,6 +82,10 @@ const headers: Headers = {
     },
 }
 
+export function isMajorRound(roundNumber: number) {
+    return roundNumber === 1 || roundNumber % 2 === 0;
+}
+
 export function rankingHeader(name: keyof Ranking): Header {
     return headers[name];
 }

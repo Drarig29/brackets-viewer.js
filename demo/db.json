@@ -777,7 +777,8 @@
                 "id": null
             },
             "opponent2": {
-                "id": null
+                "id": null,
+                "position": 1
             }
         }
     ],
