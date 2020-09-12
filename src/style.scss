@@ -104,7 +104,6 @@ h3 {
   }
 
   .round {
-    width: fit-content;
     margin: 0 auto;
   }
 }
@@ -259,7 +258,7 @@ h3 {
 .name {
   white-space: nowrap;
   overflow: hidden;
-  text-overflow: fade(10px);
+  text-overflow: ellipsis;
 
   &.win {
     font-weight: bold;
@@ -271,8 +270,7 @@ h3 {
 }
 
 .result {
-  margin-left: 20px;
-  width: 10%;
+  margin-left: 10px;
   text-align: center;
 
   &.win {
