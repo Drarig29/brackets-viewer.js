@@ -5,8 +5,7 @@
         "moduleResolution": "node",
         "strict": true,
         "types": [
-            "brackets-model",
-            "jquery"
+            "brackets-model"
         ],
         "esModuleInterop": true,
         "allowSyntheticDefaultImports": true,

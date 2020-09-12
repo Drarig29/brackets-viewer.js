@@ -31,7 +31,6 @@
     "homepage": "https://github.com/Drarig29/brackets-viewer.js#readme",
     "devDependencies": {
         "@babel/core": "^7.10.2",
-        "@types/jquery": "^3.3.38",
         "babel-loader": "^8.1.0",
         "css-loader": "^3.5.3",
         "json-server": "^0.16.1",
