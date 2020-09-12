@@ -351,7 +351,7 @@ class BracketsViewer {
     }
 
     private renderHint(name: JQuery, hint: string) {
-        name.text(hint);
+        name.addClass('hint').text(hint);
     }
 
     private renderTeamOrigin(name: JQuery, team: ParticipantResult, inLowerBracket: boolean) {
