@@ -15,9 +15,9 @@ class BracketsViewer {
     private participants!: Participant[];
 
     public render(rootSelector: string, data: ViewerData) {
-        const root = $(rootSelector);
+        const root = document.querySelector(rootSelector) as HTMLElement;
 
-        if (root.length === 0) {
+        if (!root) {
             throw Error('Root not found. You must have a root element with id "root"')
         }
 
@@ -34,20 +34,29 @@ class BracketsViewer {
         }
     }
 
-    private renderRoundRobin(root: JQuery, data: ViewerData) {
+    private renderRoundRobin(root: HTMLElement, data: ViewerData) {
         data.participants.map(participant => this.teamRefsDOM[participant.id] = []);
 
         this.participants = data.participants;
 
-        const container = $('<div class="round-robin">');
+        const container = document.createElement('div');
+        container.classList.add('round-robin');
         let groupNumber = 1;
 
         for (const group of splitBy(data.matches, 'group_id')) {
-            const groupDOM = $('<section class="group">').append($('<h2>').text(`Group ${groupNumber++}`));;
+            const h2 = document.createElement('h2');
+            h2.innerText = `Group ${groupNumber++}`;
+            const groupDOM = document.createElement('section');
+            groupDOM.classList.add('group');
+            groupDOM.append(h2);
             let roundNumber = 1;
 
             for (const round of splitBy(group, 'round_id')) {
-                const roundDOM = $('<article class="round">').append($('<h3>').text(`Round ${roundNumber}`));
+                const h3 = document.createElement('h3');
+                h3.innerText = `Round ${roundNumber}`;
+                const roundDOM = document.createElement('article');
+                roundDOM.classList.add('round');
+                roundDOM.append(h3);
 
                 for (const match of round) {
                     roundDOM.append(this.renderMatch(match));
@@ -61,24 +70,28 @@ class BracketsViewer {
             container.append(groupDOM);
         }
 
-        root.append($('<h1>').text(data.stage.name));
-        root.append(container);
+        const h1 = document.createElement('h1');
+        h1.innerText = data.stage.name;
+        root.append(h1, container);
     }
 
     private renderTable(matches: Match[]) {
         const rankings = getRanking(matches);
-        const table = $('<table>');
-        const headers = $('<tr>');
+        const table = document.createElement('table');
+        const headers = document.createElement('tr');
 
         for (const prop in rankings[0]) {
             const header = rankingHeader(prop as any);
-            headers.append($('<th>').text(header.value).attr('title', header.tooltip));
+            const th = document.createElement('th');
+            th.innerText = header.value;
+            th.setAttribute('title', header.tooltip);
+            headers.append(th);
         }
 
         table.append(headers);
 
         for (const ranking of rankings) {
-            const row = $('<tr>');
+            const row = document.createElement('tr');
 
             for (const prop in ranking) {
                 let data: number | string = ranking[prop];
@@ -87,21 +100,26 @@ class BracketsViewer {
                     const participant = this.participants.find(team => team.id === data);
 
                     if (participant !== undefined) {
-                        const cell = $('<td>').text(participant.name);
+                        const cell = document.createElement('td');
+                        cell.innerText = participant.name;
                         const id = participant.id;
 
-                        this.teamRefsDOM[id].push(cell.get(0));
-                        cell.hover(
-                            () => $(this.teamRefsDOM[id]).addClass('hover'),
-                            () => $(this.teamRefsDOM[id]).removeClass('hover'),
-                        );
+                        this.teamRefsDOM[id].push(cell);
+                        cell.addEventListener('mouseover', () => {
+                            this.teamRefsDOM[id].forEach(el => el.classList.add('hover'));
+                        });
+                        cell.addEventListener('mouseleave', () => {
+                            this.teamRefsDOM[id].forEach(el => el.classList.remove('hover'));
+                        });
 
                         row.append(cell);
                         continue;
                     }
                 }
 
-                row.append($('<td>').text(data));
+                const td = document.createElement('td');
+                td.innerText = String(data);
+                row.append(td);
             }
 
             table.append(row);
@@ -110,13 +128,15 @@ class BracketsViewer {
         return table;
     }
 
-    private renderElimination(root: JQuery, data: ViewerData) {
+    private renderElimination(root: HTMLElement, data: ViewerData) {
         data.participants.map(participant => this.teamRefsDOM[participant.id] = []);
 
         const matchesByGroup = splitBy(data.matches, 'group_id');
         this.participants = data.participants;
 
-        root.append($('<h1>').text(data.stage.name));
+        const h1 = document.createElement('h1');
+        h1.innerText = data.stage.name;
+        root.append(h1);
 
         if (data.stage.type === 'single_elimination') {
             const hasFinal = !!matchesByGroup[1];
@@ -139,13 +159,18 @@ class BracketsViewer {
     /**
      * Renders a bracket.
      */
-    private renderBracket(root: JQuery, matchesByRound: Match[][], roundName: (roundNumber: number) => string, lowerBracket?: boolean, connectFinal?: boolean) {
-        const bracket = $('<section class="bracket">');
+    private renderBracket(root: HTMLElement, matchesByRound: Match[][], roundName: (roundNumber: number) => string, lowerBracket?: boolean, connectFinal?: boolean) {
+        const bracket = document.createElement('section');
+        bracket.classList.add('bracket');
 
         let roundNumber = 1;
 
         for (const matches of matchesByRound) {
-            const roundDOM = $('<article class="round">').append($('<h3>').text(roundName(roundNumber)));
+            const h3 = document.createElement('h3');
+            h3.innerText = roundName(roundNumber);
+            const roundDOM = document.createElement('article');
+            roundDOM.classList.add('round');
+            roundDOM.append(h3);
 
             for (const match of matches) {
                 let connection: Connection;
@@ -173,7 +198,7 @@ class BracketsViewer {
     }
 
     private renderFinal(type: 'consolation_final' | 'grand_final', matches: Match[]) {
-        const upperBracket = $('.bracket').eq(0);
+        const upperBracket = document.querySelector('.bracket');
         const grandFinalName = matches.length === 1 ? () => 'Grand Final' : (i: number) => `Grand Final R${i + 1}`;
 
         for (let i = 0; i < matches.length; i++) {
@@ -182,10 +207,13 @@ class BracketsViewer {
                 connectNext: matches.length === 2 && i === 0 && 'straight',
             });
 
-            const roundDOM = $('<article class="round">').append($('<h3>').text(type === 'grand_final' ? grandFinalName(i) : 'Consolation Final'));
-            roundDOM.append(matchDOM);
+            const h3 = document.createElement('h3');
+            h3.innerText = type === 'grand_final' ? grandFinalName(i) : 'Consolation Final';
+            const roundDOM = document.createElement('article');
+            roundDOM.classList.add('round');
+            roundDOM.append(h3, matchDOM);
 
-            upperBracket.append(roundDOM);
+            if (upperBracket) upperBracket.append(roundDOM);
         }
     }
 
@@ -193,72 +221,89 @@ class BracketsViewer {
         const team1 = this.renderTeam(results.opponent1);
         const team2 = this.renderTeam(results.opponent2);
 
-        const teams = $('<div class="teams">');
-        if (label) teams.append($('<span>').text(label));
-        teams.append(team1).append(team2);
+        const teams = document.createElement('div');
+        teams.classList.add('teams');
 
-        const match = $('<div class="match">').append(teams);
+        if (label) {
+            const span = document.createElement('span');
+            span.innerText = label;
+            teams.append(span);
+        }
+
+        teams.append(team1, team2);
+
+        const match = document.createElement('div');
+        match.classList.add('match');
+        match.append(teams);
         if (!connection) return match;
 
         if (connection.connectPrevious)
-            teams.addClass('connect-previous');
+            teams.classList.add('connect-previous');
 
         if (connection.connectNext)
-            match.addClass('connect-next');
+            match.classList.add('connect-next');
 
         if (connection.connectPrevious === 'straight')
-            teams.addClass('straight');
+            teams.classList.add('straight');
 
         if (connection.connectNext === 'straight')
-            match.addClass('straight');
+            match.classList.add('straight');
 
         return match;
     }
 
     private renderTeam(team: ParticipantResult | null) {
-        const teamDOM = $(`<div class="team">`);
-        const nameDOM = $('<div class="name">');
-        const resultDOM = $('<div class="result">');
+        const teamDOM = document.createElement('div');
+        teamDOM.classList.add('team');
+        const nameDOM = document.createElement('div');
+        nameDOM.classList.add('name');
+        const resultDOM = document.createElement('div');
+        resultDOM.classList.add('result');
 
         if (team === null) {
-            nameDOM.text('BYE');
+            nameDOM.innerText = 'BYE';
         } else {
             const participant = this.participants.find(participant => participant.id === team.id);
 
-            nameDOM.text(participant === undefined ? 'TBD' : participant.name);
-            resultDOM.text(team.score === undefined ? '-' : team.score);
+            nameDOM.innerText = participant === undefined ? 'TBD' : participant.name;
+            resultDOM.innerText = team.score === undefined ? '-' : String(team.score);
 
-            if (team.position !== undefined)
-                nameDOM.append($('<span>').text(` (#${team.position})`));
+            if (team.position !== undefined) {
+                const span = document.createElement('span');
+                span.innerText = ` (#${team.position})`;
+                nameDOM.append(span);
+            }
 
             if (team.result && team.result === 'win') {
-                nameDOM.addClass('win');
-                resultDOM.addClass('win');
+                nameDOM.classList.add('win');
+                resultDOM.classList.add('win');
 
                 if (team.score === undefined)
-                    resultDOM.text('W'); // Win.
+                    resultDOM.innerText = 'W'; // Win.
             }
 
             if (team.result && team.result === 'loss' || team.forfeit) {
-                nameDOM.addClass('loss');
-                resultDOM.addClass('loss');
+                nameDOM.classList.add('loss');
+                resultDOM.classList.add('loss');
 
                 if (team.forfeit)
-                    resultDOM.text('F'); // Forfeit.
+                    resultDOM.innerText = 'F'; // Forfeit.
                 else if (team.score === undefined)
-                    resultDOM.text('L'); // Loss.
+                    resultDOM.innerText = 'L'; // Loss.
             }
         }
 
-        teamDOM.append(nameDOM).append(resultDOM);
+        teamDOM.append(nameDOM, resultDOM);
 
         if (team && team.id !== null) {
             const id = team.id;
-            this.teamRefsDOM[id].push(teamDOM.get(0));
-            teamDOM.hover(
-                () => $(this.teamRefsDOM[id]).addClass('hover'),
-                () => $(this.teamRefsDOM[id]).removeClass('hover'),
-            );
+            this.teamRefsDOM[id].push(teamDOM);
+            teamDOM.addEventListener('mouseover', () => {
+                this.teamRefsDOM[id].forEach(el => el.classList.add('hover'));
+            });
+            teamDOM.addEventListener('mouseleave', () => {
+                this.teamRefsDOM[id].forEach(el => el.classList.remove('hover'));
+            });
         }
 
         return teamDOM;
