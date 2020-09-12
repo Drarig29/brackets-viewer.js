@@ -3,7 +3,7 @@ import { Participant, Match, MatchResults, ParticipantResult, ViewerData } from 
 import { splitBy, getRanking, rankingHeader } from "./helpers";
 
 type ConnectionType = 'square' | 'straight' | false;
-type Placement = 'before' | 'after';
+type Placement = 'none' | 'before' | 'after';
 
 interface Connection {
     connectPrevious?: ConnectionType,
@@ -12,21 +12,21 @@ interface Connection {
 
 interface Config {
     /**
-     * Where the position of a participant is placed.
+     * Where the position of a participant is placed relative to its name.
      * - If `before`, the position is prepended before the team name. "#1 Team"
      * - If `after`, the position is appended after the team name, in parentheses. "Team (#1)"
      */
-    participantPositionPlacement: Placement,
+    participantOriginPlacement: Placement,
 
     /**
-     * Whether to show the position of a participant wherever possible.
+     * Whether to show the origin of a slot (wherever possible).
      */
-    showParticipantPosition: boolean,
+    showSlotsOrigin: boolean,
 
     /**
-     * Whether to show the position of a participant in the lower bracket of an elimination stage.
+     * Whether to show the origin of a slot (in the lower bracket of an elimination stage).
      */
-    showLowerBracketParticipantPosition: boolean,
+    showLowerBracketSlotsOrigin: boolean,
 }
 
 class BracketsViewer {
@@ -43,9 +43,9 @@ class BracketsViewer {
         }
 
         this.config = {
-            participantPositionPlacement: config && config.participantPositionPlacement || 'before',
-            showParticipantPosition: config && config.showParticipantPosition || true,
-            showLowerBracketParticipantPosition: config && config.showLowerBracketParticipantPosition || false,
+            participantOriginPlacement: config && config.participantOriginPlacement || 'before',
+            showSlotsOrigin: config && config.showSlotsOrigin || true,
+            showLowerBracketSlotsOrigin: config && config.showLowerBracketSlotsOrigin || false,
         };
 
         switch (data.stage.type) {
@@ -252,10 +252,12 @@ class BracketsViewer {
         } else {
             const participant = this.participants.find(participant => participant.id === team.id);
 
-            nameDOM.text(participant === undefined ? 'TBD' : participant.name);
-            resultDOM.text(team.score === undefined ? '-' : team.score);
+            if (participant) {
+                nameDOM.text(participant.name);
+                this.renderTeamOrigin(nameDOM, team, lowerBracket);
+            }
 
-            this.renderTeamPosition(nameDOM, team, lowerBracket);
+            resultDOM.text(team.score === undefined ? '-' : team.score);
 
             if (team.result && team.result === 'win') {
                 nameDOM.addClass('win');
@@ -290,18 +292,19 @@ class BracketsViewer {
         return teamDOM;
     }
 
-    private renderTeamPosition(name: JQuery, team: ParticipantResult, lowerBracket: boolean) {
+    private renderTeamOrigin(name: JQuery, team: ParticipantResult, lowerBracket: boolean) {
         if (team.position === undefined) return;
-        if (!this.config.showParticipantPosition) return;
-        if (!this.config.showLowerBracketParticipantPosition && lowerBracket) return;
+        if (this.config.participantOriginPlacement === 'none') return;
+        if (!this.config.showSlotsOrigin) return;
+        if (!this.config.showLowerBracketSlotsOrigin && lowerBracket) return;
 
         // 'P' for position (where the participant comes from) and '#' for actual seeding.
         const text = lowerBracket ? `P${team.position}` : `#${team.position}`;
 
-        this.addPosition(name, text, this.config.participantPositionPlacement);
+        this.addTeamOrigin(name, text, this.config.participantOriginPlacement);
     }
 
-    private addPosition(name: JQuery, text: string, placement: Placement,) {
+    private addTeamOrigin(name: JQuery, text: string, placement: Placement) {
         if (placement === 'before')
             name.prepend($('<span>').text(`${text} `));
         else
