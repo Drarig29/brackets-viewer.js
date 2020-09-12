@@ -3,23 +3,50 @@ import { Participant, Match, MatchResults, ParticipantResult, ViewerData } from 
 import { splitBy, getRanking, rankingHeader } from "./helpers";
 
 type ConnectionType = 'square' | 'straight' | false;
+type Placement = 'before' | 'after';
 
 interface Connection {
     connectPrevious?: ConnectionType,
     connectNext?: ConnectionType,
 }
 
+interface Config {
+    /**
+     * Where the position of a participant is placed.
+     * - If `before`, the position is prepended before the team name. "#1 Team"
+     * - If `after`, the position is appended after the team name, in parentheses. "Team (#1)"
+     */
+    participantPositionPlacement: Placement,
+
+    /**
+     * Whether to show the position of a participant wherever possible.
+     */
+    showParticipantPosition: boolean,
+
+    /**
+     * Whether to show the position of a participant in the lower bracket of an elimination stage.
+     */
+    showLowerBracketParticipantPosition: boolean,
+}
+
 class BracketsViewer {
 
     readonly teamRefsDOM: { [key: number]: HTMLElement[] } = {};
     private participants!: Participant[];
+    private config!: Config;
 
-    public render(rootSelector: string, data: ViewerData) {
+    public render(rootSelector: string, data: ViewerData, config?: Config) {
         const root = $(rootSelector);
 
         if (root.length === 0) {
             throw Error('Root not found. You must have a root element with id "root"')
         }
+
+        this.config = {
+            participantPositionPlacement: config && config.participantPositionPlacement || 'before',
+            showParticipantPosition: config && config.showParticipantPosition || true,
+            showLowerBracketParticipantPosition: config && config.showLowerBracketParticipantPosition || false,
+        };
 
         switch (data.stage.type) {
             case 'round_robin':
@@ -162,7 +189,7 @@ class BracketsViewer {
                     };
                 }
 
-                roundDOM.append(this.renderMatch(match, connection, `M ${roundNumber}.${match.number}`));
+                roundDOM.append(this.renderMatch(match, connection, `M ${roundNumber}.${match.number}`, lowerBracket));
             }
 
             bracket.append(roundDOM);
@@ -189,9 +216,9 @@ class BracketsViewer {
         }
     }
 
-    private renderMatch(results: MatchResults, connection?: Connection, label?: string) {
-        const team1 = this.renderTeam(results.opponent1);
-        const team2 = this.renderTeam(results.opponent2);
+    private renderMatch(results: MatchResults, connection?: Connection, label?: string, lowerBracket?: boolean) {
+        const team1 = this.renderTeam(results.opponent1, lowerBracket || false);
+        const team2 = this.renderTeam(results.opponent2, lowerBracket || false);
 
         const teams = $('<div class="teams">');
         if (label) teams.append($('<span>').text(label));
@@ -215,7 +242,7 @@ class BracketsViewer {
         return match;
     }
 
-    private renderTeam(team: ParticipantResult | null) {
+    private renderTeam(team: ParticipantResult | null, lowerBracket: boolean) {
         const teamDOM = $(`<div class="team">`);
         const nameDOM = $('<div class="name">');
         const resultDOM = $('<div class="result">');
@@ -228,8 +255,7 @@ class BracketsViewer {
             nameDOM.text(participant === undefined ? 'TBD' : participant.name);
             resultDOM.text(team.score === undefined ? '-' : team.score);
 
-            if (team.position !== undefined)
-                nameDOM.append($('<span>').text(` (#${team.position})`));
+            this.renderTeamPosition(nameDOM, team, lowerBracket);
 
             if (team.result && team.result === 'win') {
                 nameDOM.addClass('win');
@@ -262,6 +288,24 @@ class BracketsViewer {
         }
 
         return teamDOM;
+    }
+
+    private renderTeamPosition(name: JQuery, team: ParticipantResult, lowerBracket: boolean) {
+        if (team.position === undefined) return;
+        if (!this.config.showParticipantPosition) return;
+        if (!this.config.showLowerBracketParticipantPosition && lowerBracket) return;
+
+        // 'P' for position (where the participant comes from) and '#' for actual seeding.
+        const text = lowerBracket ? `P${team.position}` : `#${team.position}`;
+
+        this.addPosition(name, text, this.config.participantPositionPlacement);
+    }
+
+    private addPosition(name: JQuery, text: string, placement: Placement,) {
+        if (placement === 'before')
+            name.prepend($('<span>').text(`${text} `));
+        else
+            name.append($('<span>').text(` (${text})`));
     }
 }
 
