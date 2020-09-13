@@ -10,14 +10,14 @@ class BracketsViewer {
     private participants!: Participant[];
     private config!: Config;
 
-    public render(rootSelector: string, data: ViewerData, config?: Config) {
+    public render(rootSelector: string, data: ViewerData, config?: Partial<Config>) {
         const root = document.querySelector(rootSelector) as HTMLElement;
         if (!root) throw Error('Root not found. You must have a root element with id "root"');
 
         this.config = {
             participantOriginPlacement: config && config.participantOriginPlacement || 'before',
-            showSlotsOrigin: config && config.showSlotsOrigin || true,
-            showLowerBracketSlotsOrigin: config && config.showLowerBracketSlotsOrigin || false,
+            showSlotsOrigin: config && config.showSlotsOrigin !== undefined ? config.showSlotsOrigin : true,
+            showLowerBracketSlotsOrigin: config && config.showLowerBracketSlotsOrigin !== undefined ? config.showLowerBracketSlotsOrigin : true,
         };
 
         this.participants = data.participants;
@@ -223,14 +223,22 @@ class BracketsViewer {
         if (participant) {
             nameContainer.innerText = participant.name;
             this.renderTeamOrigin(nameContainer, team, inLowerBracket);
-        } else if (hint && team.position !== undefined) {
-            dom.setupHint(nameContainer, hint(team.position));
+        } else {
+            this.renderHint(nameContainer, team, hint, inLowerBracket);
         }
 
         resultContainer.innerText = `${team.score || '-'}`;
 
         dom.setupWin(nameContainer, resultContainer, team);
         dom.setupLoss(nameContainer, resultContainer, team);
+    }
+
+    private renderHint(nameContainer: HTMLElement, team: ParticipantResult, hint: MatchHint, inLowerBracket: boolean) {
+        if (hint === undefined || team.position === undefined) return;
+        if (!this.config.showSlotsOrigin) return;
+        if (!this.config.showLowerBracketSlotsOrigin && inLowerBracket) return;
+
+        dom.setupHint(nameContainer, hint(team.position));
     }
 
     private renderTeamOrigin(name: HTMLElement, team: ParticipantResult, inLowerBracket: boolean) {

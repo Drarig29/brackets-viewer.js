@@ -140,11 +140,10 @@ export function addTeamOrigin(name: HTMLElement, text: string, placement: Placem
     if (placement === 'before') {
         span.innerText = `${text} `;
         name.prepend(span);
-        return;
+    } else if (placement === 'after') {
+        span.innerText = ` (${text})`;
+        name.append(span);
     }
-
-    span.innerText = ` (${text})`;
-    name.append(span);
 }
 
 export function getBracketConnection(roundNumber: number, matchesByRound: Match[][], inLowerBracket?: boolean, connectFinal?: boolean): Connection {
