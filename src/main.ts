@@ -1,7 +1,8 @@
 import './style.scss';
-import { Participant, Match, MatchResults, ParticipantResult, ViewerData, StageType } from "brackets-model";
-import { splitBy, getRanking, isMajorRound } from "./helpers";
+import { Participant, Match, MatchResults, ParticipantResult, ViewerData, StageType } from 'brackets-model';
+import { splitBy, getRanking } from './helpers';
 import * as dom from './dom';
+import * as lang from './lang';
 
 class BracketsViewer {
 
@@ -43,13 +44,13 @@ class BracketsViewer {
         let groupNumber = 1;
 
         for (const groupMatches of matchesByGroup) {
-            const groupContainer = dom.createGroupContainer(`Group ${groupNumber++}`);
+            const groupContainer = dom.createGroupContainer(lang.getGroupName(groupNumber++));
             const matchesByRound = splitBy(groupMatches, 'round_id');
 
             let roundNumber = 1;
 
             for (const roundMatches of matchesByRound) {
-                const roundContainer = dom.createRoundContainer(`Round ${roundNumber++}`);
+                const roundContainer = dom.createRoundContainer(lang.getRoundName(roundNumber++));
 
                 for (const match of roundMatches)
                     roundContainer.append(this.createMatch(match));
@@ -75,7 +76,7 @@ class BracketsViewer {
 
     private renderSingleElimination(root: HTMLElement, matchesByGroup: Match[][]) {
         const hasFinal = matchesByGroup[1] !== undefined;
-        this.renderBracket(root, splitBy(matchesByGroup[0], "round_id"), number => `Round ${number}`);
+        this.renderBracket(root, splitBy(matchesByGroup[0], 'round_id'), lang.getRoundName);
 
         if (hasFinal)
             this.renderFinal('consolation_final', matchesByGroup[1]);
@@ -83,8 +84,8 @@ class BracketsViewer {
 
     private renderDoubleElimination(root: HTMLElement, matchesByGroup: Match[][]) {
         const hasFinal = matchesByGroup[2] !== undefined;
-        this.renderBracket(root, splitBy(matchesByGroup[0], "round_id"), number => `WB Round ${number}`, false, hasFinal);
-        this.renderBracket(root, splitBy(matchesByGroup[1], "round_id"), number => `LB Round ${number}`, true);
+        this.renderBracket(root, splitBy(matchesByGroup[0], 'round_id'), lang.getWinnerBracketRoundName, false, hasFinal);
+        this.renderBracket(root, splitBy(matchesByGroup[1], 'round_id'), lang.getLoserBracketRoundName, true);
 
         if (hasFinal)
             this.renderFinal('grand_final', matchesByGroup[2]);
@@ -116,10 +117,10 @@ class BracketsViewer {
         const upperBracket = document.querySelector('.bracket');
         if (!upperBracket) throw Error('Upper bracket not found.');
 
-        const grandFinalName = this.getGrandFinalName(matches);
+        const grandFinalName = lang.getGrandFinalName(matches);
 
         for (let i = 0; i < matches.length; i++) {
-            const roundContainer = dom.createRoundContainer(this.getFinalMatchLabel(type, grandFinalName, i));
+            const roundContainer = dom.createRoundContainer(lang.getFinalMatchLabel(type, grandFinalName, i));
             roundContainer.append(this.createFinalMatch(type, grandFinalName, matches, i));
             upperBracket.append(roundContainer);
         }
@@ -161,20 +162,16 @@ class BracketsViewer {
     }
 
     private createBracketMatch(roundNumber: number, matchesByRound: Match[][], match: Match, roundCount: number, inLowerBracket?: boolean, connectFinal?: boolean) {
-        const connection = this.getConnection(roundNumber, matchesByRound, inLowerBracket, connectFinal);
-        const matchLabel = this.getMatchLabel(match, roundNumber, roundCount, inLowerBracket);
-        const matchHint = this.getMatchHint(roundNumber, roundCount, inLowerBracket);
+        const connection = dom.getBracketConnection(roundNumber, matchesByRound, inLowerBracket, connectFinal);
+        const matchLabel = lang.getMatchLabel(match, roundNumber, roundCount, inLowerBracket);
+        const matchHint = lang.getMatchHint(roundNumber, roundCount, inLowerBracket);
         return this.createMatch(match, connection, matchLabel, matchHint, inLowerBracket);
     }
 
     private createFinalMatch(type: string, grandFinalName: (i: number) => string, matches: Match[], i: number) {
-        const connection: Connection = {
-            connectPrevious: type === 'grand_final' && (i === 0 && 'straight'),
-            connectNext: matches.length === 2 && i === 0 && 'straight',
-        };
-
-        const matchLabel = this.getFinalMatchLabel(type, grandFinalName, i);
-        const matchHint = this.getFinalMatchHint(type, i);
+        const connection = dom.getFinalConnection(type, i, matches);
+        const matchLabel = lang.getFinalMatchLabel(type, grandFinalName, i);
+        const matchHint = lang.getFinalMatchHint(type, i);
 
         return this.createMatch(matches[i], connection, matchLabel, matchHint);
     }
@@ -197,17 +194,7 @@ class BracketsViewer {
         if (!connection)
             return match;
 
-        if (connection.connectPrevious)
-            teams.classList.add('connect-previous');
-
-        if (connection.connectNext)
-            match.classList.add('connect-next');
-
-        if (connection.connectPrevious === 'straight')
-            teams.classList.add('straight');
-
-        if (connection.connectNext === 'straight')
-            match.classList.add('straight');
+        dom.setupConnection(teams, match, connection);
 
         return match;
     }
@@ -253,21 +240,9 @@ class BracketsViewer {
         if (!this.config.showLowerBracketSlotsOrigin && inLowerBracket) return;
 
         // 'P' for position (where the participant comes from) and '#' for actual seeding.
-        const text = inLowerBracket ? `P${team.position}` : `#${team.position}`;
+        const origin = inLowerBracket ? `P${team.position}` : `#${team.position}`;
 
-        this.addTeamOrigin(name, text, this.config.participantOriginPlacement);
-    }
-
-    private addTeamOrigin(name: HTMLElement, text: string, placement: Placement) {
-        const span = document.createElement('span');
-
-        if (placement === 'before') {
-            span.innerText = `${text} `;
-            name.prepend(span);
-        } else {
-            span.innerText = ` (${text})`;
-            name.append(span);
-        }
+        dom.addTeamOrigin(name, origin, this.config.participantOriginPlacement);
     }
 
     private setupMouseHover(id: number, cell: HTMLElement) {
@@ -280,81 +255,6 @@ class BracketsViewer {
         cell.addEventListener('mouseleave', () => {
             this.teamRefsDOM[id].forEach(el => el.classList.remove('hover'));
         });
-    }
-
-    private getMatchHint(roundNumber: number, roundCount: number, inLowerBracket?: boolean): MatchHint {
-        if (!inLowerBracket && roundNumber === 1)
-            return (i: number) => `Seed ${i}`;
-
-        if (inLowerBracket && isMajorRound(roundNumber)) {
-            const roundNumberWB = Math.ceil((roundNumber + 1) / 2);
-
-            let hint = (i: number) => `Loser of WB ${roundNumberWB}.${i}`;
-
-            if (roundNumber === roundCount - 2)
-                hint = (i: number) => `Loser of WB Semi ${i}`;
-
-            if (roundNumber === roundCount)
-                hint = () => 'Loser of WB Final';
-
-            return hint;
-        }
-
-        return undefined;
-    }
-
-    private getConnection(roundNumber: number, matchesByRound: Match[][], inLowerBracket?: boolean, connectFinal?: boolean): Connection {
-        if (inLowerBracket) {
-            return {
-                connectPrevious: roundNumber > 1 && (roundNumber % 2 === 1 ? 'square' : 'straight'),
-                connectNext: roundNumber < matchesByRound.length && (roundNumber % 2 === 0 ? 'square' : 'straight'),
-            };
-        }
-
-        return {
-            connectPrevious: roundNumber > 1 && 'square',
-            connectNext: roundNumber < matchesByRound.length ? 'square' : (connectFinal ? 'straight' : false),
-        }
-    }
-
-    private getMatchLabel(match: Match, roundNumber: number, roundCount: number, inLowerBracket?: boolean) {
-        let matchPrefix = 'M';
-
-        if (inLowerBracket)
-            matchPrefix = 'LB';
-        else if (inLowerBracket === false)
-            matchPrefix = 'WB';
-
-        const semiFinalRound = roundNumber === roundCount - 1;
-        const finalRound = roundNumber === roundCount;
-
-        let matchLabel = `${matchPrefix} ${roundNumber}.${match.number}`;
-
-        if (!inLowerBracket && semiFinalRound)
-            matchLabel = `Semi ${match.number}`;
-
-        if (finalRound)
-            matchLabel = 'Final';
-
-        return matchLabel;
-    }
-
-    private getFinalMatchLabel(type: string, grandFinalName: (i: number) => string, i: number) {
-        return type === 'consolation_final' ? 'Consolation Final' : grandFinalName(i);
-    }
-
-    private getFinalMatchHint(type: string, i: number): MatchHint {
-        if (type === 'consolation_final')
-            return (i: number) => `Loser of Semi ${i}`;
-
-        if (i === 0)
-            return () => 'Winner of LB Final';
-
-        return undefined;
-    }
-
-    private getGrandFinalName(matches: Match[]) {
-        return matches.length === 1 ? () => 'Grand Final' : (i: number) => `GF Round ${i + 1}`;
     }
 }
 
