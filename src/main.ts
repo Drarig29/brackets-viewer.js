@@ -318,6 +318,7 @@ class BracketsViewer {
         const match = document.createElement('div');
         match.classList.add('match');
         match.append(teams);
+        
         if (!connection) return match;
 
         if (connection.connectPrevious)

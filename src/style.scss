@@ -2,11 +2,11 @@ $round-margin: 50px;
 $match-width: 200px;
 
 $connector-width: $round-margin / 2;
-$connector-borders: 2px solid #9e9e9e;
+$connector-borders: 2px solid var(--connector-color);
 
 $win-color: #50b649;
 $loss-color: #e61a1a;
-$match-borders: 1px solid #d9d9d9;
+$match-borders: 1px solid var(--border-color);
 $match-borders-radius: 0.3rem;
 
 *,
@@ -19,15 +19,26 @@ $match-borders-radius: 0.3rem;
   font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
     "Helvetica Neue", Arial, "Noto Sans", sans-serif, "Apple Color Emoji",
     "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";
-  color: #212529;
+
+  color: var(--font-color);
+  background-color: var(--primary-background);
   text-align: left;
-  background-color: #fff;
   display: flex;
   flex-direction: column;
   align-items: flex-start;
   width: max-content;
   margin: 0 auto;
   user-select: none;
+
+  --primary-background: #fff;
+  --secondary-background: #ddd;
+  --font-color: #212529;
+  --win-color: #50b649;
+  --loss-color: #e61a1a;
+  --hint-color: #a7a7a7;
+  --connector-color: #9e9e9e;
+  --border-color: #d9d9d9;
+  --border-hover-color: #009dff;
 }
 
 h1,
@@ -70,7 +81,7 @@ h3 {
 
     table {
       margin-top: 25px;
-      color: #777676;
+      color: #a7a7a7;
       border-collapse: collapse;
     }
 
@@ -176,7 +187,7 @@ h3 {
   border-radius: $match-borders-radius;
 
   &:hover {
-    border: 1px solid #009dff;
+    border: 1px solid var(--border-hover-color);
   }
 
   & > span {
@@ -186,7 +197,7 @@ h3 {
     font-size: 0.8rem;
     background: white;
     padding: 0 5px;
-    color: #a7a7a7;
+    color: var(--hint-color);
     border-radius: 3px;
   }
 
@@ -229,10 +240,10 @@ h3 {
   display: flex;
   justify-content: space-between;
   padding: 3px 12px;
-  background: white;
+  background: var(--primary-background);
 
   &.hover {
-    background: #eceff1 !important;
+    background: var(--secondary-background) !important;
   }
 
   &:nth-of-type(1) {
@@ -260,11 +271,11 @@ h3 {
   }
 
   &.hint {
-    color: #a7a7a7;
+    color: var(--hint-color);
   }
 
   & > span {
-    color: #a7a7a7;
+    color: var(--hint-color);
   }
 }
 
