@@ -1,13 +1,25 @@
-type ConnectionType = 'square' | 'straight' | false;
-type Placement = 'none' | 'before' | 'after';
-type FinalType = 'consolation_final' | 'grand_final';
-type MatchHint = ((i: number) => string) | undefined;
+/**
+ * The data to display with `brackets-viewer.js`
+ */
+interface ViewerData {
+    /** The stage to display. */
+    stage: import('brackets-model').Stage,
+    
+    /** The matches of the stage to display. */
+    matches: import('brackets-model').Match[],
 
-interface Connection {
-    connectPrevious?: ConnectionType,
-    connectNext?: ConnectionType,
+    /** The games of the matches to display. */
+    matchGames: import('brackets-model').MatchGame[],
+
+    /** The participants who play in the stage to display. */
+    participants: import('brackets-model').Participant[],
 }
 
+type Placement = 'none' | 'before' | 'after';
+
+/**
+ * An optional config to provide to `brackets-viewer.js`
+ */
 interface Config {
     /**
      * Where the position of a participant is placed relative to its name.
@@ -31,6 +43,15 @@ interface Config {
      * Whether to highlight every instance of a participant on hover.
      */
     highlightParticipantOnHover: boolean,
+}
+
+type ConnectionType = 'square' | 'straight' | false;
+type FinalType = 'consolation_final' | 'grand_final';
+type MatchHint = ((i: number) => string) | undefined;
+
+interface Connection {
+    connectPrevious?: ConnectionType,
+    connectNext?: ConnectionType,
 }
 
 interface RankingItem {
