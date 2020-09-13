@@ -1,4 +1,4 @@
-import { ParticipantResult } from "brackets-model";
+import { Match, ParticipantResult } from "brackets-model";
 import { rankingHeader } from "./helpers";
 
 export function createResultContainer() {
@@ -132,4 +132,52 @@ export function setupLoss(nameContainer: HTMLElement, resultContainer: HTMLEleme
         else if (team.score === undefined)
             resultContainer.innerText = 'L';
     }
+}
+
+export function addTeamOrigin(name: HTMLElement, text: string, placement: Placement) {
+    const span = document.createElement('span');
+
+    if (placement === 'before') {
+        span.innerText = `${text} `;
+        name.prepend(span);
+        return;
+    }
+
+    span.innerText = ` (${text})`;
+    name.append(span);
+}
+
+export function getBracketConnection(roundNumber: number, matchesByRound: Match[][], inLowerBracket?: boolean, connectFinal?: boolean): Connection {
+    if (inLowerBracket) {
+        return {
+            connectPrevious: roundNumber > 1 && (roundNumber % 2 === 1 ? 'square' : 'straight'),
+            connectNext: roundNumber < matchesByRound.length && (roundNumber % 2 === 0 ? 'square' : 'straight'),
+        };
+    }
+
+    return {
+        connectPrevious: roundNumber > 1 && 'square',
+        connectNext: roundNumber < matchesByRound.length ? 'square' : (connectFinal ? 'straight' : false),
+    }
+}
+
+export function getFinalConnection(type: string, i: number, matches: Match[]): Connection {
+    return {
+        connectPrevious: type === 'grand_final' && (i === 0 && 'straight'),
+        connectNext: matches.length === 2 && i === 0 && 'straight',
+    };
+}
+
+export function setupConnection(teams: HTMLElement, match: HTMLElement, connection: Connection) {
+    if (connection.connectPrevious)
+        teams.classList.add('connect-previous');
+
+    if (connection.connectNext)
+        match.classList.add('connect-next');
+
+    if (connection.connectPrevious === 'straight')
+        teams.classList.add('straight');
+
+    if (connection.connectNext === 'straight')
+        match.classList.add('straight');
 }
