@@ -1,8 +1,7 @@
 $round-margin: 50px;
 $match-width: 200px;
 
-$connector-left-width: $round-margin / 2;
-$connector-right-width: ($round-margin / 2)+2;
+$connector-width: $round-margin / 2;
 $connector-borders: 2px solid #9e9e9e;
 
 $win-color: #50b649;
@@ -28,6 +27,7 @@ $match-borders-radius: 0.3rem;
   align-items: flex-start;
   width: max-content;
   margin: 0 auto;
+  user-select: none;
 }
 
 h1,
@@ -54,18 +54,14 @@ h3 {
   padding: 10px;
 }
 
-.hover {
-  background: #eceff1;
-}
-
 .round-robin {
   display: flex;
 
   .group {
     text-align: center;
-    
+
     &:not(:last-of-type) {
-        margin-right: $round-margin;
+      margin-right: $round-margin;
     }
 
     h2 {
@@ -87,6 +83,10 @@ h3 {
     td {
       border: none;
       border-top: $match-borders;
+
+      &.hover {
+        background: #eceff1 !important;
+      }
     }
 
     th,
@@ -104,6 +104,7 @@ h3 {
   }
 
   .round {
+    width: fit-content;
     margin: 0 auto;
   }
 }
@@ -140,8 +141,8 @@ h3 {
       content: "";
       display: block;
       position: absolute;
-      right: -$connector-left-width;
-      width: $connector-left-width;
+      right: -$connector-width;
+      width: $connector-width;
       height: 50%;
       border-right: $connector-borders;
     }
@@ -171,6 +172,13 @@ h3 {
   width: 100%;
   position: relative;
 
+  border: $match-borders;
+  border-radius: $match-borders-radius;
+
+  &:hover {
+    border: 1px solid #009dff;
+  }
+
   & > span {
     position: absolute;
     top: -10px;
@@ -187,25 +195,10 @@ h3 {
       content: "";
       display: block;
       position: absolute;
-      left: -$connector-right-width;
-      width: $connector-right-width;
-      top: 0;
+      left: -$connector-width;
+      width: $connector-width;
       height: 50%;
-      border-left: $connector-borders;
       border-bottom: $connector-borders;
-    }
-
-    &::after {
-      content: "";
-      display: block;
-      position: absolute;
-      left: -$connector-right-width;
-      width: $connector-right-width;
-      top: 50%;
-      height: 50%;
-      transform: translateY(-2px);
-      border-left: $connector-borders;
-      border-top: $connector-borders;
     }
 
     %straight {
@@ -238,8 +231,11 @@ h3 {
   padding: 3px 12px;
   background: white;
 
+  &.hover {
+    background: #eceff1 !important;
+  }
+
   &:nth-of-type(1) {
-    border: $match-borders;
     border-bottom: none;
     border-top-left-radius: $match-borders-radius;
     border-top-right-radius: $match-borders-radius;
@@ -247,7 +243,6 @@ h3 {
   }
 
   &:nth-of-type(2) {
-    border: $match-borders;
     border-top: none;
     border-bottom-left-radius: $match-borders-radius;
     border-bottom-right-radius: $match-borders-radius;
@@ -265,7 +260,7 @@ h3 {
   }
 
   &.hint {
-    color: #a7a7a7;  
+    color: #a7a7a7;
   }
 
   & > span {
