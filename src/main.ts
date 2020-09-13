@@ -1,6 +1,7 @@
 import './style.scss';
-import { Participant, Match, MatchResults, ParticipantResult, ViewerData } from "brackets-model";
-import { splitBy, getRanking, rankingHeader, isMajorRound } from "./helpers";
+import { Participant, Match, MatchResults, ParticipantResult, ViewerData, StageType } from "brackets-model";
+import { splitBy, getRanking, isMajorRound } from "./helpers";
+import * as dom from './dom';
 
 class BracketsViewer {
 
@@ -18,174 +19,270 @@ class BracketsViewer {
             showLowerBracketSlotsOrigin: config && config.showLowerBracketSlotsOrigin || false,
         };
 
+        this.participants = data.participants;
+        data.participants.map(participant => this.teamRefsDOM[participant.id] = []);
+
+        const matchesByGroup = splitBy(data.matches, 'group_id');
+
         switch (data.stage.type) {
             case 'round_robin':
-                this.renderRoundRobin(root, data);
+                this.renderRoundRobin(root, data.stage.name, matchesByGroup);
                 break;
             case 'single_elimination':
             case 'double_elimination':
-                this.renderElimination(root, data);
+                this.renderElimination(root, data.stage.name, data.stage.type, matchesByGroup);
                 break;
             default:
                 throw Error(`Unknown bracket type: ${data.stage.type}`);
         }
     }
 
-    private renderRoundRobin(root: HTMLElement, data: ViewerData) {
-        data.participants.map(participant => this.teamRefsDOM[participant.id] = []);
+    private renderRoundRobin(root: HTMLElement, stageName: string, matchesByGroup: Match[][]) {
+        const container = dom.createRoundRobinContainer();
 
-        this.participants = data.participants;
-
-        const container = document.createElement('div');
-        container.classList.add('round-robin');
         let groupNumber = 1;
 
-        for (const group of splitBy(data.matches, 'group_id')) {
-            const h2 = document.createElement('h2');
-            h2.innerText = `Group ${groupNumber++}`;
-            const groupDOM = document.createElement('section');
-            groupDOM.classList.add('group');
-            groupDOM.append(h2);
+        for (const groupMatches of matchesByGroup) {
+            const groupContainer = dom.createGroupContainer(`Group ${groupNumber++}`);
+            const matchesByRound = splitBy(groupMatches, 'round_id');
+
             let roundNumber = 1;
 
-            for (const round of splitBy(group, 'round_id')) {
-                const h3 = document.createElement('h3');
-                h3.innerText = `Round ${roundNumber}`;
-                const roundDOM = document.createElement('article');
-                roundDOM.classList.add('round');
-                roundDOM.append(h3);
+            for (const roundMatches of matchesByRound) {
+                const roundContainer = dom.createRoundContainer(`Round ${roundNumber++}`);
 
-                for (const match of round) {
-                    roundDOM.append(this.renderMatch(match));
-                }
+                for (const match of roundMatches)
+                    roundContainer.append(this.createMatch(match));
 
-                groupDOM.append(roundDOM);
-                roundNumber++;
+                groupContainer.append(roundContainer);
             }
 
-            groupDOM.append(this.renderTable(group));
-            container.append(groupDOM);
+            groupContainer.append(this.createRanking(groupMatches));
+            container.append(groupContainer);
         }
 
-        const h1 = document.createElement('h1');
-        h1.innerText = data.stage.name;
-        root.append(h1, container);
+        root.append(dom.createTitle(stageName), container);
     }
 
-    private renderTable(matches: Match[]) {
-        const rankings = getRanking(matches);
-        const table = document.createElement('table');
-        const headers = document.createElement('tr');
+    private renderElimination(root: HTMLElement, stageName: string, type: StageType, matchesByGroup: Match[][]) {
+        root.append(dom.createTitle(stageName));
 
-        for (const prop in rankings[0]) {
-            const header = rankingHeader(prop as any);
-            const th = document.createElement('th');
-            th.innerText = header.value;
-            th.setAttribute('title', header.tooltip);
-            headers.append(th);
-        }
+        if (type === 'single_elimination')
+            return this.renderSingleElimination(root, matchesByGroup);
 
-        table.append(headers);
-
-        for (const ranking of rankings) {
-            const row = document.createElement('tr');
-
-            for (const prop in ranking) {
-                let data: number | string = ranking[prop];
-
-                if (prop === 'id') {
-                    const participant = this.participants.find(team => team.id === data);
-
-                    if (participant !== undefined) {
-                        const cell = document.createElement('td');
-                        cell.innerText = participant.name;
-                        const id = participant.id;
-
-                        this.teamRefsDOM[id].push(cell);
-                        cell.addEventListener('mouseover', () => {
-                            this.teamRefsDOM[id].forEach(el => el.classList.add('hover'));
-                        });
-                        cell.addEventListener('mouseleave', () => {
-                            this.teamRefsDOM[id].forEach(el => el.classList.remove('hover'));
-                        });
-
-                        row.append(cell);
-                        continue;
-                    }
-                }
-
-                const td = document.createElement('td');
-                td.innerText = String(data);
-                row.append(td);
-            }
-
-            table.append(row);
-        }
-
-        return table;
+        this.renderDoubleElimination(root, matchesByGroup);
     }
 
-    private renderElimination(root: HTMLElement, data: ViewerData) {
-        data.participants.map(participant => this.teamRefsDOM[participant.id] = []);
+    private renderSingleElimination(root: HTMLElement, matchesByGroup: Match[][]) {
+        const hasFinal = matchesByGroup[1] !== undefined;
+        this.renderBracket(root, splitBy(matchesByGroup[0], "round_id"), number => `Round ${number}`);
 
-        const matchesByGroup = splitBy(data.matches, 'group_id');
-        this.participants = data.participants;
+        if (hasFinal)
+            this.renderFinal('consolation_final', matchesByGroup[1]);
+    }
 
-        const h1 = document.createElement('h1');
-        h1.innerText = data.stage.name;
-        root.append(h1);
+    private renderDoubleElimination(root: HTMLElement, matchesByGroup: Match[][]) {
+        const hasFinal = matchesByGroup[2] !== undefined;
+        this.renderBracket(root, splitBy(matchesByGroup[0], "round_id"), number => `WB Round ${number}`, false, hasFinal);
+        this.renderBracket(root, splitBy(matchesByGroup[1], "round_id"), number => `LB Round ${number}`, true);
 
-        if (data.stage.type === 'single_elimination') {
-            const hasFinal = !!matchesByGroup[1];
-            this.renderBracket(root, splitBy(matchesByGroup[0], "round_id"), number => `Round ${number}`);
-
-            if (hasFinal) {
-                this.renderFinal('consolation_final', matchesByGroup[1]);
-            }
-        } else if (data.stage.type === 'double_elimination') {
-            const hasFinal = !!matchesByGroup[2];
-            this.renderBracket(root, splitBy(matchesByGroup[0], "round_id"), number => `WB Round ${number}`, false, hasFinal);
-            this.renderBracket(root, splitBy(matchesByGroup[1], "round_id"), number => `LB Round ${number}`, true);
-
-            if (hasFinal) {
-                this.renderFinal('grand_final', matchesByGroup[2]);
-            }
-        }
+        if (hasFinal)
+            this.renderFinal('grand_final', matchesByGroup[2]);
     }
 
     /**
      * Renders a bracket.
      */
     private renderBracket(root: HTMLElement, matchesByRound: Match[][], roundName: (roundNumber: number) => string, inLowerBracket?: boolean, connectFinal?: boolean) {
+        const bracketContainer = dom.createBracketContainer();
         const roundCount = matchesByRound.length;
-        const bracket = document.createElement('section');
-        bracket.classList.add('bracket');
 
         let roundNumber = 1;
 
         for (const matches of matchesByRound) {
-            const h3 = document.createElement('h3');
-            h3.innerText = roundName(roundNumber);
-            const roundDOM = document.createElement('article');
-            roundDOM.classList.add('round');
-            roundDOM.append(h3);
+            const roundContainer = dom.createRoundContainer(roundName(roundNumber));
 
-            for (const match of matches) {
-                const connection = this.getConnection(inLowerBracket, roundNumber, matchesByRound, connectFinal);
-                const matchLabel = this.getMatchLabel(match, roundNumber, roundCount, inLowerBracket);
-                const matchHint = this.getMatchHint(inLowerBracket, roundNumber, roundCount);
+            for (const match of matches)
+                roundContainer.append(this.createBracketMatch(roundNumber, matchesByRound, match, roundCount, inLowerBracket, connectFinal));
 
-                roundDOM.append(this.renderMatch(match, connection, matchLabel, matchHint, inLowerBracket));
-            }
-
-            bracket.append(roundDOM);
+            bracketContainer.append(roundContainer);
             roundNumber++;
         }
 
-        root.append(bracket);
+        root.append(bracketContainer);
     }
 
-    private getMatchHint(inLowerBracket: boolean | undefined, roundNumber: number, roundCount: number): MatchHint {
+    private renderFinal(type: FinalType, matches: Match[]) {
+        const upperBracket = document.querySelector('.bracket');
+        if (!upperBracket) throw Error('Upper bracket not found.');
+
+        const grandFinalName = this.getGrandFinalName(matches);
+
+        for (let i = 0; i < matches.length; i++) {
+            const roundContainer = dom.createRoundContainer(this.getFinalMatchLabel(type, grandFinalName, i));
+            roundContainer.append(this.createFinalMatch(type, grandFinalName, matches, i));
+            upperBracket.append(roundContainer);
+        }
+    }
+
+    private createRanking(matches: Match[]) {
+        const table = dom.createTable();
+        const ranking = getRanking(matches);
+
+        table.append(dom.createHeaders(ranking));
+
+        for (const item of ranking)
+            table.append(this.createRankingItem(item));
+
+        return table;
+    }
+
+    private createRankingItem(item: RankingItem) {
+        const row = dom.createRow();
+
+        for (const prop in item) {
+            let data: number | string = item[prop];
+
+            if (prop === 'id') {
+                const participant = this.participants.find(team => team.id === data);
+
+                if (participant !== undefined) {
+                    const cell = dom.createCell(participant.name);
+                    this.setupMouseHover(participant.id, cell);
+                    row.append(cell);
+                    continue;
+                }
+            }
+
+            row.append(dom.createCell(data));
+        }
+
+        return row;
+    }
+
+    private createBracketMatch(roundNumber: number, matchesByRound: Match[][], match: Match, roundCount: number, inLowerBracket?: boolean, connectFinal?: boolean) {
+        const connection = this.getConnection(roundNumber, matchesByRound, inLowerBracket, connectFinal);
+        const matchLabel = this.getMatchLabel(match, roundNumber, roundCount, inLowerBracket);
+        const matchHint = this.getMatchHint(roundNumber, roundCount, inLowerBracket);
+        return this.createMatch(match, connection, matchLabel, matchHint, inLowerBracket);
+    }
+
+    private createFinalMatch(type: string, grandFinalName: (i: number) => string, matches: Match[], i: number) {
+        const connection: Connection = {
+            connectPrevious: type === 'grand_final' && (i === 0 && 'straight'),
+            connectNext: matches.length === 2 && i === 0 && 'straight',
+        };
+
+        const matchLabel = this.getFinalMatchLabel(type, grandFinalName, i);
+        const matchHint = this.getFinalMatchHint(type, i);
+
+        return this.createMatch(matches[i], connection, matchLabel, matchHint);
+    }
+
+    private createMatch(results: MatchResults, connection?: Connection, label?: string, hint?: MatchHint, inLowerBracket?: boolean) {
+        inLowerBracket = inLowerBracket || false;
+
+        const match = dom.createMatchContainer();
+        const teams = dom.createTeamsContainer();
+
+        const team1 = this.createTeam(results.opponent1, hint, inLowerBracket);
+        const team2 = this.createTeam(results.opponent2, hint, inLowerBracket);
+
+        if (label)
+            teams.append(dom.createMatchLabel(label));
+
+        teams.append(team1, team2);
+        match.append(teams);
+
+        if (!connection)
+            return match;
+
+        if (connection.connectPrevious)
+            teams.classList.add('connect-previous');
+
+        if (connection.connectNext)
+            match.classList.add('connect-next');
+
+        if (connection.connectPrevious === 'straight')
+            teams.classList.add('straight');
+
+        if (connection.connectNext === 'straight')
+            match.classList.add('straight');
+
+        return match;
+    }
+
+    private createTeam(team: ParticipantResult | null, hint: MatchHint, inLowerBracket: boolean) {
+        const teamContainer = dom.createTeamContainer();
+        const nameContainer = dom.createNameContainer();
+        const resultContainer = dom.createResultContainer();
+
+        if (team === null)
+            nameContainer.innerText = 'BYE';
+        else
+            this.renderParticipant(nameContainer, resultContainer, team, hint, inLowerBracket);
+
+        teamContainer.append(nameContainer, resultContainer);
+
+        if (team && team.id !== null)
+            this.setupMouseHover(team.id, teamContainer);
+
+        return teamContainer;
+    }
+
+    private renderParticipant(nameContainer: HTMLElement, resultContainer: HTMLElement, team: ParticipantResult, hint: MatchHint, inLowerBracket: boolean) {
+        const participant = this.participants.find(participant => participant.id === team.id);
+
+        if (participant) {
+            nameContainer.innerText = participant.name;
+            this.renderTeamOrigin(nameContainer, team, inLowerBracket);
+        } else if (hint && team.position !== undefined) {
+            dom.setupHint(nameContainer, hint(team.position));
+        }
+
+        resultContainer.innerText = `${team.score || '-'}`;
+
+        dom.setupWin(nameContainer, resultContainer, team);
+        dom.setupLoss(nameContainer, resultContainer, team);
+    }
+
+    private renderTeamOrigin(name: HTMLElement, team: ParticipantResult, inLowerBracket: boolean) {
+        if (team.position === undefined) return;
+        if (this.config.participantOriginPlacement === 'none') return;
+        if (!this.config.showSlotsOrigin) return;
+        if (!this.config.showLowerBracketSlotsOrigin && inLowerBracket) return;
+
+        // 'P' for position (where the participant comes from) and '#' for actual seeding.
+        const text = inLowerBracket ? `P${team.position}` : `#${team.position}`;
+
+        this.addTeamOrigin(name, text, this.config.participantOriginPlacement);
+    }
+
+    private addTeamOrigin(name: HTMLElement, text: string, placement: Placement) {
+        const span = document.createElement('span');
+
+        if (placement === 'before') {
+            span.innerText = `${text} `;
+            name.prepend(span);
+        } else {
+            span.innerText = ` (${text})`;
+            name.append(span);
+        }
+    }
+
+    private setupMouseHover(id: number, cell: HTMLElement) {
+        this.teamRefsDOM[id].push(cell);
+
+        cell.addEventListener('mouseover', () => {
+            this.teamRefsDOM[id].forEach(el => el.classList.add('hover'));
+        });
+
+        cell.addEventListener('mouseleave', () => {
+            this.teamRefsDOM[id].forEach(el => el.classList.remove('hover'));
+        });
+    }
+
+    private getMatchHint(roundNumber: number, roundCount: number, inLowerBracket?: boolean): MatchHint {
         if (!inLowerBracket && roundNumber === 1)
             return (i: number) => `Seed ${i}`;
 
@@ -206,7 +303,7 @@ class BracketsViewer {
         return undefined;
     }
 
-    private getConnection(inLowerBracket: boolean | undefined, roundNumber: number, matchesByRound: Match[][], connectFinal: boolean | undefined): Connection {
+    private getConnection(roundNumber: number, matchesByRound: Match[][], inLowerBracket?: boolean, connectFinal?: boolean): Connection {
         if (inLowerBracket) {
             return {
                 connectPrevious: roundNumber > 1 && (roundNumber % 2 === 1 ? 'square' : 'straight'),
@@ -220,7 +317,7 @@ class BracketsViewer {
         }
     }
 
-    private getMatchLabel(match: Match, roundNumber: number, roundCount: number, inLowerBracket: boolean | undefined) {
+    private getMatchLabel(match: Match, roundNumber: number, roundCount: number, inLowerBracket?: boolean) {
         let matchPrefix = 'M';
 
         if (inLowerBracket)
@@ -242,157 +339,22 @@ class BracketsViewer {
         return matchLabel;
     }
 
-    private renderFinal(type: FinalType, matches: Match[]) {
-        const upperBracket = document.querySelector('.bracket');
-        if (!upperBracket) throw Error('Upper bracket not found.');
-
-        const grandFinalMatchHint = (i: number) => i === 0 ? () => 'Winner of LB Final' : undefined;
-        const grandFinalName = matches.length === 1 ? () => 'Grand Final' : (i: number) => `GF Round ${i + 1}`;
-
-        for (let i = 0; i < matches.length; i++) {
-            const matchLabel = type === 'consolation_final' ? 'Consolation Final' : grandFinalName(i);
-            const matchHint = type === 'consolation_final' ? (i: number) => `Loser of Semi ${i}` : grandFinalMatchHint(i);
-
-            const matchDOM = this.renderMatch(matches[i], {
-                connectPrevious: type === 'grand_final' && (i === 0 && 'straight'),
-                connectNext: matches.length === 2 && i === 0 && 'straight',
-            }, matchLabel, matchHint, undefined);
-
-            const h3 = document.createElement('h3');
-            h3.innerText = type === 'grand_final' ? grandFinalName(i) : 'Consolation Final';
-
-            const roundDOM = document.createElement('article');
-            roundDOM.classList.add('round');
-            roundDOM.append(h3, matchDOM);
-
-            upperBracket.append(roundDOM);
-        }
+    private getFinalMatchLabel(type: string, grandFinalName: (i: number) => string, i: number) {
+        return type === 'consolation_final' ? 'Consolation Final' : grandFinalName(i);
     }
 
-    private renderMatch(results: MatchResults, connection?: Connection, label?: string, hint?: MatchHint, inLowerBracket?: boolean) {
-        inLowerBracket = inLowerBracket || false;
+    private getFinalMatchHint(type: string, i: number): MatchHint {
+        if (type === 'consolation_final')
+            return (i: number) => `Loser of Semi ${i}`;
 
-        const team1 = this.renderTeam(results.opponent1, hint, inLowerBracket);
-        const team2 = this.renderTeam(results.opponent2, hint, inLowerBracket);
+        if (i === 0)
+            return () => 'Winner of LB Final';
 
-        const teams = document.createElement('div');
-        teams.classList.add('teams');
-
-        if (label) {
-            const span = document.createElement('span');
-            span.innerText = label;
-            teams.append(span);
-        }
-
-        teams.append(team1, team2);
-
-        const match = document.createElement('div');
-        match.classList.add('match');
-        match.append(teams);
-        
-        if (!connection) return match;
-
-        if (connection.connectPrevious)
-            teams.classList.add('connect-previous');
-
-        if (connection.connectNext)
-            match.classList.add('connect-next');
-
-        if (connection.connectPrevious === 'straight')
-            teams.classList.add('straight');
-
-        if (connection.connectNext === 'straight')
-            match.classList.add('straight');
-
-        return match;
+        return undefined;
     }
 
-    private renderTeam(team: ParticipantResult | null, hint: MatchHint, inLowerBracket: boolean) {
-        const teamDOM = document.createElement('div');
-        teamDOM.classList.add('team');
-
-        const nameDOM = document.createElement('div');
-        nameDOM.classList.add('name');
-
-        const resultDOM = document.createElement('div');
-        resultDOM.classList.add('result');
-
-        if (team === null) {
-            nameDOM.innerText = 'BYE';
-        } else {
-            const participant = this.participants.find(participant => participant.id === team.id);
-
-            if (participant) {
-                nameDOM.innerText = participant.name;
-                this.renderTeamOrigin(nameDOM, team, inLowerBracket);
-            } else if (hint && team.position) {
-                this.renderHint(nameDOM, hint(team.position));
-            }
-
-            resultDOM.innerText = team.score === undefined ? '-' : String(team.score);
-
-            if (team.result && team.result === 'win') {
-                nameDOM.classList.add('win');
-                resultDOM.classList.add('win');
-
-                if (team.score === undefined)
-                    resultDOM.innerText = 'W'; // Win.
-            }
-
-            if (team.result && team.result === 'loss' || team.forfeit) {
-                nameDOM.classList.add('loss');
-                resultDOM.classList.add('loss');
-
-                if (team.forfeit)
-                    resultDOM.innerText = 'F'; // Forfeit.
-                else if (team.score === undefined)
-                    resultDOM.innerText = 'L'; // Loss.
-            }
-        }
-
-        teamDOM.append(nameDOM, resultDOM);
-
-        if (team && team.id !== null) {
-            const id = team.id;
-            this.teamRefsDOM[id].push(teamDOM);
-            teamDOM.addEventListener('mouseover', () => {
-                this.teamRefsDOM[id].forEach(el => el.classList.add('hover'));
-            });
-            teamDOM.addEventListener('mouseleave', () => {
-                this.teamRefsDOM[id].forEach(el => el.classList.remove('hover'));
-            });
-        }
-
-        return teamDOM;
-    }
-
-    private renderHint(name: HTMLElement, hint: string) {
-        name.classList.add('hint');
-        name.innerText = hint;
-    }
-
-    private renderTeamOrigin(name: HTMLElement, team: ParticipantResult, inLowerBracket: boolean) {
-        if (team.position === undefined) return;
-        if (this.config.participantOriginPlacement === 'none') return;
-        if (!this.config.showSlotsOrigin) return;
-        if (!this.config.showLowerBracketSlotsOrigin && inLowerBracket) return;
-
-        // 'P' for position (where the participant comes from) and '#' for actual seeding.
-        const text = inLowerBracket ? `P${team.position}` : `#${team.position}`;
-
-        this.addTeamOrigin(name, text, this.config.participantOriginPlacement);
-    }
-
-    private addTeamOrigin(name: HTMLElement, text: string, placement: Placement) {
-        const span = document.createElement('span');
-        
-        if (placement === 'before') {
-            span.innerText = `${text} `;
-            name.prepend(span);
-        } else {
-            span.innerText = ` (${text})`;
-            name.append(span);
-        }
+    private getGrandFinalName(matches: Match[]) {
+        return matches.length === 1 ? () => 'Grand Final' : (i: number) => `GF Round ${i + 1}`;
     }
 }
 
