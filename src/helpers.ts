@@ -13,29 +13,11 @@ export function splitBy<T>(array: T[], key: keyof T): T[][] {
     return Object.values(obj);
 }
 
-interface Ranking {
-    [prop: string]: number,
-    rank: number,
-    id: number,
-    played: number,
-    wins: number,
-    draws: number,
-    losses: number,
-    forfeits: number,
-    scoreFor: number,
-    scoreAgainst: number,
-    scoreDifference: number,
-    points: number,
+export function isMajorRound(roundNumber: number) {
+    return roundNumber === 1 || roundNumber % 2 === 0;
 }
 
-interface Header {
-    value: string,
-    tooltip: string,
-}
-
-type Headers = { [name in keyof Ranking]: Header };
-
-const headers: Headers = {
+const headers: RankingHeaders = {
     'rank': {
         value: '#',
         tooltip: 'Rank',
@@ -82,78 +64,78 @@ const headers: Headers = {
     },
 }
 
-export function isMajorRound(roundNumber: number) {
-    return roundNumber === 1 || roundNumber % 2 === 0;
-}
-
-export function rankingHeader(name: keyof Ranking): Header {
+export function rankingHeader(name: keyof RankingItem): Header {
     return headers[name];
 }
 
-export function getRanking(matches: Match[], pointsFormula?: (ranking: Ranking) => number): Ranking[] {
-    const teams: { [id: number]: Ranking } = {};
+export function getRanking(matches: Match[], formula?: RankingFormula): Ranking {
+    formula = formula || (
+        (item: RankingItem) => 3 * item.wins + 1 * item.draws + 0 * item.losses
+    );
 
-    function processTeam(current: ParticipantResult | null, other: ParticipantResult | null) {
-        if (!current || current.id === null) return;
-
-        const state = teams[current.id] || {
-            rank: 0,
-            id: 0,
-            played: 0,
-            wins: 0,
-            draws: 0,
-            losses: 0,
-            forfeits: 0,
-            scoreFor: 0,
-            scoreAgainst: 0,
-            scoreDifference: 0,
-            points: 0,
-        };
-
-        state.id = current.id;
-        state.played++;
-
-        if (current.result === 'win')
-            state.wins++;
-
-        if (current.result === 'draw')
-            state.draws++;
-
-        if (current.result === 'loss')
-            state.losses++;
-
-        if (current.forfeit)
-            state.forfeits++;
-
-        state.scoreFor += current.score || 0;
-        state.scoreAgainst += other && other.score || 0;
-        state.scoreDifference = state.scoreFor - state.scoreAgainst;
-
-        const formula = pointsFormula || (
-            (ranking: Ranking) => 3 * ranking.wins + 1 * ranking.draws + 0 * ranking.losses
-        );
-
-        state.points = formula(state);
-
-        teams[current.id] = state;
-    }
+    const rankingMap: RankingMap = {};
 
     for (const match of matches) {
-        processTeam(match.opponent1, match.opponent2);
-        processTeam(match.opponent2, match.opponent1);
+        processTeam(rankingMap, formula, match.opponent1, match.opponent2);
+        processTeam(rankingMap, formula, match.opponent2, match.opponent1);
     }
 
-    const rankings = Object.values(teams).sort((a, b) => b.points - a.points);
+    return createRanking(rankingMap);
+}
 
-    let rank = {
+function createRanking(rankingMap: RankingMap) {
+    const ranking = Object.values(rankingMap).sort((a, b) => b.points - a.points);
+    
+    const rank = {
         value: 0,
         lastPoints: -1,
     };
 
-    for (const ranking of rankings) {
-        ranking.rank = rank.lastPoints !== ranking.points ? ++rank.value : rank.value;
-        rank.lastPoints = ranking.points;
+    for (const item of ranking) {
+        item.rank = rank.lastPoints !== item.points ? ++rank.value : rank.value;
+        rank.lastPoints = item.points;
     }
 
-    return rankings;
+    return ranking;
+}
+
+function processTeam(rankingMap: RankingMap, formula: RankingFormula, current: ParticipantResult | null, other: ParticipantResult | null) {
+    if (!current || current.id === null) return;
+
+    const state = rankingMap[current.id] || {
+        rank: 0,
+        id: 0,
+        played: 0,
+        wins: 0,
+        draws: 0,
+        losses: 0,
+        forfeits: 0,
+        scoreFor: 0,
+        scoreAgainst: 0,
+        scoreDifference: 0,
+        points: 0,
+    };
+
+    state.id = current.id;
+    state.played++;
+
+    if (current.result === 'win')
+        state.wins++;
+
+    if (current.result === 'draw')
+        state.draws++;
+
+    if (current.result === 'loss')
+        state.losses++;
+
+    if (current.forfeit)
+        state.forfeits++;
+
+    state.scoreFor += current.score || 0;
+    state.scoreAgainst += other && other.score || 0;
+    state.scoreDifference = state.scoreFor - state.scoreAgainst;
+
+    state.points = formula(state);
+
+    rankingMap[current.id] = state;
 }
