@@ -1,5 +1,5 @@
 import './style.scss';
-import { Participant, Match, MatchResults, ParticipantResult, ViewerData, StageType } from 'brackets-model';
+import { Participant, Match, MatchResults, ParticipantResult, StageType } from 'brackets-model';
 import { splitBy, getRanking } from './helpers';
 import * as dom from './dom';
 import * as lang from './lang';
