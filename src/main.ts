@@ -18,6 +18,7 @@ class BracketsViewer {
             participantOriginPlacement: config && config.participantOriginPlacement || 'before',
             showSlotsOrigin: config && config.showSlotsOrigin !== undefined ? config.showSlotsOrigin : true,
             showLowerBracketSlotsOrigin: config && config.showLowerBracketSlotsOrigin !== undefined ? config.showLowerBracketSlotsOrigin : true,
+            highlightParticipantOnHover: config && config.highlightParticipantOnHover !== undefined ? config.highlightParticipantOnHover : true,
         };
 
         this.participants = data.participants;
@@ -254,6 +255,8 @@ class BracketsViewer {
     }
 
     private setupMouseHover(id: number, cell: HTMLElement) {
+        if (!this.config.highlightParticipantOnHover) return;
+
         this.teamRefsDOM[id].push(cell);
 
         cell.addEventListener('mouseover', () => {

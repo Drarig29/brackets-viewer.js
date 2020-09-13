@@ -26,6 +26,11 @@ interface Config {
      * Whether to show the origin of a slot (in the lower bracket of an elimination stage).
      */
     showLowerBracketSlotsOrigin: boolean,
+
+    /**
+     * Whether to highlight every instance of a participant on hover.
+     */
+    highlightParticipantOnHover: boolean,
 }
 
 interface RankingItem {
