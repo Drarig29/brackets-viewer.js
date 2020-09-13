@@ -2,35 +2,6 @@ import './style.scss';
 import { Participant, Match, MatchResults, ParticipantResult, ViewerData } from "brackets-model";
 import { splitBy, getRanking, rankingHeader, isMajorRound } from "./helpers";
 
-type ConnectionType = 'square' | 'straight' | false;
-type Placement = 'none' | 'before' | 'after';
-type FinalType = 'consolation_final' | 'grand_final';
-type MatchHint = ((i: number) => string) | undefined;
-
-interface Connection {
-    connectPrevious?: ConnectionType,
-    connectNext?: ConnectionType,
-}
-
-interface Config {
-    /**
-     * Where the position of a participant is placed relative to its name.
-     * - If `before`, the position is prepended before the team name. "#1 Team"
-     * - If `after`, the position is appended after the team name, in parentheses. "Team (#1)"
-     */
-    participantOriginPlacement: Placement,
-
-    /**
-     * Whether to show the origin of a slot (wherever possible).
-     */
-    showSlotsOrigin: boolean,
-
-    /**
-     * Whether to show the origin of a slot (in the lower bracket of an elimination stage).
-     */
-    showLowerBracketSlotsOrigin: boolean,
-}
-
 class BracketsViewer {
 
     readonly teamRefsDOM: { [key: number]: HTMLElement[] } = {};
