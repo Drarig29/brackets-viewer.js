@@ -9,6 +9,7 @@
         "db": "json-server --watch demo/db.json",
         "build": "npx webpack --mode production",
         "start": "npx webpack --watch --mode development",
+        "prepare": "npm run build",
         "prepublishOnly": "npm run build"
     },
     "repository": {
