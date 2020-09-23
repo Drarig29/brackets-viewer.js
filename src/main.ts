@@ -22,7 +22,7 @@ class BracketsViewer {
         };
 
         this.participants = data.participants;
-        data.participants.map(participant => this.teamRefsDOM[participant.id] = []);
+        data.participants.forEach(participant => this.teamRefsDOM[participant.id] = []);
 
         const matchesByGroup = splitBy(data.matches, 'group_id');
 
@@ -219,7 +219,7 @@ class BracketsViewer {
     }
 
     private renderParticipant(nameContainer: HTMLElement, resultContainer: HTMLElement, team: ParticipantResult, hint: MatchHint, inLowerBracket: boolean) {
-        const participant = this.participants.find(participant => participant.id === team.id);
+        const participant = this.participants.find(item => item.id === team.id);
 
         if (participant) {
             nameContainer.innerText = participant.name;
