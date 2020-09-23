@@ -50,7 +50,7 @@ export function getFinalMatchLabel(type: string, grandFinalName: (i: number) => 
 
 export function getFinalMatchHint(type: string, i: number): MatchHint {
     if (type === 'consolation_final')
-        return (i: number) => `Loser of Semi ${i}`;
+        return number => `Loser of Semi ${number}`;
 
     if (i === 0)
         return () => 'Winner of LB Final';
