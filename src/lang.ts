@@ -1,4 +1,4 @@
-import { Match } from "brackets-model";
+import { Match, Status } from "brackets-model";
 import { isMajorRound } from "./helpers";
 
 export function getMatchHint(roundNumber: number, roundCount: number, inLowerBracket?: boolean): MatchHint {
@@ -56,6 +56,17 @@ export function getFinalMatchHint(type: string, i: number): MatchHint {
         return () => 'Winner of LB Final';
 
     return undefined;
+}
+
+export function getMatchStatus(status: Status) {
+    switch (status) {
+        case Status.Locked: return 'Locked';
+        case Status.Waiting: return 'Waiting';
+        case Status.Ready: return 'Ready';
+        case Status.Running: return 'Running';
+        case Status.Completed: return 'Completed';
+        case Status.Archived: return 'Archived';
+    }
 }
 
 export function getGrandFinalName(matches: Match[]) {

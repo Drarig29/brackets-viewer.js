@@ -187,7 +187,7 @@ class BracketsViewer {
         const team2 = this.createTeam(results.opponent2, hint, inLowerBracket);
 
         if (label)
-            teams.append(dom.createMatchLabel(label));
+            teams.append(dom.createMatchLabel(label, lang.getMatchStatus(results.status)));
 
         teams.append(team1, team2);
         match.append(teams);
