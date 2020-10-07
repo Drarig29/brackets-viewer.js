@@ -25,9 +25,10 @@ export function createMatchContainer() {
     return match;
 }
 
-export function createMatchLabel(label: string) {
+export function createMatchLabel(label: string, status: string) {
     const span = document.createElement('span');
     span.innerText = label;
+    span.title = status;
     return span;
 }
 
