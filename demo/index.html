@@ -23,5 +23,7 @@
             showLowerBracketSlotsOrigin: true,
             highlightParticipantOnHover: true,
         });
-    })();
+    })().catch(() => {
+        alert('Failed to fetch localhost. Please do `npm run db` or use json-server your own way.');
+    });
 </script>
