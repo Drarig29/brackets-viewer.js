@@ -120,9 +120,13 @@ class BracketsViewer {
 
         const grandFinalName = lang.getGrandFinalName(matches);
 
-        for (let i = 0; i < matches.length; i++) {
+        const winnerWb =  matches[0].opponent1;
+        const finalsToDisplay = (winnerWb && winnerWb.id != null && winnerWb.result != "win") ? 2 : 1;
+
+        const finalMatches = matches.slice(0, finalsToDisplay);
+        for (let i = 0; i < finalMatches.length; i++) {
             const roundContainer = dom.createRoundContainer(lang.getFinalMatchLabel(type, grandFinalName, i));
-            roundContainer.append(this.createFinalMatch(type, grandFinalName, matches, i));
+            roundContainer.append(this.createFinalMatch(type, grandFinalName, finalMatches, i));
             upperBracket.append(roundContainer);
         }
     }
