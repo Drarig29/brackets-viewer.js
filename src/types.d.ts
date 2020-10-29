@@ -73,6 +73,11 @@ export type FinalType = 'consolation_final' | 'grand_final';
 export type OriginHint = ((position: number) => string) | undefined;
 
 /**
+ * A function returning a round name based on its number and the count of rounds.
+ */
+export type RoundName = (roundNumber: number, roundCount: number) => string;
+
+/**
  * Contains the information about the connections of a match.
  */
 export interface Connection {
