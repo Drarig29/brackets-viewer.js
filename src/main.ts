@@ -119,9 +119,13 @@ export class BracketsViewer {
      * @param matchesByGroup A list of matches for each group.
      */
     private renderDoubleElimination(root: HTMLElement, matchesByGroup: Match[][]): void {
+        const hasLoserBracket = matchesByGroup[1] !== undefined;
         const hasFinal = matchesByGroup[2] !== undefined;
+
         this.renderBracket(root, splitBy(matchesByGroup[0], 'round_id'), lang.getWinnerBracketRoundName, false, hasFinal);
-        this.renderBracket(root, splitBy(matchesByGroup[1], 'round_id'), lang.getLoserBracketRoundName, true);
+
+        if (hasLoserBracket)
+            this.renderBracket(root, splitBy(matchesByGroup[1], 'round_id'), lang.getLoserBracketRoundName, true);
 
         if (hasFinal)
             this.renderFinal('grand_final', matchesByGroup[2]);
