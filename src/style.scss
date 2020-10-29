@@ -258,38 +258,38 @@ h3 {
     border-bottom-right-radius: $match-borders-radius;
     padding-bottom: 8px;
   }
-}
 
-.name {
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
+  .name {
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
 
-  &.win {
+    &.hint {
+      color: var(--hint-color);
+    }
+
+    & > span {
+      color: var(--hint-color);
+      font-size: 0.9rem;
+      font-weight: initial;
+    }
+  }
+
+  &.win .name {
     font-weight: bold;
   }
 
-  &.hint {
-    color: var(--hint-color);
+  .result {
+    margin-left: 10px;
+    width: 15%;
+    text-align: center;
   }
 
-  & > span {
-    color: var(--hint-color);
-    font-size: 0.9rem;
-    font-weight: initial
-  }
-}
-
-.result {
-  margin-left: 10px;
-  width: 15%;
-  text-align: center;
-
-  &.win {
+  &.win .result {
     color: var(--win-color);
   }
 
-  &.loss {
+  &.loss .result {
     color: var(--loss-color);
   }
 }
