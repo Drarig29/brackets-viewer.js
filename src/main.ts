@@ -3,14 +3,22 @@ import { Participant, Match, MatchResults, ParticipantResult, StageType } from '
 import { splitBy, getRanking } from './helpers';
 import * as dom from './dom';
 import * as lang from './lang';
+import { Config, Connection, FinalType, MatchHint, RankingItem, ViewerData } from './types';
 
-class BracketsViewer {
+export class BracketsViewer {
 
-    readonly teamRefsDOM: { [key: number]: HTMLElement[] } = {};
+    readonly teamRefsDOM: { [participantId: number]: HTMLElement[] } = {};
     private participants!: Participant[];
     private config!: Config;
 
-    public render(rootSelector: string, data: ViewerData, config?: Partial<Config>) {
+    /**
+     * Renders a stage (round-robin, single or double elimination).
+     *
+     * @param rootSelector The DOM selector for the root element.
+     * @param data The data to display.
+     * @param config An optional configuration for the viewer.
+     */
+    public render(rootSelector: string, data: ViewerData, config?: Partial<Config>): void {
         const root = document.querySelector(rootSelector) as HTMLElement;
         if (!root) throw Error('Root not found. You must have a root element with id "root"');
 
@@ -39,7 +47,14 @@ class BracketsViewer {
         }
     }
 
-    private renderRoundRobin(root: HTMLElement, stageName: string, matchesByGroup: Match[][]) {
+    /**
+     * Renders a round-robin stage.
+     *
+     * @param root The root element.
+     * @param stageName Name of the stage.
+     * @param matchesByGroup A list of matches for each group.
+     */
+    private renderRoundRobin(root: HTMLElement, stageName: string, matchesByGroup: Match[][]): void {
         const container = dom.createRoundRobinContainer();
 
         let groupNumber = 1;
@@ -66,16 +81,30 @@ class BracketsViewer {
         root.append(dom.createTitle(stageName), container);
     }
 
-    private renderElimination(root: HTMLElement, stageName: string, type: StageType, matchesByGroup: Match[][]) {
+    /**
+     * Renders an elimination stage (single or double).
+     *
+     * @param root The root element.
+     * @param stageName Name of the stage.
+     * @param type Type of the stage.
+     * @param matchesByGroup A list of matches for each group.
+     */
+    private renderElimination(root: HTMLElement, stageName: string, type: StageType, matchesByGroup: Match[][]): void {
         root.append(dom.createTitle(stageName));
 
         if (type === 'single_elimination')
-            return this.renderSingleElimination(root, matchesByGroup);
-
-        this.renderDoubleElimination(root, matchesByGroup);
+            this.renderSingleElimination(root, matchesByGroup);
+        else
+            this.renderDoubleElimination(root, matchesByGroup);
     }
 
-    private renderSingleElimination(root: HTMLElement, matchesByGroup: Match[][]) {
+    /**
+     * Renders a single elimination stage.
+     *
+     * @param root The root element.
+     * @param matchesByGroup A list of matches for each group.
+     */
+    private renderSingleElimination(root: HTMLElement, matchesByGroup: Match[][]): void {
         const hasFinal = matchesByGroup[1] !== undefined;
         this.renderBracket(root, splitBy(matchesByGroup[0], 'round_id'), lang.getRoundName);
 
@@ -83,7 +112,13 @@ class BracketsViewer {
             this.renderFinal('consolation_final', matchesByGroup[1]);
     }
 
-    private renderDoubleElimination(root: HTMLElement, matchesByGroup: Match[][]) {
+    /**
+     * Renders a double elimination stage.
+     *
+     * @param root The root element.
+     * @param matchesByGroup A list of matches for each group.
+     */
+    private renderDoubleElimination(root: HTMLElement, matchesByGroup: Match[][]): void {
         const hasFinal = matchesByGroup[2] !== undefined;
         this.renderBracket(root, splitBy(matchesByGroup[0], 'round_id'), lang.getWinnerBracketRoundName, false, hasFinal);
         this.renderBracket(root, splitBy(matchesByGroup[1], 'round_id'), lang.getLoserBracketRoundName, true);
@@ -94,8 +129,14 @@ class BracketsViewer {
 
     /**
      * Renders a bracket.
+     *
+     * @param root The root element.
+     * @param matchesByRound A list of matches for each round.
+     * @param roundName A function giving a round's name based on its number.
+     * @param inLowerBracket Whether the bracket is in lower bracket.
+     * @param connectFinal Whether to connect the last match of the bracket to the final.
      */
-    private renderBracket(root: HTMLElement, matchesByRound: Match[][], roundName: (roundNumber: number) => string, inLowerBracket?: boolean, connectFinal?: boolean) {
+    private renderBracket(root: HTMLElement, matchesByRound: Match[][], roundName: (roundNumber: number) => string, inLowerBracket?: boolean, connectFinal?: boolean): void {
         const bracketContainer = dom.createBracketContainer();
         const roundCount = matchesByRound.length;
 
@@ -105,7 +146,7 @@ class BracketsViewer {
             const roundContainer = dom.createRoundContainer(roundName(roundNumber));
 
             for (const match of matches)
-                roundContainer.append(this.createBracketMatch(roundNumber, matchesByRound, match, roundCount, inLowerBracket, connectFinal));
+                roundContainer.append(this.createBracketMatch(roundNumber, roundCount, match, inLowerBracket, connectFinal));
 
             bracketContainer.append(roundContainer);
             roundNumber++;
@@ -114,40 +155,58 @@ class BracketsViewer {
         root.append(bracketContainer);
     }
 
-    private renderFinal(type: FinalType, matches: Match[]) {
+    /**
+     * Renders a final group.
+     *
+     * @param finalType Type of the final.
+     * @param matches Matches of the final.
+     */
+    private renderFinal(finalType: FinalType, matches: Match[]): void {
         const upperBracket = document.querySelector('.bracket');
         if (!upperBracket) throw Error('Upper bracket not found.');
 
-        const grandFinalName = lang.getGrandFinalName(matches);
+        const grandFinalName = lang.getGrandFinalName(matches.length);
 
-        const winnerWb =  matches[0].opponent1;
+        const winnerWb = matches[0].opponent1;
         const finalsToDisplay = (winnerWb && winnerWb.id != null && winnerWb.result != "win") ? 2 : 1;
 
         const finalMatches = matches.slice(0, finalsToDisplay);
+
         for (let i = 0; i < finalMatches.length; i++) {
-            const roundContainer = dom.createRoundContainer(lang.getFinalMatchLabel(type, grandFinalName, i));
-            roundContainer.append(this.createFinalMatch(type, grandFinalName, finalMatches, i));
+            const roundNumber = i + 1;
+            const roundContainer = dom.createRoundContainer(lang.getFinalMatchLabel(finalType, grandFinalName, roundNumber));
+            roundContainer.append(this.createFinalMatch(finalType, grandFinalName, finalMatches, roundNumber));
             upperBracket.append(roundContainer);
         }
     }
 
-    private createRanking(matches: Match[]) {
+    /**
+     * Creates a ranking table based on matches of a round-robin stage.
+     *
+     * @param matches The list of matches.
+     */
+    private createRanking(matches: Match[]): HTMLElement {
         const table = dom.createTable();
         const ranking = getRanking(matches);
 
-        table.append(dom.createHeaders(ranking));
+        table.append(dom.createRankingHeaders(ranking));
 
         for (const item of ranking)
-            table.append(this.createRankingItem(item));
+            table.append(this.createRankingRow(item));
 
         return table;
     }
 
-    private createRankingItem(item: RankingItem) {
+    /**
+     * Creates a row of the ranking table.
+     *
+     * @param item Item of the ranking.
+     */
+    private createRankingRow(item: RankingItem): HTMLElement {
         const row = dom.createRow();
 
         for (const prop in item) {
-            let data: number | string = item[prop];
+            const data: number | string = item[prop];
 
             if (prop === 'id') {
                 const participant = this.participants.find(team => team.id === data);
@@ -166,22 +225,47 @@ class BracketsViewer {
         return row;
     }
 
-    private createBracketMatch(roundNumber: number, matchesByRound: Match[][], match: Match, roundCount: number, inLowerBracket?: boolean, connectFinal?: boolean) {
-        const connection = dom.getBracketConnection(roundNumber, matchesByRound, inLowerBracket, connectFinal);
-        const matchLabel = lang.getMatchLabel(match, roundNumber, roundCount, inLowerBracket);
+    /**
+     * Creates a match in a bracket.
+     *
+     * @param roundNumber Number of the round.
+     * @param roundCount Count of rounds.
+     * @param match Information about the match.
+     * @param inLowerBracket Whether the match is in lower bracket.
+     * @param connectFinal Whether to connect this match to the final if it happens to be the last one of the bracket.
+     */
+    private createBracketMatch(roundNumber: number, roundCount: number, match: Match, inLowerBracket?: boolean, connectFinal?: boolean): HTMLElement {
+        const connection = dom.getBracketConnection(roundNumber, roundCount, inLowerBracket, connectFinal);
+        const matchLabel = lang.getMatchLabel(match.number, roundNumber, roundCount, inLowerBracket);
         const matchHint = lang.getMatchHint(roundNumber, roundCount, inLowerBracket);
         return this.createMatch(match, connection, matchLabel, matchHint, inLowerBracket);
     }
 
-    private createFinalMatch(type: string, grandFinalName: (i: number) => string, matches: Match[], i: number) {
-        const connection = dom.getFinalConnection(type, i, matches);
-        const matchLabel = lang.getFinalMatchLabel(type, grandFinalName, i);
-        const matchHint = lang.getFinalMatchHint(type, i);
-
-        return this.createMatch(matches[i], connection, matchLabel, matchHint);
+    /**
+     * Creates a match in a final.
+     *
+     * @param type Type of the final.
+     * @param grandFinalName A function giving a grand final phase's name based on the round number.
+     * @param matches Matches of the final.
+     * @param roundNumber Number of the round.
+     */
+    private createFinalMatch(type: FinalType, grandFinalName: (roundNumber: number) => string, matches: Match[], roundNumber: number): HTMLElement {
+        const connection = dom.getFinalConnection(type, roundNumber, matches.length);
+        const matchLabel = lang.getFinalMatchLabel(type, grandFinalName, roundNumber);
+        const matchHint = lang.getFinalMatchHint(type, roundNumber);
+        return this.createMatch(matches[roundNumber], connection, matchLabel, matchHint);
     }
 
-    private createMatch(results: MatchResults, connection?: Connection, label?: string, hint?: MatchHint, inLowerBracket?: boolean) {
+    /**
+     * Creates a match based on its results.
+     *
+     * @param results Results of the match.
+     * @param connection Connection of this match with the others.
+     * @param label Label of the match.
+     * @param hint Hint for the match.
+     * @param inLowerBracket Whether the match is in lower bracket.
+     */
+    private createMatch(results: MatchResults, connection?: Connection, label?: string, hint?: MatchHint, inLowerBracket?: boolean): HTMLElement {
         inLowerBracket = inLowerBracket || false;
 
         const match = dom.createMatchContainer();
@@ -204,7 +288,16 @@ class BracketsViewer {
         return match;
     }
 
-    private createTeam(team: ParticipantResult | null, hint: MatchHint, inLowerBracket: boolean) {
+    // TODO: get rid of the word "team"
+
+    /**
+     * Creates a team for a match.
+     *
+     * @param team Information about the team.
+     * @param hint Hint of the match.
+     * @param inLowerBracket Whether the match is in lower bracket.
+     */
+    private createTeam(team: ParticipantResult | null, hint: MatchHint, inLowerBracket: boolean): HTMLElement {
         const teamContainer = dom.createTeamContainer();
         const nameContainer = dom.createNameContainer();
         const resultContainer = dom.createResultContainer();
@@ -222,15 +315,23 @@ class BracketsViewer {
         return teamContainer;
     }
 
-    private renderParticipant(nameContainer: HTMLElement, resultContainer: HTMLElement, team: ParticipantResult, hint: MatchHint, inLowerBracket: boolean) {
+    /**
+     * Renders a participant.
+     *
+     * @param nameContainer The name container.
+     * @param resultContainer The result container.
+     * @param team The participant result.
+     * @param hint Hint for the participant.
+     * @param inLowerBracket Whether the match is in lower bracket.
+     */
+    private renderParticipant(nameContainer: HTMLElement, resultContainer: HTMLElement, team: ParticipantResult, hint: MatchHint, inLowerBracket: boolean): void {
         const participant = this.participants.find(item => item.id === team.id);
 
         if (participant) {
             nameContainer.innerText = participant.name;
             this.renderTeamOrigin(nameContainer, team, inLowerBracket);
-        } else {
+        } else
             this.renderHint(nameContainer, team, hint, inLowerBracket);
-        }
 
         resultContainer.innerText = `${team.score || '-'}`;
 
@@ -238,7 +339,15 @@ class BracketsViewer {
         dom.setupLoss(nameContainer, resultContainer, team);
     }
 
-    private renderHint(nameContainer: HTMLElement, team: ParticipantResult, hint: MatchHint, inLowerBracket: boolean) {
+    /**
+     * Renders a hint for a participant.
+     *
+     * @param nameContainer The name container.
+     * @param team The participant result.
+     * @param hint Hint for the participant.
+     * @param inLowerBracket Whether the match is in lower bracket.
+     */
+    private renderHint(nameContainer: HTMLElement, team: ParticipantResult, hint: MatchHint, inLowerBracket: boolean): void {
         if (hint === undefined || team.position === undefined) return;
         if (!this.config.showSlotsOrigin) return;
         if (!this.config.showLowerBracketSlotsOrigin && inLowerBracket) return;
@@ -246,7 +355,14 @@ class BracketsViewer {
         dom.setupHint(nameContainer, hint(team.position));
     }
 
-    private renderTeamOrigin(name: HTMLElement, team: ParticipantResult, inLowerBracket: boolean) {
+    /**
+     * Renders a participant's origin.
+     *
+     * @param nameContainer The name container.
+     * @param team The participant result.
+     * @param inLowerBracket Whether the match is in lower bracket.
+     */
+    private renderTeamOrigin(nameContainer: HTMLElement, team: ParticipantResult, inLowerBracket: boolean): void {
         if (team.position === undefined) return;
         if (this.config.participantOriginPlacement === 'none') return;
         if (!this.config.showSlotsOrigin) return;
@@ -255,22 +371,28 @@ class BracketsViewer {
         // 'P' for position (where the participant comes from) and '#' for actual seeding.
         const origin = inLowerBracket ? `P${team.position}` : `#${team.position}`;
 
-        dom.addTeamOrigin(name, origin, this.config.participantOriginPlacement);
+        dom.addTeamOrigin(nameContainer, origin, this.config.participantOriginPlacement);
     }
 
-    private setupMouseHover(id: number, cell: HTMLElement) {
+    /**
+     * Sets mouse hover events for a participant.
+     *
+     * @param participantId ID of the participant.
+     * @param element The dom element to add events to. 
+     */
+    private setupMouseHover(participantId: number, element: HTMLElement): void {
         if (!this.config.highlightParticipantOnHover) return;
 
-        this.teamRefsDOM[id].push(cell);
+        this.teamRefsDOM[participantId].push(element);
 
-        cell.addEventListener('mouseover', () => {
-            this.teamRefsDOM[id].forEach(el => el.classList.add('hover'));
+        element.addEventListener('mouseover', () => {
+            this.teamRefsDOM[participantId].forEach(el => el.classList.add('hover'));
         });
 
-        cell.addEventListener('mouseleave', () => {
-            this.teamRefsDOM[id].forEach(el => el.classList.remove('hover'));
+        element.addEventListener('mouseleave', () => {
+            this.teamRefsDOM[participantId].forEach(el => el.classList.remove('hover'));
         });
     }
 }
 
-(window as any).bracketsViewer = new BracketsViewer();
+window.bracketsViewer = new BracketsViewer();

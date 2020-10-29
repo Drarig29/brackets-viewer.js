@@ -1,26 +1,38 @@
+import { Stage, Match, MatchGame, Participant } from "brackets-model";
+import { BracketsViewer } from "./main";
+
+declare global {
+    interface Window {
+        bracketsViewer: BracketsViewer,
+    }
+}
+
 /**
  * The data to display with `brackets-viewer.js`
  */
-interface ViewerData {
+export interface ViewerData {
     /** The stage to display. */
-    stage: import('brackets-model').Stage,
-    
+    stage: Stage,
+
     /** The matches of the stage to display. */
-    matches: import('brackets-model').Match[],
+    matches: Match[],
 
     /** The games of the matches to display. */
-    matchGames: import('brackets-model').MatchGame[],
+    matchGames: MatchGame[],
 
     /** The participants who play in the stage to display. */
-    participants: import('brackets-model').Participant[],
+    participants: Participant[],
 }
 
-type Placement = 'none' | 'before' | 'after';
+/**
+ * The possible placements of a participant's origin.
+ */
+export type Placement = 'none' | 'before' | 'after';
 
 /**
  * An optional config to provide to `brackets-viewer.js`
  */
-interface Config {
+export interface Config {
     /**
      * Where the position of a participant is placed relative to its name.
      * - If `none`, the position is not added.
@@ -45,16 +57,33 @@ interface Config {
     highlightParticipantOnHover: boolean,
 }
 
-type ConnectionType = 'square' | 'straight' | false;
-type FinalType = 'consolation_final' | 'grand_final';
-type MatchHint = ((i: number) => string) | undefined;
+/**
+ * The possible types of connection between matches.
+ */
+export type ConnectionType = 'square' | 'straight' | false;
 
-interface Connection {
+/**
+ * The possible types of final.
+ */
+export type FinalType = 'consolation_final' | 'grand_final';
+
+/**
+ * A function returning a match hint based on an index.
+ */
+export type MatchHint = ((i: number) => string) | undefined;
+
+/**
+ * Contains the information about the connections of a match.
+ */
+export interface Connection {
     connectPrevious?: ConnectionType,
     connectNext?: ConnectionType,
 }
 
-interface RankingItem {
+/**
+ * An item of the ranking.
+ */
+export interface RankingItem {
     [prop: string]: number,
     rank: number,
     id: number,
@@ -69,12 +98,30 @@ interface RankingItem {
     points: number,
 }
 
-interface Header {
-    value: string,
+/**
+ * Contains information about a header of the ranking and its tooltip.
+ */
+export interface RankingHeader {
+    text: string,
     tooltip: string,
 }
 
-type RankingFormula = (ranking: RankingItem) => number;
-type RankingHeaders = { [name in keyof RankingItem]: Header };
-type RankingMap = { [id: number]: RankingItem };
-type Ranking = RankingItem[];
+/**
+ * A formula which computes points given a ranking row.
+ */
+export type RankingFormula = (ranking: RankingItem) => number;
+
+/**
+ * An object mapping ranking properties to their header.
+ */
+export type RankingHeaders = { [name in keyof RankingItem]: RankingHeader };
+
+/** 
+ * An object mapping a participant id to its row in the ranking.
+ */
+export type RankingMap = { [id: number]: RankingItem };
+
+/**
+ * Definition of a ranking.
+ */
+export type Ranking = RankingItem[];

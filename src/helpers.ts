@@ -1,5 +1,12 @@
 import { Match, ParticipantResult } from "brackets-model";
+import { RankingHeader, Ranking, RankingFormula, RankingHeaders, RankingItem, RankingMap } from "./types";
 
+/**
+ * Splits an array based on values of a given key of the objects of the array.
+ *
+ * @param array The array to split.
+ * @param key The key of T.
+ */
 export function splitBy<T>(array: T[], key: keyof T): T[][] {
     const obj = Object();
 
@@ -13,61 +20,80 @@ export function splitBy<T>(array: T[], key: keyof T): T[][] {
     return Object.values(obj);
 }
 
-export function isMajorRound(roundNumber: number) {
+/**
+ * Indicates whether a round is major.
+ *
+ * @param roundNumber Number of the round.
+ */
+export function isMajorRound(roundNumber: number): boolean {
     return roundNumber === 1 || roundNumber % 2 === 0;
 }
 
+/**
+ * Headers of the ranking.
+ */
 const headers: RankingHeaders = {
     'rank': {
-        value: '#',
+        text: '#',
         tooltip: 'Rank',
     },
     'id': {
-        value: 'Name',
+        text: 'Name',
         tooltip: 'Name',
     },
     'played': {
-        value: 'P',
+        text: 'P',
         tooltip: 'Played',
     },
     'wins': {
-        value: 'W',
+        text: 'W',
         tooltip: 'Wins',
     },
     'draws': {
-        value: 'D',
+        text: 'D',
         tooltip: 'Draws',
     },
     'losses': {
-        value: 'L',
+        text: 'L',
         tooltip: 'Losses',
     },
     'forfeits': {
-        value: 'F',
+        text: 'F',
         tooltip: 'Forfeits',
     },
     'scoreFor': {
-        value: 'SF',
+        text: 'SF',
         tooltip: 'Score For',
     },
     'scoreAgainst': {
-        value: 'SA',
+        text: 'SA',
         tooltip: 'Score Against',
     },
     'scoreDifference': {
-        value: '+/-',
+        text: '+/-',
         tooltip: 'Score Difference',
     },
     'points': {
-        value: 'Pts',
+        text: 'Pts',
         tooltip: 'Points',
     },
 }
 
-export function rankingHeader(name: keyof RankingItem): Header {
-    return headers[name];
+/**
+ * Returns the header for a ranking property.
+ *
+ * @param itemName Name of the ranking property.
+ */
+export function rankingHeader(itemName: keyof RankingItem): RankingHeader {
+    return headers[itemName];
 }
 
+/**
+ * Calculates the ranking based on a list of matches and a formula.
+ *
+ * @param matches The list of matches.
+ * @param formula The points formula to apply.
+ */
 export function getRanking(matches: Match[], formula?: RankingFormula): Ranking {
     formula = formula || (
         (item: RankingItem) => 3 * item.wins + 1 * item.draws + 0 * item.losses
@@ -76,30 +102,22 @@ export function getRanking(matches: Match[], formula?: RankingFormula): Ranking 
     const rankingMap: RankingMap = {};
 
     for (const match of matches) {
-        processTeam(rankingMap, formula, match.opponent1, match.opponent2);
-        processTeam(rankingMap, formula, match.opponent2, match.opponent1);
+        processParticipant(rankingMap, formula, match.opponent1, match.opponent2);
+        processParticipant(rankingMap, formula, match.opponent2, match.opponent1);
     }
 
     return createRanking(rankingMap);
 }
 
-function createRanking(rankingMap: RankingMap) {
-    const ranking = Object.values(rankingMap).sort((a, b) => b.points - a.points);
-    
-    const rank = {
-        value: 0,
-        lastPoints: -1,
-    };
-
-    for (const item of ranking) {
-        item.rank = rank.lastPoints !== item.points ? ++rank.value : rank.value;
-        rank.lastPoints = item.points;
-    }
-
-    return ranking;
-}
-
-function processTeam(rankingMap: RankingMap, formula: RankingFormula, current: ParticipantResult | null, other: ParticipantResult | null) {
+/**
+ * Processes a participant and edits the ranking map.
+ *
+ * @param rankingMap The ranking map to edit.
+ * @param formula The points formula to apply.
+ * @param current The current participant.
+ * @param other The opponent.
+ */
+function processParticipant(rankingMap: RankingMap, formula: RankingFormula, current: ParticipantResult | null, other: ParticipantResult | null): void {
     if (!current || current.id === null) return;
 
     const state = rankingMap[current.id] || {
@@ -138,4 +156,25 @@ function processTeam(rankingMap: RankingMap, formula: RankingFormula, current: P
     state.points = formula(state);
 
     rankingMap[current.id] = state;
+}
+
+/**
+ * Creates the final ranking based on a ranking map. (Sort + Total points)
+ *
+ * @param rankingMap The ranking map (object).
+ */
+function createRanking(rankingMap: RankingMap): RankingItem[] {
+    const ranking = Object.values(rankingMap).sort((a, b) => b.points - a.points);
+
+    const rank = {
+        value: 0,
+        lastPoints: -1,
+    };
+
+    for (const item of ranking) {
+        item.rank = rank.lastPoints !== item.points ? ++rank.value : rank.value;
+        rank.lastPoints = item.points;
+    }
+
+    return ranking;
 }

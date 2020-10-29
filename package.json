@@ -10,7 +10,8 @@
         "build": "npx webpack --mode production",
         "start": "npx webpack --watch --mode development",
         "prepare": "npm run build",
-        "prepublishOnly": "npm run build"
+        "prepublishOnly": "npm run build",
+        "lint": "eslint src/**/*.ts --fix"
     },
     "repository": {
         "type": "git",
@@ -31,8 +32,12 @@
     "homepage": "https://github.com/Drarig29/brackets-viewer.js#readme",
     "devDependencies": {
         "@babel/core": "^7.10.2",
+        "@typescript-eslint/eslint-plugin": "^4.6.0",
+        "@typescript-eslint/parser": "^4.6.0",
         "babel-loader": "^8.1.0",
         "css-loader": "^3.5.3",
+        "eslint": "^7.12.1",
+        "eslint-plugin-jsdoc": "^30.7.3",
         "json-server": "^0.16.2",
         "mini-css-extract-plugin": "^0.9.0",
         "node-sass": "^4.14.1",
