@@ -1,27 +1,25 @@
 import { Status } from "brackets-model";
 import { isMajorRound } from "./helpers";
-import { FinalType, MatchHint } from "./types";
-
-// TODO: rename match hint to position hint
+import { FinalType, OriginHint } from "./types";
 
 /**
- * Returns a match hint based on rounds information.
+ * Returns an origin hint function based on rounds information.
  *
  * @param roundNumber Number of the round.
  * @param roundCount Count of rounds.
  * @param inLowerBracket Whether the round is in lower bracket.
  */
-export function getMatchHint(roundNumber: number, roundCount: number, inLowerBracket?: boolean): MatchHint {
+export function getOriginHint(roundNumber: number, roundCount: number, inLowerBracket?: boolean): OriginHint {
     if (!inLowerBracket && roundNumber === 1)
-        return (i: number) => `Seed ${i}`;
+        return (position: number) => `Seed ${position}`;
 
     if (inLowerBracket && isMajorRound(roundNumber)) {
         const roundNumberWB = Math.ceil((roundNumber + 1) / 2);
 
-        let hint = (i: number) => `Loser of WB ${roundNumberWB}.${i}`;
+        let hint = (position: number) => `Loser of WB ${roundNumberWB}.${position}`;
 
         if (roundNumber === roundCount - 2)
-            hint = (i: number) => `Loser of WB Semi ${i}`;
+            hint = (position: number) => `Loser of WB Semi ${position}`;
 
         if (roundNumber === roundCount)
             hint = () => 'Loser of WB Final';
@@ -79,15 +77,15 @@ export function getFinalMatchLabel(finalType: FinalType, roundNumber: number, ro
 }
 
 /**
- * Returns the hint of a match in final.
+ * Returns an origin hint function for a match in final.
  *
  * @param finalType Type of the final.
  * @param roundNumber Number of the round.
  */
-export function getFinalMatchHint(finalType: FinalType, roundNumber: number): MatchHint {
+export function getFinalOriginHint(finalType: FinalType, roundNumber: number): OriginHint {
     // Single elimination.
     if (finalType === 'consolation_final')
-        return number => `Loser of Semi ${number}`;
+        return position => `Loser of Semi ${position}`;
 
     // Double elimination.
     if (roundNumber === 1)
