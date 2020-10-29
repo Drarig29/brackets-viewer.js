@@ -7,7 +7,7 @@ import { FinalType, MatchLocation, OriginHint, RankingHeaders } from './types';
  *
  * @param roundNumber Number of the round.
  * @param roundCount Count of rounds.
- * @param inLowerBracket Whether the round is in lower bracket.
+ * @param matchLocation Location of the match.
  */
 export function getOriginHint(roundNumber: number, roundCount: number, matchLocation?: MatchLocation): OriginHint {
     if (matchLocation !== 'lower-bracket' && roundNumber === 1)
@@ -36,7 +36,7 @@ export function getOriginHint(roundNumber: number, roundCount: number, matchLoca
  * @param matchNumber Number of the match.
  * @param roundNumber Number of the round.
  * @param roundCount Count of rounds.
- * @param inLowerBracket Whether the round is in lower bracket.
+ * @param matchLocation Location of the match.
  */
 export function getMatchLabel(matchNumber: number, roundNumber: number, roundCount: number, matchLocation?: MatchLocation): string {
     let matchPrefix = 'M';

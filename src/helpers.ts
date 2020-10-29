@@ -21,7 +21,14 @@ export function splitBy<T>(array: T[], key: keyof T): T[][] {
     return Object.values(obj);
 }
 
-export function getOriginAbbreviation(matchLocation: string, skipFirstRound: boolean, roundNumber?: number) {
+/**
+ * Returns the abbreviation for a participant origin.
+ *
+ * @param matchLocation Location of the match.
+ * @param skipFirstRound Whether to skip the first round.
+ * @param roundNumber Number of the round.
+ */
+export function getOriginAbbreviation(matchLocation: string, skipFirstRound: boolean, roundNumber?: number): string {
     if (skipFirstRound && matchLocation === 'lower-bracket' && roundNumber === 1)
         return abbreviations.seed;
 
