@@ -48,6 +48,6 @@
         "webpack-cli": "^3.3.11"
     },
     "dependencies": {
-        "brackets-model": "^1.2.0"
+        "brackets-model": "^1.3.1"
     }
 }
