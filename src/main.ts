@@ -165,17 +165,16 @@ export class BracketsViewer {
         const upperBracket = document.querySelector('.bracket');
         if (!upperBracket) throw Error('Upper bracket not found.');
 
-        const grandFinalName = lang.getGrandFinalName(matches.length);
-
         const winnerWb = matches[0].opponent1;
         const finalsToDisplay = (winnerWb && winnerWb.id != null && winnerWb.result != "win") ? 2 : 1;
-
         const finalMatches = matches.slice(0, finalsToDisplay);
+
+        const roundCount = matches.length;
 
         for (let i = 0; i < finalMatches.length; i++) {
             const roundNumber = i + 1;
-            const roundContainer = dom.createRoundContainer(lang.getFinalMatchLabel(finalType, grandFinalName, roundNumber));
-            roundContainer.append(this.createFinalMatch(finalType, grandFinalName, finalMatches, roundNumber));
+            const roundContainer = dom.createRoundContainer(lang.getFinalMatchLabel(finalType, roundNumber, roundCount));
+            roundContainer.append(this.createFinalMatch(finalType, finalMatches, roundNumber, roundCount));
             upperBracket.append(roundContainer);
         }
     }
@@ -245,14 +244,14 @@ export class BracketsViewer {
      * Creates a match in a final.
      *
      * @param type Type of the final.
-     * @param grandFinalName A function giving a grand final phase's name based on the round number.
      * @param matches Matches of the final.
      * @param roundNumber Number of the round.
+     * @param roundCount Count of rounds.
      */
-    private createFinalMatch(type: FinalType, grandFinalName: (roundNumber: number) => string, matches: Match[], roundNumber: number): HTMLElement {
+    private createFinalMatch(type: FinalType, matches: Match[], roundNumber: number, roundCount: number): HTMLElement {
         const roundIndex = roundNumber - 1;
         const connection = dom.getFinalConnection(type, roundNumber, matches.length);
-        const matchLabel = lang.getFinalMatchLabel(type, grandFinalName, roundNumber);
+        const matchLabel = lang.getFinalMatchLabel(type, roundNumber, roundCount);
         const matchHint = lang.getFinalMatchHint(type, roundNumber);
         return this.createMatch(matches[roundIndex], connection, matchLabel, matchHint);
     }
@@ -319,6 +318,7 @@ export class BracketsViewer {
     /**
      * Renders a participant.
      *
+     * @param teamContainer The team container.
      * @param nameContainer The name container.
      * @param resultContainer The result container.
      * @param team The participant result.

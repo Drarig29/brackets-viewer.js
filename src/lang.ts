@@ -62,17 +62,20 @@ export function getMatchLabel(matchNumber: number, roundNumber: number, roundCou
     return matchLabel;
 }
 
-// TODO: refactor this, grandFinalName isn't always used... no need to pass it in the first place...
-
 /**
  * Returns the label of a match in final.
  *
  * @param finalType Type of the final.
- * @param grandFinalName Name of the final.
  * @param roundNumber Number of the round.
+ * @param roundCount Count of rounds.
  */
-export function getFinalMatchLabel(finalType: FinalType, grandFinalName: (roundNumber: number) => string, roundNumber: number): string {
-    return finalType === 'consolation_final' ? 'Consolation Final' : grandFinalName(roundNumber);
+export function getFinalMatchLabel(finalType: FinalType, roundNumber: number, roundCount: number): string {
+    // Single elimination.
+    if (finalType === 'consolation_final')
+        return 'Consolation Final';
+
+    // Double elimination.
+    return getGrandFinalName(roundNumber, roundCount);
 }
 
 /**
@@ -110,12 +113,16 @@ export function getMatchStatus(status: Status): string {
 }
 
 /**
- * Returns the name of a grand final phase.
+ * Returns the name of a grand final round.
  *
+ * @param roundNumber Number of the round.
  * @param roundCount Count of final rounds.
  */
-export function getGrandFinalName(roundCount: number): (roundNumber: number) => string {
-    return roundCount === 1 ? () => 'Grand Final' : (roundNumber: number) => `GF Round ${roundNumber}`;
+export function getGrandFinalName(roundNumber: number, roundCount: number): string {
+    if (roundCount === 1)
+        return 'Grand Final';
+
+    return `GF Round ${roundNumber}`;
 }
 
 /**
