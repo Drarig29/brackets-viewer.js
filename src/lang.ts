@@ -1,6 +1,16 @@
-import { Match, Status } from "brackets-model";
+import { Status } from "brackets-model";
 import { isMajorRound } from "./helpers";
+import { FinalType, MatchHint } from "./types";
 
+// TODO: rename match hint to position hint
+
+/**
+ * Returns a match hint based on rounds information.
+ *
+ * @param roundNumber Number of the round.
+ * @param roundCount Count of rounds.
+ * @param inLowerBracket Whether the round is in lower bracket.
+ */
 export function getMatchHint(roundNumber: number, roundCount: number, inLowerBracket?: boolean): MatchHint {
     if (!inLowerBracket && roundNumber === 1)
         return (i: number) => `Seed ${i}`;
@@ -22,7 +32,15 @@ export function getMatchHint(roundNumber: number, roundCount: number, inLowerBra
     return undefined;
 }
 
-export function getMatchLabel(match: Match, roundNumber: number, roundCount: number, inLowerBracket?: boolean) {
+/**
+ * Returns the label of a match.
+ *
+ * @param matchNumber Number of the match.
+ * @param roundNumber Number of the round.
+ * @param roundCount Count of rounds.
+ * @param inLowerBracket Whether the round is in lower bracket.
+ */
+export function getMatchLabel(matchNumber: number, roundNumber: number, roundCount: number, inLowerBracket?: boolean): string {
     let matchPrefix = 'M';
 
     if (inLowerBracket)
@@ -33,10 +51,10 @@ export function getMatchLabel(match: Match, roundNumber: number, roundCount: num
     const semiFinalRound = roundNumber === roundCount - 1;
     const finalRound = roundNumber === roundCount;
 
-    let matchLabel = `${matchPrefix} ${roundNumber}.${match.number}`;
+    let matchLabel = `${matchPrefix} ${roundNumber}.${matchNumber}`;
 
     if (!inLowerBracket && semiFinalRound)
-        matchLabel = `Semi ${match.number}`;
+        matchLabel = `Semi ${matchNumber}`;
 
     if (finalRound)
         matchLabel = 'Final';
@@ -44,21 +62,43 @@ export function getMatchLabel(match: Match, roundNumber: number, roundCount: num
     return matchLabel;
 }
 
-export function getFinalMatchLabel(type: string, grandFinalName: (i: number) => string, i: number) {
-    return type === 'consolation_final' ? 'Consolation Final' : grandFinalName(i);
+// TODO: refactor this, grandFinalName isn't always used... no need to pass it in the first place...
+
+/**
+ * Returns the label of a match in final.
+ *
+ * @param finalType Type of the final.
+ * @param grandFinalName Name of the final.
+ * @param roundNumber Number of the round.
+ */
+export function getFinalMatchLabel(finalType: FinalType, grandFinalName: (roundNumber: number) => string, roundNumber: number): string {
+    return finalType === 'consolation_final' ? 'Consolation Final' : grandFinalName(roundNumber);
 }
 
-export function getFinalMatchHint(type: string, i: number): MatchHint {
-    if (type === 'consolation_final')
+/**
+ * Returns the hint of a match in final.
+ *
+ * @param finalType Type of the final.
+ * @param roundNumber Number of the round.
+ */
+export function getFinalMatchHint(finalType: FinalType, roundNumber: number): MatchHint {
+    // Single elimination.
+    if (finalType === 'consolation_final')
         return number => `Loser of Semi ${number}`;
 
-    if (i === 0)
+    // Double elimination.
+    if (roundNumber === 1)
         return () => 'Winner of LB Final';
 
     return undefined;
 }
 
-export function getMatchStatus(status: Status) {
+/**
+ * Returns the status of a match.
+ *
+ * @param status The match status.
+ */
+export function getMatchStatus(status: Status): string {
     switch (status) {
         case Status.Locked: return 'Locked';
         case Status.Waiting: return 'Waiting';
@@ -69,22 +109,49 @@ export function getMatchStatus(status: Status) {
     }
 }
 
-export function getGrandFinalName(matches: Match[]) {
-    return matches.length === 1 ? () => 'Grand Final' : (i: number) => `GF Round ${i + 1}`;
+/**
+ * Returns the name of a grand final phase.
+ *
+ * @param roundCount Count of final rounds.
+ */
+export function getGrandFinalName(roundCount: number): (roundNumber: number) => string {
+    return roundCount === 1 ? () => 'Grand Final' : (roundNumber: number) => `GF Round ${roundNumber}`;
 }
 
-export function getGroupName(groupNumber: number) {
-    return `Round ${groupNumber}`;
+/**
+ * Returns the name of a group.
+ *
+ * @param groupNumber Number of the group.
+ */
+export function getGroupName(groupNumber: number): string {
+    return `Group ${groupNumber}`;
 }
 
-export function getRoundName(roundNumber: number) {
+/**
+ * Returns the name of a round.
+ *
+ * @param roundNumber Number of the round.
+ */
+export function getRoundName(roundNumber: number): string {
     return `Round ${roundNumber}`;
 }
 
-export function getWinnerBracketRoundName(roundNumber: number) {
+/**
+ * Returns the name of a round in the winner bracket of a double elimination stage.
+ *
+ * @param roundNumber Number of the round.
+ */
+export function getWinnerBracketRoundName(roundNumber: number): string {
     return `WB Round ${roundNumber}`;
 }
 
-export function getLoserBracketRoundName(roundNumber: number) {
+/**
+ * Returns the name of a round in the loser bracket of a double elimination stage.
+ *
+ * @param roundNumber Number of the round.
+ */
+export function getLoserBracketRoundName(roundNumber: number): string {
     return `LB Round ${roundNumber}`;
 }
+
+// TODO: add letters as traduction (W, L, D, F and all ranking headers)
