@@ -1,15 +1,16 @@
 import './style.scss';
 import { Participant, Match, MatchResults, ParticipantResult, StageType } from 'brackets-model';
-import { splitBy, getRanking } from './helpers';
+import { splitBy, getRanking, getOriginAbbreviation } from './helpers';
 import * as dom from './dom';
 import * as lang from './lang';
-import { Config, Connection, FinalType, OriginHint, RankingItem, RoundName, ViewerData } from './types';
+import { Config, Connection, FinalType, MatchLocation, OriginHint, RankingItem, RoundName, ViewerData } from './types';
 
 export class BracketsViewer {
 
     readonly teamRefsDOM: { [participantId: number]: HTMLElement[] } = {};
     private participants!: Participant[];
     private config!: Config;
+    private skipFirstRound!: boolean;
 
     /**
      * Renders a stage (round-robin, single or double elimination).
@@ -28,6 +29,8 @@ export class BracketsViewer {
             showLowerBracketSlotsOrigin: config && config.showLowerBracketSlotsOrigin !== undefined ? config.showLowerBracketSlotsOrigin : true,
             highlightParticipantOnHover: config && config.highlightParticipantOnHover !== undefined ? config.highlightParticipantOnHover : true,
         };
+
+        this.skipFirstRound = data.stage.settings.skipFirstRound || false;
 
         this.participants = data.participants;
         data.participants.forEach(participant => this.teamRefsDOM[participant.id] = []);
@@ -141,6 +144,7 @@ export class BracketsViewer {
      * @param connectFinal Whether to connect the last match of the bracket to the final.
      */
     private renderBracket(root: HTMLElement, matchesByRound: Match[][], roundName: RoundName, inLowerBracket?: boolean, connectFinal?: boolean): void {
+        const matchLocation = inLowerBracket ? 'lower-bracket' : 'upper-bracket';
         const bracketContainer = dom.createBracketContainer();
         const roundCount = matchesByRound.length;
 
@@ -150,7 +154,7 @@ export class BracketsViewer {
             const roundContainer = dom.createRoundContainer(roundName(roundNumber, roundCount));
 
             for (const match of matches)
-                roundContainer.append(this.createBracketMatch(roundNumber, roundCount, match, inLowerBracket, connectFinal));
+                roundContainer.append(this.createBracketMatch(roundNumber, roundCount, match, matchLocation, connectFinal));
 
             bracketContainer.append(roundContainer);
             roundNumber++;
@@ -233,14 +237,13 @@ export class BracketsViewer {
      * @param roundNumber Number of the round.
      * @param roundCount Count of rounds.
      * @param match Information about the match.
-     * @param inLowerBracket Whether the match is in lower bracket.
      * @param connectFinal Whether to connect this match to the final if it happens to be the last one of the bracket.
      */
-    private createBracketMatch(roundNumber: number, roundCount: number, match: Match, inLowerBracket?: boolean, connectFinal?: boolean): HTMLElement {
-        const connection = dom.getBracketConnection(roundNumber, roundCount, inLowerBracket, connectFinal);
-        const matchLabel = lang.getMatchLabel(match.number, roundNumber, roundCount, inLowerBracket);
-        const originHint = lang.getOriginHint(roundNumber, roundCount, inLowerBracket);
-        return this.createMatch(match, connection, matchLabel, originHint, inLowerBracket);
+    private createBracketMatch(roundNumber: number, roundCount: number, match: Match, matchLocation?: MatchLocation, connectFinal?: boolean): HTMLElement {
+        const connection = dom.getBracketConnection(roundNumber, roundCount, matchLocation, connectFinal);
+        const matchLabel = lang.getMatchLabel(match.number, roundNumber, roundCount, matchLocation);
+        const originHint = lang.getOriginHint(roundNumber, roundCount, matchLocation);
+        return this.createMatch(match, connection, matchLabel, originHint, matchLocation, roundNumber);
     }
 
     /**
@@ -256,7 +259,7 @@ export class BracketsViewer {
         const connection = dom.getFinalConnection(type, roundNumber, matches.length);
         const matchLabel = lang.getFinalMatchLabel(type, roundNumber, roundCount);
         const originHint = lang.getFinalOriginHint(type, roundNumber);
-        return this.createMatch(matches[roundIndex], connection, matchLabel, originHint);
+        return this.createMatch(matches[roundIndex], connection, matchLabel, originHint, 'final-group');
     }
 
     /**
@@ -268,14 +271,14 @@ export class BracketsViewer {
      * @param originHint Origin hint for the match.
      * @param inLowerBracket Whether the match is in lower bracket.
      */
-    private createMatch(results: MatchResults, connection?: Connection, label?: string, originHint?: OriginHint, inLowerBracket?: boolean): HTMLElement {
-        inLowerBracket = inLowerBracket || false;
+    private createMatch(results: MatchResults, connection?: Connection, label?: string, originHint?: OriginHint, matchLocation?: MatchLocation, roundNumber?: number): HTMLElement {
+        matchLocation = matchLocation || 'upper-bracket';
 
         const match = dom.createMatchContainer();
         const opponents = dom.createOpponentsContainer();
 
-        const team1 = this.createTeam(results.opponent1, originHint, inLowerBracket);
-        const team2 = this.createTeam(results.opponent2, originHint, inLowerBracket);
+        const team1 = this.createTeam(results.opponent1, originHint, matchLocation, roundNumber);
+        const team2 = this.createTeam(results.opponent2, originHint, matchLocation, roundNumber);
 
         if (label)
             opponents.append(dom.createMatchLabel(label, lang.getMatchStatus(results.status)));
@@ -298,7 +301,7 @@ export class BracketsViewer {
      * @param originHint Origin hint for the match.
      * @param inLowerBracket Whether the match is in lower bracket.
      */
-    private createTeam(participant: ParticipantResult | null, originHint: OriginHint, inLowerBracket: boolean): HTMLElement {
+    private createTeam(participant: ParticipantResult | null, originHint: OriginHint, matchLocation: MatchLocation, roundNumber?: number): HTMLElement {
         const participantContainer = dom.createParticipantContainer();
         const nameContainer = dom.createNameContainer();
         const resultContainer = dom.createResultContainer();
@@ -306,7 +309,7 @@ export class BracketsViewer {
         if (participant === null)
             nameContainer.innerText = 'BYE';
         else
-            this.renderParticipant(participantContainer, nameContainer, resultContainer, participant, originHint, inLowerBracket);
+            this.renderParticipant(participantContainer, nameContainer, resultContainer, participant, originHint, matchLocation, roundNumber);
 
         participantContainer.append(nameContainer, resultContainer);
 
@@ -315,6 +318,8 @@ export class BracketsViewer {
 
         return participantContainer;
     }
+
+    // TODO: group containers into an object
 
     /**
      * Renders a participant.
@@ -326,14 +331,14 @@ export class BracketsViewer {
      * @param originHint Origin hint for the match.
      * @param inLowerBracket Whether the match is in lower bracket.
      */
-    private renderParticipant(participantContainer: HTMLElement, nameContainer: HTMLElement, resultContainer: HTMLElement, participant: ParticipantResult, originHint: OriginHint, inLowerBracket: boolean): void {
+    private renderParticipant(participantContainer: HTMLElement, nameContainer: HTMLElement, resultContainer: HTMLElement, participant: ParticipantResult, originHint: OriginHint, matchLocation: MatchLocation, roundNumber?: number): void {
         const found = this.participants.find(item => item.id === participant.id);
 
         if (found) {
             nameContainer.innerText = found.name;
-            this.renderTeamOrigin(nameContainer, participant, inLowerBracket);
+            this.renderTeamOrigin(nameContainer, participant, matchLocation, roundNumber);
         } else
-            this.renderHint(nameContainer, participant, originHint, inLowerBracket);
+            this.renderHint(nameContainer, participant, originHint, matchLocation);
 
         resultContainer.innerText = `${participant.score || '-'}`;
 
@@ -349,10 +354,10 @@ export class BracketsViewer {
      * @param originHint Origin hint for the participant.
      * @param inLowerBracket Whether the match is in lower bracket.
      */
-    private renderHint(nameContainer: HTMLElement, participant: ParticipantResult, originHint: OriginHint, inLowerBracket: boolean): void {
+    private renderHint(nameContainer: HTMLElement, participant: ParticipantResult, originHint: OriginHint, matchLocation: MatchLocation): void {
         if (originHint === undefined || participant.position === undefined) return;
         if (!this.config.showSlotsOrigin) return;
-        if (!this.config.showLowerBracketSlotsOrigin && inLowerBracket) return;
+        if (!this.config.showLowerBracketSlotsOrigin && matchLocation === 'lower-bracket') return;
 
         dom.setupHint(nameContainer, originHint(participant.position));
     }
@@ -364,13 +369,14 @@ export class BracketsViewer {
      * @param participant The participant result.
      * @param inLowerBracket Whether the match is in lower bracket.
      */
-    private renderTeamOrigin(nameContainer: HTMLElement, participant: ParticipantResult, inLowerBracket: boolean): void {
+    private renderTeamOrigin(nameContainer: HTMLElement, participant: ParticipantResult, matchLocation: MatchLocation, roundNumber?: number): void {
         if (participant.position === undefined) return;
         if (this.config.participantOriginPlacement === 'none') return;
         if (!this.config.showSlotsOrigin) return;
-        if (!this.config.showLowerBracketSlotsOrigin && inLowerBracket) return;
+        if (!this.config.showLowerBracketSlotsOrigin && matchLocation === 'lower-bracket') return;
 
-        const origin = (inLowerBracket ? lang.abbreviations.position : lang.abbreviations.seed) + participant.position;
+        const abbreviation = getOriginAbbreviation(matchLocation, this.skipFirstRound, roundNumber);
+        const origin = abbreviation + participant.position;
         dom.addTeamOrigin(nameContainer, origin, this.config.participantOriginPlacement);
     }
 

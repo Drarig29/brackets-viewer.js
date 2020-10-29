@@ -1,5 +1,5 @@
 import { Match, ParticipantResult } from 'brackets-model';
-import { headers } from './lang';
+import { headers, abbreviations } from './lang';
 import { RankingHeader, Ranking, RankingFormula, RankingItem, RankingMap } from './types';
 
 /**
@@ -19,6 +19,16 @@ export function splitBy<T>(array: T[], key: keyof T): T[][] {
     }
 
     return Object.values(obj);
+}
+
+export function getOriginAbbreviation(matchLocation: string, skipFirstRound: boolean, roundNumber?: number) {
+    if (skipFirstRound && matchLocation === 'lower-bracket' && roundNumber === 1)
+        return abbreviations.seed;
+
+    if (matchLocation === 'lower-bracket' || matchLocation === 'final-group')
+        return abbreviations.position;
+
+    return abbreviations.seed;
 }
 
 /**

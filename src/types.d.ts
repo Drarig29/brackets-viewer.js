@@ -68,6 +68,11 @@ export type ConnectionType = 'square' | 'straight' | false;
 export type FinalType = 'consolation_final' | 'grand_final';
 
 /**
+ * The possible locations of a match.
+ */
+export type MatchLocation = 'upper-bracket' | 'lower-bracket' | 'final-group';
+
+/**
  * A function returning an origin hint based on a participant's position.
  */
 export type OriginHint = ((position: number) => string) | undefined;

@@ -1,6 +1,6 @@
 import { Status } from 'brackets-model';
 import { isMajorRound } from './helpers';
-import { FinalType, OriginHint, RankingHeaders } from './types';
+import { FinalType, MatchLocation, OriginHint, RankingHeaders } from './types';
 
 /**
  * Returns an origin hint function based on rounds information.
@@ -9,11 +9,11 @@ import { FinalType, OriginHint, RankingHeaders } from './types';
  * @param roundCount Count of rounds.
  * @param inLowerBracket Whether the round is in lower bracket.
  */
-export function getOriginHint(roundNumber: number, roundCount: number, inLowerBracket?: boolean): OriginHint {
-    if (!inLowerBracket && roundNumber === 1)
+export function getOriginHint(roundNumber: number, roundCount: number, matchLocation?: MatchLocation): OriginHint {
+    if (matchLocation !== 'lower-bracket' && roundNumber === 1)
         return (position: number) => `Seed ${position}`;
 
-    if (inLowerBracket && isMajorRound(roundNumber)) {
+    if (matchLocation === 'lower-bracket' && isMajorRound(roundNumber)) {
         const roundNumberWB = Math.ceil((roundNumber + 1) / 2);
 
         let hint = (position: number) => `Loser of WB ${roundNumberWB}.${position}`;
@@ -38,26 +38,24 @@ export function getOriginHint(roundNumber: number, roundCount: number, inLowerBr
  * @param roundCount Count of rounds.
  * @param inLowerBracket Whether the round is in lower bracket.
  */
-export function getMatchLabel(matchNumber: number, roundNumber: number, roundCount: number, inLowerBracket?: boolean): string {
+export function getMatchLabel(matchNumber: number, roundNumber: number, roundCount: number, matchLocation?: MatchLocation): string {
     let matchPrefix = 'M';
 
-    if (inLowerBracket)
-        matchPrefix = 'LB';
-    else if (inLowerBracket === false)
+    if (matchLocation === 'upper-bracket')
         matchPrefix = 'WB';
+    else if (matchLocation === 'lower-bracket')
+        matchPrefix = 'LB';
 
     const semiFinalRound = roundNumber === roundCount - 1;
     const finalRound = roundNumber === roundCount;
 
-    let matchLabel = `${matchPrefix} ${roundNumber}.${matchNumber}`;
-
-    if (!inLowerBracket && semiFinalRound)
-        matchLabel = `Semi ${matchNumber}`;
+    if (matchLocation === 'upper-bracket' && semiFinalRound)
+        return `${matchPrefix} Semi ${matchNumber}`;
 
     if (finalRound)
-        matchLabel = 'Final';
+        return `${matchPrefix} Final`;
 
-    return matchLabel;
+    return `${matchPrefix} ${roundNumber}.${matchNumber}`;
 }
 
 /**
