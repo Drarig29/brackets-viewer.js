@@ -166,7 +166,7 @@ export class BracketsViewer {
         if (!upperBracket) throw Error('Upper bracket not found.');
 
         const winnerWb = matches[0].opponent1;
-        const finalsToDisplay = (winnerWb && winnerWb.id != null && winnerWb.result != "win") ? 2 : 1;
+        const finalsToDisplay = (winnerWb && winnerWb.id != null && winnerWb.result != 'win') ? 2 : 1;
         const finalMatches = matches.slice(0, finalsToDisplay);
 
         const roundCount = matches.length;

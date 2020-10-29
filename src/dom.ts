@@ -1,7 +1,7 @@
-import { ParticipantResult } from "brackets-model";
-import { rankingHeader } from "./helpers";
-import { abbreviations } from "./lang";
-import { Connection, FinalType, Placement, Ranking } from "./types";
+import { ParticipantResult } from 'brackets-model';
+import { rankingHeader } from './helpers';
+import { abbreviations } from './lang';
+import { Connection, FinalType, Placement, Ranking } from './types';
 
 /**
  * Creates the title of the viewer.

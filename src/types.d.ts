@@ -1,5 +1,5 @@
-import { Stage, Match, MatchGame, Participant } from "brackets-model";
-import { BracketsViewer } from "./main";
+import { Stage, Match, MatchGame, Participant } from 'brackets-model';
+import { BracketsViewer } from './main';
 
 declare global {
     interface Window {
