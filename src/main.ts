@@ -3,7 +3,7 @@ import { Participant, Match, MatchResults, ParticipantResult, StageType } from '
 import { splitBy, getRanking, getOriginAbbreviation } from './helpers';
 import * as dom from './dom';
 import * as lang from './lang';
-import { Config, Connection, FinalType, MatchLocation, OriginHint, RankingItem, RoundName, ViewerData } from './types';
+import { Config, Connection, FinalType, MatchLocation, OriginHint, ParticipantContainers, RankingItem, RoundName, ViewerData } from './types';
 
 export class BracketsViewer {
 
@@ -305,49 +305,47 @@ export class BracketsViewer {
      * @param roundNumber Number of the round.
      */
     private createTeam(participant: ParticipantResult | null, originHint: OriginHint, matchLocation: MatchLocation, roundNumber?: number): HTMLElement {
-        const participantContainer = dom.createParticipantContainer();
-        const nameContainer = dom.createNameContainer();
-        const resultContainer = dom.createResultContainer();
+        const containers: ParticipantContainers = {
+            participant: dom.createParticipantContainer(),
+            name: dom.createNameContainer(),
+            result: dom.createResultContainer(),
+        }
 
         if (participant === null)
-            nameContainer.innerText = 'BYE';
+            containers.name.innerText = 'BYE';
         else
-            this.renderParticipant(participantContainer, nameContainer, resultContainer, participant, originHint, matchLocation, roundNumber);
+            this.renderParticipant(containers, participant, originHint, matchLocation, roundNumber);
 
-        participantContainer.append(nameContainer, resultContainer);
+        containers.participant.append(containers.name, containers.result);
 
         if (participant && participant.id !== null)
-            this.setupMouseHover(participant.id, participantContainer);
+            this.setupMouseHover(participant.id, containers.participant);
 
-        return participantContainer;
+        return containers.participant;
     }
-
-    // TODO: group containers into an object
 
     /**
      * Renders a participant.
      *
-     * @param participantContainer The participant container.
-     * @param nameContainer The name container.
-     * @param resultContainer The result container.
+     * @param containers Containers for the participant.
      * @param participant The participant result.
      * @param originHint Origin hint for the match.
      * @param matchLocation Location of the match.
      * @param roundNumber Number of the round.
      */
-    private renderParticipant(participantContainer: HTMLElement, nameContainer: HTMLElement, resultContainer: HTMLElement, participant: ParticipantResult, originHint: OriginHint, matchLocation: MatchLocation, roundNumber?: number): void {
+    private renderParticipant(containers: ParticipantContainers, participant: ParticipantResult, originHint: OriginHint, matchLocation: MatchLocation, roundNumber?: number): void {
         const found = this.participants.find(item => item.id === participant.id);
 
         if (found) {
-            nameContainer.innerText = found.name;
-            this.renderTeamOrigin(nameContainer, participant, matchLocation, roundNumber);
+            containers.name.innerText = found.name;
+            this.renderTeamOrigin(containers.name, participant, matchLocation, roundNumber);
         } else
-            this.renderHint(nameContainer, participant, originHint, matchLocation);
+            this.renderHint(containers.name, participant, originHint, matchLocation);
 
-        resultContainer.innerText = `${participant.score || '-'}`;
+        containers.result.innerText = `${participant.score || '-'}`;
 
-        dom.setupWin(participantContainer, resultContainer, participant);
-        dom.setupLoss(participantContainer, resultContainer, participant);
+        dom.setupWin(containers.participant, containers.result, participant);
+        dom.setupLoss(containers.participant, containers.result, participant);
     }
 
     /**
