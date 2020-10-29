@@ -234,7 +234,7 @@ export function addTeamOrigin(nameContainer: HTMLElement, text: string, placemen
  *
  * @param roundNumber Number of the round.
  * @param roundCount Count of rounds.
- * @param inLowerBracket Whether the round is in lower bracket.
+ * @param matchLocation Location of the match.
  * @param connectFinal Whether to connect to the final.
  */
 export function getBracketConnection(roundNumber: number, roundCount: number, matchLocation?: MatchLocation, connectFinal?: boolean): Connection {

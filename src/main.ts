@@ -237,6 +237,7 @@ export class BracketsViewer {
      * @param roundNumber Number of the round.
      * @param roundCount Count of rounds.
      * @param match Information about the match.
+     * @param matchLocation Location of the match.
      * @param connectFinal Whether to connect this match to the final if it happens to be the last one of the bracket.
      */
     private createBracketMatch(roundNumber: number, roundCount: number, match: Match, matchLocation?: MatchLocation, connectFinal?: boolean): HTMLElement {
@@ -269,7 +270,8 @@ export class BracketsViewer {
      * @param connection Connection of this match with the others.
      * @param label Label of the match.
      * @param originHint Origin hint for the match.
-     * @param inLowerBracket Whether the match is in lower bracket.
+     * @param matchLocation Location of the match.
+     * @param roundNumber Number of the round.
      */
     private createMatch(results: MatchResults, connection?: Connection, label?: string, originHint?: OriginHint, matchLocation?: MatchLocation, roundNumber?: number): HTMLElement {
         matchLocation = matchLocation || 'upper-bracket';
@@ -299,7 +301,8 @@ export class BracketsViewer {
      *
      * @param participant Information about the participant.
      * @param originHint Origin hint for the match.
-     * @param inLowerBracket Whether the match is in lower bracket.
+     * @param matchLocation Location of the match.
+     * @param roundNumber Number of the round.
      */
     private createTeam(participant: ParticipantResult | null, originHint: OriginHint, matchLocation: MatchLocation, roundNumber?: number): HTMLElement {
         const participantContainer = dom.createParticipantContainer();
@@ -329,7 +332,8 @@ export class BracketsViewer {
      * @param resultContainer The result container.
      * @param participant The participant result.
      * @param originHint Origin hint for the match.
-     * @param inLowerBracket Whether the match is in lower bracket.
+     * @param matchLocation Location of the match.
+     * @param roundNumber Number of the round.
      */
     private renderParticipant(participantContainer: HTMLElement, nameContainer: HTMLElement, resultContainer: HTMLElement, participant: ParticipantResult, originHint: OriginHint, matchLocation: MatchLocation, roundNumber?: number): void {
         const found = this.participants.find(item => item.id === participant.id);
@@ -352,7 +356,7 @@ export class BracketsViewer {
      * @param nameContainer The name container.
      * @param participant The participant result.
      * @param originHint Origin hint for the participant.
-     * @param inLowerBracket Whether the match is in lower bracket.
+     * @param matchLocation Location of the match.
      */
     private renderHint(nameContainer: HTMLElement, participant: ParticipantResult, originHint: OriginHint, matchLocation: MatchLocation): void {
         if (originHint === undefined || participant.position === undefined) return;
@@ -367,7 +371,8 @@ export class BracketsViewer {
      *
      * @param nameContainer The name container.
      * @param participant The participant result.
-     * @param inLowerBracket Whether the match is in lower bracket.
+     * @param matchLocation Location of the match.
+     * @param roundNumber Number of the round.
      */
     private renderTeamOrigin(nameContainer: HTMLElement, participant: ParticipantResult, matchLocation: MatchLocation, roundNumber?: number): void {
         if (participant.position === undefined) return;
