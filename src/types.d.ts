@@ -135,3 +135,12 @@ export type RankingMap = { [id: number]: RankingItem };
  * Definition of a ranking.
  */
 export type Ranking = RankingItem[];
+
+/**
+ * Structure containing all the containers for a participant.
+ */
+export interface ParticipantContainers {
+    participant: HTMLElement,
+    name: HTMLElement,
+    result: HTMLElement,
+}
