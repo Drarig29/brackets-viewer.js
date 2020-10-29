@@ -84,25 +84,25 @@ export function createMatchLabel(label: string, status: string): HTMLElement {
 }
 
 /**
- * Creates a container which contains the teams of a match.
+ * Creates a container which contains the opponents of a match.
  */
-export function createTeamsContainer(): HTMLElement {
-    const teams = document.createElement('div');
-    teams.classList.add('teams');
-    return teams;
+export function createOpponentsContainer(): HTMLElement {
+    const opponents = document.createElement('div');
+    opponents.classList.add('opponents');
+    return opponents;
 }
 
 /**
- * Creates a container which contains a team.
+ * Creates a container which contains a participant.
  */
-export function createTeamContainer(): HTMLElement {
+export function createParticipantContainer(): HTMLElement {
     const teamDOM = document.createElement('div');
-    teamDOM.classList.add('team');
+    teamDOM.classList.add('participant');
     return teamDOM;
 }
 
 /**
- * Creates a container which contains the name of a team.
+ * Creates a container which contains the name of a participant.
  */
 export function createNameContainer(): HTMLElement {
     const nameDOM = document.createElement('div');
@@ -111,7 +111,7 @@ export function createNameContainer(): HTMLElement {
 }
 
 /**
- * Creates a container which contains the result of a match for a team.
+ * Creates a container which contains the result of a match for a participant.
  */
 export function createResultContainer(): HTMLElement {
     const resultDOM = document.createElement('div');
@@ -176,45 +176,45 @@ export function setupHint(nameContainer: HTMLElement, hint: string): void {
 }
 
 /**
- * Sets a win for a team.
+ * Sets a win for a participant.
  *
- * @param teamContainer The team container.
+ * @param participantContainer The participant container.
  * @param resultContainer The result container.
- * @param team The team result.
+ * @param participant The participant result.
  */
-export function setupWin(teamContainer: HTMLElement, resultContainer: HTMLElement, team: ParticipantResult): void {
-    if (team.result && team.result === 'win') {
-        teamContainer.classList.add('win');
+export function setupWin(participantContainer: HTMLElement, resultContainer: HTMLElement, participant: ParticipantResult): void {
+    if (participant.result && participant.result === 'win') {
+        participantContainer.classList.add('win');
 
-        if (team.score === undefined)
+        if (participant.score === undefined)
             resultContainer.innerText = 'W';
     }
 }
 
 /**
- * Sets a loss for a team.
+ * Sets a loss for a participant.
  *
- * @param teamContainer The team container.
+ * @param participantContainer The participant container.
  * @param resultContainer The result container.
- * @param team The team result.
+ * @param participant The participant result.
  */
-export function setupLoss(teamContainer: HTMLElement, resultContainer: HTMLElement, team: ParticipantResult): void {
-    if (team.result && team.result === 'loss' || team.forfeit) {
-        teamContainer.classList.add('loss');
+export function setupLoss(participantContainer: HTMLElement, resultContainer: HTMLElement, participant: ParticipantResult): void {
+    if (participant.result && participant.result === 'loss' || participant.forfeit) {
+        participantContainer.classList.add('loss');
 
-        if (team.forfeit)
+        if (participant.forfeit)
             resultContainer.innerText = 'F'; // Forfeit.
-        else if (team.score === undefined)
+        else if (participant.score === undefined)
             resultContainer.innerText = 'L';
     }
 }
 
 /**
- * Adds the team origin to a name 
+ * Adds the participant origin to a name 
  *
  * @param nameContainer The name container.
  * @param text The text to set (origin).
- * @param placement The placement of the team origin.
+ * @param placement The placement of the participant origin.
  */
 export function addTeamOrigin(nameContainer: HTMLElement, text: string, placement: Placement): void {
     const span = document.createElement('span');
@@ -267,7 +267,7 @@ export function getFinalConnection(finalType: FinalType, roundNumber: number, ma
 /**
  * Sets the connection a match containers.
  *
- * @param teamsContainer The teams container.
+ * @param teamsContainer The opponents container.
  * @param matchContainer The match container.
  * @param connection The connection to set.
  */

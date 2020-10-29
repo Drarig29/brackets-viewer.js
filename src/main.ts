@@ -208,7 +208,7 @@ export class BracketsViewer {
             const data: number | string = item[prop];
 
             if (prop === 'id') {
-                const participant = this.participants.find(team => team.id === data);
+                const participant = this.participants.find(participant => participant.id === data);
 
                 if (participant !== undefined) {
                     const cell = dom.createCell(participant.name);
@@ -269,108 +269,106 @@ export class BracketsViewer {
         inLowerBracket = inLowerBracket || false;
 
         const match = dom.createMatchContainer();
-        const teams = dom.createTeamsContainer();
+        const opponents = dom.createOpponentsContainer();
 
         const team1 = this.createTeam(results.opponent1, hint, inLowerBracket);
         const team2 = this.createTeam(results.opponent2, hint, inLowerBracket);
 
         if (label)
-            teams.append(dom.createMatchLabel(label, lang.getMatchStatus(results.status)));
+            opponents.append(dom.createMatchLabel(label, lang.getMatchStatus(results.status)));
 
-        teams.append(team1, team2);
-        match.append(teams);
+        opponents.append(team1, team2);
+        match.append(opponents);
 
         if (!connection)
             return match;
 
-        dom.setupConnection(teams, match, connection);
+        dom.setupConnection(opponents, match, connection);
 
         return match;
     }
 
-    // TODO: get rid of the word "team"
-
     /**
-     * Creates a team for a match.
+     * Creates a participant for a match.
      *
-     * @param team Information about the team.
+     * @param participant Information about the participant.
      * @param hint Hint of the match.
      * @param inLowerBracket Whether the match is in lower bracket.
      */
-    private createTeam(team: ParticipantResult | null, hint: MatchHint, inLowerBracket: boolean): HTMLElement {
-        const teamContainer = dom.createTeamContainer();
+    private createTeam(participant: ParticipantResult | null, hint: MatchHint, inLowerBracket: boolean): HTMLElement {
+        const participantContainer = dom.createParticipantContainer();
         const nameContainer = dom.createNameContainer();
         const resultContainer = dom.createResultContainer();
 
-        if (team === null)
+        if (participant === null)
             nameContainer.innerText = 'BYE';
         else
-            this.renderParticipant(teamContainer, nameContainer, resultContainer, team, hint, inLowerBracket);
+            this.renderParticipant(participantContainer, nameContainer, resultContainer, participant, hint, inLowerBracket);
 
-        teamContainer.append(nameContainer, resultContainer);
+        participantContainer.append(nameContainer, resultContainer);
 
-        if (team && team.id !== null)
-            this.setupMouseHover(team.id, teamContainer);
+        if (participant && participant.id !== null)
+            this.setupMouseHover(participant.id, participantContainer);
 
-        return teamContainer;
+        return participantContainer;
     }
 
     /**
      * Renders a participant.
      *
-     * @param teamContainer The team container.
+     * @param participantContainer The participant container.
      * @param nameContainer The name container.
      * @param resultContainer The result container.
-     * @param team The participant result.
+     * @param participant The participant result.
      * @param hint Hint for the participant.
      * @param inLowerBracket Whether the match is in lower bracket.
      */
-    private renderParticipant(teamContainer: HTMLElement, nameContainer: HTMLElement, resultContainer: HTMLElement, team: ParticipantResult, hint: MatchHint, inLowerBracket: boolean): void {
-        const participant = this.participants.find(item => item.id === team.id);
+    private renderParticipant(participantContainer: HTMLElement, nameContainer: HTMLElement, resultContainer: HTMLElement, participant: ParticipantResult, hint: MatchHint, inLowerBracket: boolean): void {
+        const found = this.participants.find(item => item.id === participant.id);
 
-        if (participant) {
-            nameContainer.innerText = participant.name;
-            this.renderTeamOrigin(nameContainer, team, inLowerBracket);
+        if (found) {
+            nameContainer.innerText = found.name;
+            this.renderTeamOrigin(nameContainer, participant, inLowerBracket);
         } else
-            this.renderHint(nameContainer, team, hint, inLowerBracket);
+            this.renderHint(nameContainer, participant, hint, inLowerBracket);
 
-        resultContainer.innerText = `${team.score || '-'}`;
+        resultContainer.innerText = `${participant.score || '-'}`;
 
-        dom.setupWin(teamContainer, resultContainer, team);
-        dom.setupLoss(teamContainer, resultContainer, team);
+        dom.setupWin(participantContainer, resultContainer, participant);
+        dom.setupLoss(participantContainer, resultContainer, participant);
     }
 
     /**
      * Renders a hint for a participant.
      *
      * @param nameContainer The name container.
-     * @param team The participant result.
+     * @param participant The participant result.
      * @param hint Hint for the participant.
      * @param inLowerBracket Whether the match is in lower bracket.
      */
-    private renderHint(nameContainer: HTMLElement, team: ParticipantResult, hint: MatchHint, inLowerBracket: boolean): void {
-        if (hint === undefined || team.position === undefined) return;
+    private renderHint(nameContainer: HTMLElement, participant: ParticipantResult, hint: MatchHint, inLowerBracket: boolean): void {
+        if (hint === undefined || participant.position === undefined) return;
         if (!this.config.showSlotsOrigin) return;
         if (!this.config.showLowerBracketSlotsOrigin && inLowerBracket) return;
 
-        dom.setupHint(nameContainer, hint(team.position));
+        dom.setupHint(nameContainer, hint(participant.position));
     }
 
     /**
      * Renders a participant's origin.
      *
      * @param nameContainer The name container.
-     * @param team The participant result.
+     * @param participant The participant result.
      * @param inLowerBracket Whether the match is in lower bracket.
      */
-    private renderTeamOrigin(nameContainer: HTMLElement, team: ParticipantResult, inLowerBracket: boolean): void {
-        if (team.position === undefined) return;
+    private renderTeamOrigin(nameContainer: HTMLElement, participant: ParticipantResult, inLowerBracket: boolean): void {
+        if (participant.position === undefined) return;
         if (this.config.participantOriginPlacement === 'none') return;
         if (!this.config.showSlotsOrigin) return;
         if (!this.config.showLowerBracketSlotsOrigin && inLowerBracket) return;
 
         // 'P' for position (where the participant comes from) and '#' for actual seeding.
-        const origin = inLowerBracket ? `P${team.position}` : `#${team.position}`;
+        const origin = inLowerBracket ? `P${participant.position}` : `#${participant.position}`;
 
         dom.addTeamOrigin(nameContainer, origin, this.config.participantOriginPlacement);
     }

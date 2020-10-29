@@ -36,8 +36,8 @@ export interface Config {
     /**
      * Where the position of a participant is placed relative to its name.
      * - If `none`, the position is not added.
-     * - If `before`, the position is prepended before the team name. "#1 Team"
-     * - If `after`, the position is appended after the team name, in parentheses. "Team (#1)"
+     * - If `before`, the position is prepended before the participant name. "#1 Team"
+     * - If `after`, the position is appended after the participant name, in parentheses. "Team (#1)"
      */
     participantOriginPlacement: Placement,
 
