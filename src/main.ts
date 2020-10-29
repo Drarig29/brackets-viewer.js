@@ -3,7 +3,7 @@ import { Participant, Match, MatchResults, ParticipantResult, StageType } from '
 import { splitBy, getRanking } from './helpers';
 import * as dom from './dom';
 import * as lang from './lang';
-import { Config, Connection, FinalType, MatchHint, RankingItem, ViewerData } from './types';
+import { Config, Connection, FinalType, OriginHint, RankingItem, ViewerData } from './types';
 
 export class BracketsViewer {
 
@@ -171,8 +171,7 @@ export class BracketsViewer {
 
         const roundCount = matches.length;
 
-        for (let i = 0; i < finalMatches.length; i++) {
-            const roundNumber = i + 1;
+        for (let roundNumber = 1; roundNumber <= finalMatches.length; roundNumber++) {
             const roundContainer = dom.createRoundContainer(lang.getFinalMatchLabel(finalType, roundNumber, roundCount));
             roundContainer.append(this.createFinalMatch(finalType, finalMatches, roundNumber, roundCount));
             upperBracket.append(roundContainer);
@@ -236,8 +235,8 @@ export class BracketsViewer {
     private createBracketMatch(roundNumber: number, roundCount: number, match: Match, inLowerBracket?: boolean, connectFinal?: boolean): HTMLElement {
         const connection = dom.getBracketConnection(roundNumber, roundCount, inLowerBracket, connectFinal);
         const matchLabel = lang.getMatchLabel(match.number, roundNumber, roundCount, inLowerBracket);
-        const matchHint = lang.getMatchHint(roundNumber, roundCount, inLowerBracket);
-        return this.createMatch(match, connection, matchLabel, matchHint, inLowerBracket);
+        const originHint = lang.getOriginHint(roundNumber, roundCount, inLowerBracket);
+        return this.createMatch(match, connection, matchLabel, originHint, inLowerBracket);
     }
 
     /**
@@ -252,8 +251,8 @@ export class BracketsViewer {
         const roundIndex = roundNumber - 1;
         const connection = dom.getFinalConnection(type, roundNumber, matches.length);
         const matchLabel = lang.getFinalMatchLabel(type, roundNumber, roundCount);
-        const matchHint = lang.getFinalMatchHint(type, roundNumber);
-        return this.createMatch(matches[roundIndex], connection, matchLabel, matchHint);
+        const originHint = lang.getFinalOriginHint(type, roundNumber);
+        return this.createMatch(matches[roundIndex], connection, matchLabel, originHint);
     }
 
     /**
@@ -262,17 +261,17 @@ export class BracketsViewer {
      * @param results Results of the match.
      * @param connection Connection of this match with the others.
      * @param label Label of the match.
-     * @param hint Hint for the match.
+     * @param originHint Origin hint for the match.
      * @param inLowerBracket Whether the match is in lower bracket.
      */
-    private createMatch(results: MatchResults, connection?: Connection, label?: string, hint?: MatchHint, inLowerBracket?: boolean): HTMLElement {
+    private createMatch(results: MatchResults, connection?: Connection, label?: string, originHint?: OriginHint, inLowerBracket?: boolean): HTMLElement {
         inLowerBracket = inLowerBracket || false;
 
         const match = dom.createMatchContainer();
         const opponents = dom.createOpponentsContainer();
 
-        const team1 = this.createTeam(results.opponent1, hint, inLowerBracket);
-        const team2 = this.createTeam(results.opponent2, hint, inLowerBracket);
+        const team1 = this.createTeam(results.opponent1, originHint, inLowerBracket);
+        const team2 = this.createTeam(results.opponent2, originHint, inLowerBracket);
 
         if (label)
             opponents.append(dom.createMatchLabel(label, lang.getMatchStatus(results.status)));
@@ -292,10 +291,10 @@ export class BracketsViewer {
      * Creates a participant for a match.
      *
      * @param participant Information about the participant.
-     * @param hint Hint of the match.
+     * @param originHint Origin hint for the match.
      * @param inLowerBracket Whether the match is in lower bracket.
      */
-    private createTeam(participant: ParticipantResult | null, hint: MatchHint, inLowerBracket: boolean): HTMLElement {
+    private createTeam(participant: ParticipantResult | null, originHint: OriginHint, inLowerBracket: boolean): HTMLElement {
         const participantContainer = dom.createParticipantContainer();
         const nameContainer = dom.createNameContainer();
         const resultContainer = dom.createResultContainer();
@@ -303,7 +302,7 @@ export class BracketsViewer {
         if (participant === null)
             nameContainer.innerText = 'BYE';
         else
-            this.renderParticipant(participantContainer, nameContainer, resultContainer, participant, hint, inLowerBracket);
+            this.renderParticipant(participantContainer, nameContainer, resultContainer, participant, originHint, inLowerBracket);
 
         participantContainer.append(nameContainer, resultContainer);
 
@@ -320,17 +319,17 @@ export class BracketsViewer {
      * @param nameContainer The name container.
      * @param resultContainer The result container.
      * @param participant The participant result.
-     * @param hint Hint for the participant.
+     * @param originHint Origin hint for the match.
      * @param inLowerBracket Whether the match is in lower bracket.
      */
-    private renderParticipant(participantContainer: HTMLElement, nameContainer: HTMLElement, resultContainer: HTMLElement, participant: ParticipantResult, hint: MatchHint, inLowerBracket: boolean): void {
+    private renderParticipant(participantContainer: HTMLElement, nameContainer: HTMLElement, resultContainer: HTMLElement, participant: ParticipantResult, originHint: OriginHint, inLowerBracket: boolean): void {
         const found = this.participants.find(item => item.id === participant.id);
 
         if (found) {
             nameContainer.innerText = found.name;
             this.renderTeamOrigin(nameContainer, participant, inLowerBracket);
         } else
-            this.renderHint(nameContainer, participant, hint, inLowerBracket);
+            this.renderHint(nameContainer, participant, originHint, inLowerBracket);
 
         resultContainer.innerText = `${participant.score || '-'}`;
 
@@ -339,19 +338,19 @@ export class BracketsViewer {
     }
 
     /**
-     * Renders a hint for a participant.
+     * Renders an origin hint for a participant.
      *
      * @param nameContainer The name container.
      * @param participant The participant result.
-     * @param hint Hint for the participant.
+     * @param originHint Origin hint for the participant.
      * @param inLowerBracket Whether the match is in lower bracket.
      */
-    private renderHint(nameContainer: HTMLElement, participant: ParticipantResult, hint: MatchHint, inLowerBracket: boolean): void {
-        if (hint === undefined || participant.position === undefined) return;
+    private renderHint(nameContainer: HTMLElement, participant: ParticipantResult, originHint: OriginHint, inLowerBracket: boolean): void {
+        if (originHint === undefined || participant.position === undefined) return;
         if (!this.config.showSlotsOrigin) return;
         if (!this.config.showLowerBracketSlotsOrigin && inLowerBracket) return;
 
-        dom.setupHint(nameContainer, hint(participant.position));
+        dom.setupHint(nameContainer, originHint(participant.position));
     }
 
     /**

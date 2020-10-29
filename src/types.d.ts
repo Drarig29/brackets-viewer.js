@@ -68,9 +68,9 @@ export type ConnectionType = 'square' | 'straight' | false;
 export type FinalType = 'consolation_final' | 'grand_final';
 
 /**
- * A function returning a match hint based on an index.
+ * A function returning an origin hint based on a participant's position.
  */
-export type MatchHint = ((i: number) => string) | undefined;
+export type OriginHint = ((position: number) => string) | undefined;
 
 /**
  * Contains the information about the connections of a match.
