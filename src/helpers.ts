@@ -1,6 +1,6 @@
-import { Match, ParticipantResult } from "brackets-model";
-import { headers } from "./lang";
-import { RankingHeader, Ranking, RankingFormula, RankingItem, RankingMap } from "./types";
+import { Match, ParticipantResult } from 'brackets-model';
+import { headers } from './lang';
+import { RankingHeader, Ranking, RankingFormula, RankingItem, RankingMap } from './types';
 
 /**
  * Splits an array based on values of a given key of the objects of the array.

@@ -1,6 +1,6 @@
-import { Status } from "brackets-model";
-import { isMajorRound } from "./helpers";
-import { FinalType, OriginHint, RankingHeaders } from "./types";
+import { Status } from 'brackets-model';
+import { isMajorRound } from './helpers';
+import { FinalType, OriginHint, RankingHeaders } from './types';
 
 /**
  * Returns an origin hint function based on rounds information.
