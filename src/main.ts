@@ -3,7 +3,7 @@ import { Participant, Match, MatchResults, ParticipantResult, StageType } from '
 import { splitBy, getRanking } from './helpers';
 import * as dom from './dom';
 import * as lang from './lang';
-import { Config, Connection, FinalType, OriginHint, RankingItem, ViewerData } from './types';
+import { Config, Connection, FinalType, OriginHint, RankingItem, RoundName, ViewerData } from './types';
 
 export class BracketsViewer {
 
@@ -66,7 +66,7 @@ export class BracketsViewer {
             let roundNumber = 1;
 
             for (const roundMatches of matchesByRound) {
-                const roundContainer = dom.createRoundContainer(lang.getRoundName(roundNumber++));
+                const roundContainer = dom.createRoundContainer(lang.getRoundName(roundNumber++, 0));
 
                 for (const match of roundMatches)
                     roundContainer.append(this.createMatch(match));
@@ -140,14 +140,14 @@ export class BracketsViewer {
      * @param inLowerBracket Whether the bracket is in lower bracket.
      * @param connectFinal Whether to connect the last match of the bracket to the final.
      */
-    private renderBracket(root: HTMLElement, matchesByRound: Match[][], roundName: (roundNumber: number) => string, inLowerBracket?: boolean, connectFinal?: boolean): void {
+    private renderBracket(root: HTMLElement, matchesByRound: Match[][], roundName: RoundName, inLowerBracket?: boolean, connectFinal?: boolean): void {
         const bracketContainer = dom.createBracketContainer();
         const roundCount = matchesByRound.length;
 
         let roundNumber = 1;
 
         for (const matches of matchesByRound) {
-            const roundContainer = dom.createRoundContainer(roundName(roundNumber));
+            const roundContainer = dom.createRoundContainer(roundName(roundNumber, roundCount));
 
             for (const match of matches)
                 roundContainer.append(this.createBracketMatch(roundNumber, roundCount, match, inLowerBracket, connectFinal));

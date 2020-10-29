@@ -136,27 +136,30 @@ export function getGroupName(groupNumber: number): string {
  * Returns the name of a round.
  *
  * @param roundNumber Number of the round.
+ * @param roundCount Count of rounds.
  */
-export function getRoundName(roundNumber: number): string {
-    return `Round ${roundNumber}`;
+export function getRoundName(roundNumber: number, roundCount: number): string {
+    return roundNumber === roundCount ? 'Final Round' : `Round ${roundNumber}`;
 }
 
 /**
  * Returns the name of a round in the winner bracket of a double elimination stage.
  *
  * @param roundNumber Number of the round.
+ * @param roundCount Count of rounds.
  */
-export function getWinnerBracketRoundName(roundNumber: number): string {
-    return `WB Round ${roundNumber}`;
+export function getWinnerBracketRoundName(roundNumber: number, roundCount: number): string {
+    return roundNumber === roundCount ? 'WB Final Round' : `WB Round ${roundNumber}`;
 }
 
 /**
  * Returns the name of a round in the loser bracket of a double elimination stage.
  *
  * @param roundNumber Number of the round.
+ * @param roundCount Count of rounds.
  */
-export function getLoserBracketRoundName(roundNumber: number): string {
-    return `LB Round ${roundNumber}`;
+export function getLoserBracketRoundName(roundNumber: number, roundCount: number): string {
+    return roundNumber === roundCount ? 'LB Final Round' : `LB Round ${roundNumber}`;
 }
 
 /** 
