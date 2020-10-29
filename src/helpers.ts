@@ -1,5 +1,6 @@
 import { Match, ParticipantResult } from "brackets-model";
-import { RankingHeader, Ranking, RankingFormula, RankingHeaders, RankingItem, RankingMap } from "./types";
+import { headers } from "./lang";
+import { RankingHeader, Ranking, RankingFormula, RankingItem, RankingMap } from "./types";
 
 /**
  * Splits an array based on values of a given key of the objects of the array.
@@ -27,56 +28,6 @@ export function splitBy<T>(array: T[], key: keyof T): T[][] {
  */
 export function isMajorRound(roundNumber: number): boolean {
     return roundNumber === 1 || roundNumber % 2 === 0;
-}
-
-/**
- * Headers of the ranking.
- */
-const headers: RankingHeaders = {
-    'rank': {
-        text: '#',
-        tooltip: 'Rank',
-    },
-    'id': {
-        text: 'Name',
-        tooltip: 'Name',
-    },
-    'played': {
-        text: 'P',
-        tooltip: 'Played',
-    },
-    'wins': {
-        text: 'W',
-        tooltip: 'Wins',
-    },
-    'draws': {
-        text: 'D',
-        tooltip: 'Draws',
-    },
-    'losses': {
-        text: 'L',
-        tooltip: 'Losses',
-    },
-    'forfeits': {
-        text: 'F',
-        tooltip: 'Forfeits',
-    },
-    'scoreFor': {
-        text: 'SF',
-        tooltip: 'Score For',
-    },
-    'scoreAgainst': {
-        text: 'SA',
-        tooltip: 'Score Against',
-    },
-    'scoreDifference': {
-        text: '+/-',
-        tooltip: 'Score Difference',
-    },
-    'points': {
-        text: 'Pts',
-        tooltip: 'Points',
-    },
 }
 
 /**

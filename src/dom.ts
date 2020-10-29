@@ -1,5 +1,6 @@
 import { ParticipantResult } from "brackets-model";
 import { rankingHeader } from "./helpers";
+import { abbreviations } from "./lang";
 import { Connection, FinalType, Placement, Ranking } from "./types";
 
 /**
@@ -187,7 +188,7 @@ export function setupWin(participantContainer: HTMLElement, resultContainer: HTM
         participantContainer.classList.add('win');
 
         if (participant.score === undefined)
-            resultContainer.innerText = 'W';
+            resultContainer.innerText = abbreviations.win;
     }
 }
 
@@ -203,9 +204,9 @@ export function setupLoss(participantContainer: HTMLElement, resultContainer: HT
         participantContainer.classList.add('loss');
 
         if (participant.forfeit)
-            resultContainer.innerText = 'F'; // Forfeit.
+            resultContainer.innerText = abbreviations.forfeit;
         else if (participant.score === undefined)
-            resultContainer.innerText = 'L';
+            resultContainer.innerText = abbreviations.loss;
     }
 }
 
