@@ -1,6 +1,6 @@
 import { Status } from "brackets-model";
 import { isMajorRound } from "./helpers";
-import { FinalType, OriginHint } from "./types";
+import { FinalType, OriginHint, RankingHeaders } from "./types";
 
 /**
  * Returns an origin hint function based on rounds information.
@@ -159,4 +159,63 @@ export function getLoserBracketRoundName(roundNumber: number): string {
     return `LB Round ${roundNumber}`;
 }
 
-// TODO: add letters as traduction (W, L, D, F and all ranking headers)
+/** 
+ * Abbreviations used in the viewer.
+ */
+export const abbreviations = {
+    win: 'W',
+    loss: 'L',
+    forfeit: 'F',
+    position: 'P',
+    seed: '#',
+}
+
+/**
+ * Headers of the ranking.
+ */
+export const headers: RankingHeaders = {
+    rank: {
+        text: '#',
+        tooltip: 'Rank',
+    },
+    id: {
+        text: 'Name',
+        tooltip: 'Name',
+    },
+    played: {
+        text: 'P',
+        tooltip: 'Played',
+    },
+    wins: {
+        text: abbreviations.win,
+        tooltip: 'Wins',
+    },
+    draws: {
+        text: 'D',
+        tooltip: 'Draws',
+    },
+    losses: {
+        text: abbreviations.loss,
+        tooltip: 'Losses',
+    },
+    forfeits: {
+        text: abbreviations.forfeit,
+        tooltip: 'Forfeits',
+    },
+    scoreFor: {
+        text: 'SF',
+        tooltip: 'Score For',
+    },
+    scoreAgainst: {
+        text: 'SA',
+        tooltip: 'Score Against',
+    },
+    scoreDifference: {
+        text: '+/-',
+        tooltip: 'Score Difference',
+    },
+    points: {
+        text: 'Pts',
+        tooltip: 'Points',
+    },
+}

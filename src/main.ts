@@ -366,9 +366,7 @@ export class BracketsViewer {
         if (!this.config.showSlotsOrigin) return;
         if (!this.config.showLowerBracketSlotsOrigin && inLowerBracket) return;
 
-        // 'P' for position (where the participant comes from) and '#' for actual seeding.
-        const origin = inLowerBracket ? `P${participant.position}` : `#${participant.position}`;
-
+        const origin = (inLowerBracket ? lang.abbreviations.position : lang.abbreviations.seed) + participant.position;
         dom.addTeamOrigin(nameContainer, origin, this.config.participantOriginPlacement);
     }
 
