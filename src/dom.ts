@@ -175,19 +175,16 @@ export function setupHint(nameContainer: HTMLElement, hint: string): void {
     nameContainer.innerText = hint;
 }
 
-// TODO: set win on parent
-
 /**
  * Sets a win for a team.
  *
- * @param nameContainer The name container.
+ * @param teamContainer The team container.
  * @param resultContainer The result container.
  * @param team The team result.
  */
-export function setupWin(nameContainer: HTMLElement, resultContainer: HTMLElement, team: ParticipantResult): void {
+export function setupWin(teamContainer: HTMLElement, resultContainer: HTMLElement, team: ParticipantResult): void {
     if (team.result && team.result === 'win') {
-        nameContainer.classList.add('win');
-        resultContainer.classList.add('win');
+        teamContainer.classList.add('win');
 
         if (team.score === undefined)
             resultContainer.innerText = 'W';
@@ -197,14 +194,13 @@ export function setupWin(nameContainer: HTMLElement, resultContainer: HTMLElemen
 /**
  * Sets a loss for a team.
  *
- * @param nameContainer The name container.
+ * @param teamContainer The team container.
  * @param resultContainer The result container.
  * @param team The team result.
  */
-export function setupLoss(nameContainer: HTMLElement, resultContainer: HTMLElement, team: ParticipantResult): void {
+export function setupLoss(teamContainer: HTMLElement, resultContainer: HTMLElement, team: ParticipantResult): void {
     if (team.result && team.result === 'loss' || team.forfeit) {
-        nameContainer.classList.add('loss');
-        resultContainer.classList.add('loss');
+        teamContainer.classList.add('loss');
 
         if (team.forfeit)
             resultContainer.innerText = 'F'; // Forfeit.

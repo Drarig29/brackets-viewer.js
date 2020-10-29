@@ -250,10 +250,11 @@ export class BracketsViewer {
      * @param roundNumber Number of the round.
      */
     private createFinalMatch(type: FinalType, grandFinalName: (roundNumber: number) => string, matches: Match[], roundNumber: number): HTMLElement {
+        const roundIndex = roundNumber - 1;
         const connection = dom.getFinalConnection(type, roundNumber, matches.length);
         const matchLabel = lang.getFinalMatchLabel(type, grandFinalName, roundNumber);
         const matchHint = lang.getFinalMatchHint(type, roundNumber);
-        return this.createMatch(matches[roundNumber], connection, matchLabel, matchHint);
+        return this.createMatch(matches[roundIndex], connection, matchLabel, matchHint);
     }
 
     /**
@@ -305,7 +306,7 @@ export class BracketsViewer {
         if (team === null)
             nameContainer.innerText = 'BYE';
         else
-            this.renderParticipant(nameContainer, resultContainer, team, hint, inLowerBracket);
+            this.renderParticipant(teamContainer, nameContainer, resultContainer, team, hint, inLowerBracket);
 
         teamContainer.append(nameContainer, resultContainer);
 
@@ -324,7 +325,7 @@ export class BracketsViewer {
      * @param hint Hint for the participant.
      * @param inLowerBracket Whether the match is in lower bracket.
      */
-    private renderParticipant(nameContainer: HTMLElement, resultContainer: HTMLElement, team: ParticipantResult, hint: MatchHint, inLowerBracket: boolean): void {
+    private renderParticipant(teamContainer: HTMLElement, nameContainer: HTMLElement, resultContainer: HTMLElement, team: ParticipantResult, hint: MatchHint, inLowerBracket: boolean): void {
         const participant = this.participants.find(item => item.id === team.id);
 
         if (participant) {
@@ -335,8 +336,8 @@ export class BracketsViewer {
 
         resultContainer.innerText = `${team.score || '-'}`;
 
-        dom.setupWin(nameContainer, resultContainer, team);
-        dom.setupLoss(nameContainer, resultContainer, team);
+        dom.setupWin(teamContainer, resultContainer, team);
+        dom.setupLoss(teamContainer, resultContainer, team);
     }
 
     /**
