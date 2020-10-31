@@ -243,7 +243,7 @@ export class BracketsViewer {
     private createBracketMatch(roundNumber: number, roundCount: number, match: Match, matchLocation?: MatchLocation, connectFinal?: boolean): HTMLElement {
         const connection = dom.getBracketConnection(roundNumber, roundCount, matchLocation, connectFinal);
         const matchLabel = lang.getMatchLabel(match.number, roundNumber, roundCount, matchLocation);
-        const originHint = lang.getOriginHint(roundNumber, roundCount, matchLocation);
+        const originHint = lang.getOriginHint(roundNumber, roundCount, this.skipFirstRound, matchLocation);
         return this.createMatch(match, connection, matchLabel, originHint, matchLocation, roundNumber);
     }
 
