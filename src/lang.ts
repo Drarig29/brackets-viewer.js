@@ -9,22 +9,23 @@ import { FinalType, MatchLocation, OriginHint, RankingHeaders } from './types';
  * @param roundCount Count of rounds.
  * @param matchLocation Location of the match.
  */
-export function getOriginHint(roundNumber: number, roundCount: number, matchLocation?: MatchLocation): OriginHint {
-    if (matchLocation !== 'lower-bracket' && roundNumber === 1)
+export function getOriginHint(roundNumber: number, roundCount: number, skipFirstRound: boolean, matchLocation?: MatchLocation): OriginHint {
+    if (roundNumber === 1 && (matchLocation === 'upper-bracket' || (matchLocation === 'lower-bracket' && skipFirstRound)))
         return (position: number) => `Seed ${position}`;
 
     if (matchLocation === 'lower-bracket' && isMajorRound(roundNumber)) {
-        const roundNumberWB = Math.ceil((roundNumber + 1) / 2);
-
-        let hint = (position: number) => `Loser of WB ${roundNumberWB}.${position}`;
-
         if (roundNumber === roundCount - 2)
-            hint = (position: number) => `Loser of WB Semi ${position}`;
+            return (position: number) => `Loser of WB Semi ${position}`;
 
         if (roundNumber === roundCount)
-            hint = () => 'Loser of WB Final';
+            return () => 'Loser of WB Final';
 
-        return hint;
+        const roundNumberWB = Math.ceil((roundNumber + 1) / 2);
+
+        if (skipFirstRound)
+            return (position: number) => `Loser of WB ${roundNumberWB - 1}.${position}`;
+
+        return (position: number) => `Loser of WB ${roundNumberWB}.${position}`;
     }
 
     return undefined;
@@ -39,12 +40,8 @@ export function getOriginHint(roundNumber: number, roundCount: number, matchLoca
  * @param matchLocation Location of the match.
  */
 export function getMatchLabel(matchNumber: number, roundNumber: number, roundCount: number, matchLocation?: MatchLocation): string {
-    let matchPrefix = 'M';
-
-    if (matchLocation === 'upper-bracket')
-        matchPrefix = 'WB';
-    else if (matchLocation === 'lower-bracket')
-        matchPrefix = 'LB';
+    const matchPrefix = matchLocation === 'upper-bracket' ? 'WB' :
+        matchLocation === 'lower-bracket' ? 'LB' : 'M';
 
     const semiFinalRound = roundNumber === roundCount - 1;
     const finalRound = roundNumber === roundCount;
