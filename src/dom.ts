@@ -1,7 +1,7 @@
 import { ParticipantResult } from 'brackets-model';
 import { rankingHeader } from './helpers';
 import { abbreviations } from './lang';
-import { Connection, FinalType, MatchLocation, Placement, Ranking } from './types';
+import { Connection, FinalType, BracketType, Placement, Ranking } from './types';
 
 /**
  * Creates the title of the viewer.
@@ -237,8 +237,8 @@ export function addTeamOrigin(nameContainer: HTMLElement, text: string, placemen
  * @param matchLocation Location of the match.
  * @param connectFinal Whether to connect to the final.
  */
-export function getBracketConnection(roundNumber: number, roundCount: number, matchLocation?: MatchLocation, connectFinal?: boolean): Connection {
-    if (matchLocation === 'lower-bracket') {
+export function getBracketConnection(roundNumber: number, roundCount: number, matchLocation?: BracketType, connectFinal?: boolean): Connection {
+    if (matchLocation === 'loser-bracket') {
         return {
             connectPrevious: roundNumber > 1 && (roundNumber % 2 === 1 ? 'square' : 'straight'),
             connectNext: roundNumber < roundCount && (roundNumber % 2 === 0 ? 'square' : 'straight'),
