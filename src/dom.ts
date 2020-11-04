@@ -211,7 +211,7 @@ export function setupLoss(participantContainer: HTMLElement, resultContainer: HT
 }
 
 /**
- * Adds the participant origin to a name 
+ * Adds the participant origin to a name.
  *
  * @param nameContainer The name container.
  * @param text The text to set (origin).
@@ -248,7 +248,7 @@ export function getBracketConnection(roundNumber: number, roundCount: number, ma
     return {
         connectPrevious: roundNumber > 1 && 'square',
         connectNext: roundNumber < roundCount ? 'square' : (connectFinal ? 'straight' : false),
-    }
+    };
 }
 
 /**

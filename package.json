@@ -11,7 +11,7 @@
         "start": "npx webpack --watch --mode development",
         "prepare": "npm run build",
         "prepublishOnly": "npm run build",
-        "lint": "eslint **/*.ts --fix"
+        "lint": "eslint **/*.{js,ts} --fix"
     },
     "repository": {
         "type": "git",

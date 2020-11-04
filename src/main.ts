@@ -3,7 +3,17 @@ import { Participant, Match, MatchResults, ParticipantResult, StageType } from '
 import { splitBy, getRanking, getOriginAbbreviation } from './helpers';
 import * as dom from './dom';
 import * as lang from './lang';
-import { Config, Connection, FinalType, BracketType, OriginHint, ParticipantContainers, RankingItem, RoundName, ViewerData } from './types';
+import {
+    Config,
+    Connection,
+    FinalType,
+    BracketType,
+    OriginHint,
+    ParticipantContainers,
+    RankingItem,
+    RoundName,
+    ViewerData,
+} from './types';
 
 export class BracketsViewer {
 
@@ -172,8 +182,8 @@ export class BracketsViewer {
         if (!upperBracket) throw Error('Upper bracket not found.');
 
         const winnerWb = matches[0].opponent1;
-        const finalsToDisplay = (winnerWb && winnerWb.id != null && winnerWb.result != 'win') ? 2 : 1;
-        const finalMatches = matches.slice(0, finalsToDisplay);
+        const displayCount = winnerWb?.id === null || winnerWb?.result === 'win' ? 1 : 2;
+        const finalMatches = matches.slice(0, displayCount);
 
         const roundCount = matches.length;
 
@@ -305,7 +315,7 @@ export class BracketsViewer {
             participant: dom.createParticipantContainer(),
             name: dom.createNameContainer(),
             result: dom.createResultContainer(),
-        }
+        };
 
         if (participant === null)
             containers.name.innerText = 'BYE';
@@ -383,7 +393,7 @@ export class BracketsViewer {
      * Sets mouse hover events for a participant.
      *
      * @param participantId ID of the participant.
-     * @param element The dom element to add events to. 
+     * @param element The dom element to add events to.
      */
     private setupMouseHover(participantId: number, element: HTMLElement): void {
         if (!this.config.highlightParticipantOnHover) return;
