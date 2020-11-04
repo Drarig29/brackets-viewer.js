@@ -113,12 +113,18 @@ export function getFinalOriginHint(finalType: FinalType, roundNumber: number): O
  */
 export function getMatchStatus(status: Status): string {
     switch (status) {
-        case Status.Locked: return 'Locked';
-        case Status.Waiting: return 'Waiting';
-        case Status.Ready: return 'Ready';
-        case Status.Running: return 'Running';
-        case Status.Completed: return 'Completed';
-        case Status.Archived: return 'Archived';
+        case Status.Locked:
+            return 'Locked';
+        case Status.Waiting:
+            return 'Waiting';
+        case Status.Ready:
+            return 'Ready';
+        case Status.Running:
+            return 'Running';
+        case Status.Completed:
+            return 'Completed';
+        case Status.Archived:
+            return 'Archived';
     }
 }
 
@@ -174,7 +180,7 @@ export function getLoserBracketRoundName(roundNumber: number, roundCount: number
     return roundNumber === roundCount ? 'LB Final Round' : `LB Round ${roundNumber}`;
 }
 
-/** 
+/**
  * Abbreviations used in the viewer.
  */
 export const abbreviations = {
@@ -183,7 +189,7 @@ export const abbreviations = {
     forfeit: 'F',
     position: 'P',
     seed: '#',
-}
+};
 
 /**
  * Headers of the ranking.
@@ -233,4 +239,4 @@ export const headers: RankingHeaders = {
         text: 'Pts',
         tooltip: 'Points',
     },
-}
+};
