@@ -15,13 +15,12 @@ export class BracketsViewer {
     /**
      * Renders a stage (round-robin, single or double elimination).
      *
-     * @param rootSelector The DOM selector for the root element.
      * @param data The data to display.
      * @param config An optional configuration for the viewer.
      */
-    public render(rootSelector: string, data: ViewerData, config?: Partial<Config>): void {
-        const root = document.querySelector(rootSelector) as HTMLElement;
-        if (!root) throw Error('Root not found. You must have a root element with id "root"');
+    public render(data: ViewerData, config?: Partial<Config>): void {
+        const root = document.querySelector('.bracket-viewer') as HTMLElement;
+        if (!root) throw Error('Root not found. You must have a root element with class "bracket-viewer".');
 
         this.config = {
             participantOriginPlacement: config && config.participantOriginPlacement || 'before',
@@ -211,7 +210,7 @@ export class BracketsViewer {
         const row = dom.createRow();
 
         for (const prop in item) {
-            const data: number | string = item[prop];
+            const data = item[prop];
 
             if (prop === 'id') {
                 const participant = this.participants.find(participant => participant.id === data);

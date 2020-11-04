@@ -87,7 +87,8 @@
             "tournament_id": 0,
             "name": "Amateur",
             "type": "double_elimination",
-            "number": 1
+            "number": 1,
+            "settings":  {}
         }
     ],
     "group": [
