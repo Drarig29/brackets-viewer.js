@@ -72,13 +72,15 @@ export class BracketsViewer {
         let groupNumber = 1;
 
         for (const groupMatches of matchesByGroup) {
-            const groupContainer = dom.createGroupContainer(lang.getGroupName(groupNumber++));
+            const groupId = groupMatches[0].group_id;
+            const groupContainer = dom.createGroupContainer(groupId, lang.getGroupName(groupNumber++));
             const matchesByRound = splitBy(groupMatches, 'round_id');
 
             let roundNumber = 1;
 
             for (const roundMatches of matchesByRound) {
-                const roundContainer = dom.createRoundContainer(lang.getRoundName(roundNumber++, 0));
+                const roundId = roundMatches[0].round_id;
+                const roundContainer = dom.createRoundContainer(roundId, lang.getRoundName(roundNumber++, 0));
 
                 for (const match of roundMatches)
                     roundContainer.append(this.createMatch(match));
@@ -153,13 +155,15 @@ export class BracketsViewer {
      * @param connectFinal Whether to connect the last match of the bracket to the final.
      */
     private renderBracket(root: HTMLElement, matchesByRound: Match[][], roundName: RoundName, bracketType: BracketType, connectFinal?: boolean): void {
-        const bracketContainer = dom.createBracketContainer();
+        const groupId = matchesByRound[0][0].group_id;
         const roundCount = matchesByRound.length;
+        const bracketContainer = dom.createBracketContainer(groupId);
 
         let roundNumber = 1;
 
         for (const matches of matchesByRound) {
-            const roundContainer = dom.createRoundContainer(roundName(roundNumber, roundCount));
+            const roundId = matches[0].round_id;
+            const roundContainer = dom.createRoundContainer(roundId, roundName(roundNumber, roundCount));
 
             for (const match of matches)
                 roundContainer.append(this.createBracketMatch(roundNumber, roundCount, match, bracketType, connectFinal));
@@ -187,8 +191,9 @@ export class BracketsViewer {
 
         const roundCount = matches.length;
 
-        for (let roundNumber = 1; roundNumber <= finalMatches.length; roundNumber++) {
-            const roundContainer = dom.createRoundContainer(lang.getFinalMatchLabel(finalType, roundNumber, roundCount));
+        for (let roundIndex = 0; roundIndex < finalMatches.length; roundIndex++) {
+            const roundNumber = roundIndex + 1;
+            const roundContainer = dom.createRoundContainer(finalMatches[roundIndex].round_id, lang.getFinalMatchLabel(finalType, roundNumber, roundCount));
             roundContainer.append(this.createFinalMatch(finalType, finalMatches, roundNumber, roundCount));
             upperBracket.append(roundContainer);
         }
@@ -274,32 +279,32 @@ export class BracketsViewer {
     /**
      * Creates a match based on its results.
      *
-     * @param results Results of the match.
+     * @param match Results of the match.
      * @param matchLocation Location of the match.
      * @param connection Connection of this match with the others.
      * @param label Label of the match.
      * @param originHint Origin hint for the match.
      * @param roundNumber Number of the round.
      */
-    private createMatch(results: MatchResults, matchLocation?: BracketType, connection?: Connection, label?: string, originHint?: OriginHint, roundNumber?: number): HTMLElement {
-        const match = dom.createMatchContainer();
+    private createMatch(match: MatchResults, matchLocation?: BracketType, connection?: Connection, label?: string, originHint?: OriginHint, roundNumber?: number): HTMLElement {
+        const matchContainer = dom.createMatchContainer(match.id);
         const opponents = dom.createOpponentsContainer();
 
-        const team1 = this.createTeam(results.opponent1, originHint, matchLocation, roundNumber);
-        const team2 = this.createTeam(results.opponent2, originHint, matchLocation, roundNumber);
+        const team1 = this.createTeam(match.opponent1, originHint, matchLocation, roundNumber);
+        const team2 = this.createTeam(match.opponent2, originHint, matchLocation, roundNumber);
 
         if (label)
-            opponents.append(dom.createMatchLabel(label, lang.getMatchStatus(results.status)));
+            opponents.append(dom.createMatchLabel(label, lang.getMatchStatus(match.status)));
 
         opponents.append(team1, team2);
-        match.append(opponents);
+        matchContainer.append(opponents);
 
         if (!connection)
-            return match;
+            return matchContainer;
 
-        dom.setupConnection(opponents, match, connection);
+        dom.setupConnection(opponents, matchContainer, connection);
 
-        return match;
+        return matchContainer;
     }
 
     /**
@@ -312,7 +317,7 @@ export class BracketsViewer {
      */
     private createTeam(participant: ParticipantResult | null, originHint: OriginHint, matchLocation?: BracketType, roundNumber?: number): HTMLElement {
         const containers: ParticipantContainers = {
-            participant: dom.createParticipantContainer(),
+            participant: dom.createParticipantContainer(participant && participant.id),
             name: dom.createNameContainer(),
             result: dom.createResultContainer(),
         };
