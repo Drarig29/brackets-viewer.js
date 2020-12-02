@@ -25,49 +25,59 @@ export function createRoundRobinContainer(): HTMLElement {
 
 /**
  * Creates a container which contains a single bracket of a single or double elimination.
+ *
+ * @param id ID of the group.
  */
-export function createBracketContainer(): HTMLElement {
+export function createBracketContainer(id: number): HTMLElement {
     const bracket = document.createElement('section');
     bracket.classList.add('bracket');
+    bracket.setAttribute('data-group-id', id.toString());
     return bracket;
 }
 
 /**
  * Creates a container which contains a group.
  *
+ * @param id ID of the group.
  * @param title Title of the group.
  */
-export function createGroupContainer(title: string): HTMLElement {
+export function createGroupContainer(id: number, title: string): HTMLElement {
     const h2 = document.createElement('h2');
     h2.innerText = title;
 
-    const groupDOM = document.createElement('section');
-    groupDOM.classList.add('group');
-    groupDOM.append(h2);
-    return groupDOM;
+    const group = document.createElement('section');
+    group.classList.add('group');
+    group.setAttribute('data-group-id', id.toString());
+    group.append(h2);
+    return group;
 }
 
 /**
  * Creates a container which contains a round.
  *
+ * @param id ID of the round.
  * @param title Title of the round.
  */
-export function createRoundContainer(title: string): HTMLElement {
+export function createRoundContainer(id: number, title: string): HTMLElement {
     const h3 = document.createElement('h3');
     h3.innerText = title;
 
-    const roundDOM = document.createElement('article');
-    roundDOM.classList.add('round');
-    roundDOM.append(h3);
-    return roundDOM;
+    const round = document.createElement('article');
+    round.classList.add('round');
+    round.setAttribute('data-round-id', id.toString());
+    round.append(h3);
+    return round;
 }
 
 /**
  * Creates a container which contains a match.
+ *
+ * @param id ID of the match.
  */
-export function createMatchContainer(): HTMLElement {
+export function createMatchContainer(id: number): HTMLElement {
     const match = document.createElement('div');
     match.classList.add('match');
+    match.setAttribute('data-match-id', id.toString());
     return match;
 }
 
@@ -95,29 +105,35 @@ export function createOpponentsContainer(): HTMLElement {
 
 /**
  * Creates a container which contains a participant.
+ *
+ * @param id ID of the participant.
  */
-export function createParticipantContainer(): HTMLElement {
-    const teamDOM = document.createElement('div');
-    teamDOM.classList.add('participant');
-    return teamDOM;
+export function createParticipantContainer(id: number | null): HTMLElement {
+    const team = document.createElement('div');
+    team.classList.add('participant');
+
+    if (id !== null)
+        team.setAttribute('data-participant-id', id.toString());
+
+    return team;
 }
 
 /**
  * Creates a container which contains the name of a participant.
  */
 export function createNameContainer(): HTMLElement {
-    const nameDOM = document.createElement('div');
-    nameDOM.classList.add('name');
-    return nameDOM;
+    const name = document.createElement('div');
+    name.classList.add('name');
+    return name;
 }
 
 /**
  * Creates a container which contains the result of a match for a participant.
  */
 export function createResultContainer(): HTMLElement {
-    const resultDOM = document.createElement('div');
-    resultDOM.classList.add('result');
-    return resultDOM;
+    const result = document.createElement('div');
+    result.classList.add('result');
+    return result;
 }
 
 /**
