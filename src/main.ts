@@ -1,6 +1,6 @@
 import './style.scss';
 import { Participant, Match, MatchResults, ParticipantResult, StageType } from 'brackets-model';
-import { splitBy, getRanking, getOriginAbbreviation } from './helpers';
+import { splitBy, getRanking, getOriginAbbreviation, findRoot } from './helpers';
 import * as dom from './dom';
 import * as lang from './lang';
 import {
@@ -31,8 +31,7 @@ export class BracketsViewer {
      * @param config An optional configuration for the viewer.
      */
     public render(data: ViewerData, config?: Partial<Config>): void {
-        const root = document.querySelector('.bracket-viewer') as HTMLElement;
-        if (!root) throw Error('Root not found. You must have a root element with class "bracket-viewer".');
+        const root = findRoot(config?.selector);
 
         this.config = {
             participantOriginPlacement: config && config.participantOriginPlacement || 'before',
@@ -402,7 +401,7 @@ export class BracketsViewer {
      */
     private renderTeamOrigin(nameContainer: HTMLElement, participant: ParticipantResult, matchLocation?: BracketType, roundNumber?: number): void {
         if (participant.position === undefined || matchLocation === undefined) return;
-        if (this.config.participantOriginPlacement === 'none') return;
+        if (!this.config.participantOriginPlacement || this.config.participantOriginPlacement === 'none') return;
         if (!this.config.showSlotsOrigin) return;
         if (!this.config.showLowerBracketSlotsOrigin && matchLocation === 'loser-bracket') return;
 

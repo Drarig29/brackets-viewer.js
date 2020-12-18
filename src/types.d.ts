@@ -34,27 +34,32 @@ export type Placement = 'none' | 'before' | 'after';
  */
 export interface Config {
     /**
+     * An optional selector to select the root element.
+     */
+    selector?: string,
+
+    /**
      * Where the position of a participant is placed relative to its name.
      * - If `none`, the position is not added.
      * - If `before`, the position is prepended before the participant name. "#1 Team"
      * - If `after`, the position is appended after the participant name, in parentheses. "Team (#1)"
      */
-    participantOriginPlacement: Placement,
+    participantOriginPlacement?: Placement,
 
     /**
      * Whether to show the origin of a slot (wherever possible).
      */
-    showSlotsOrigin: boolean,
+    showSlotsOrigin?: boolean,
 
     /**
      * Whether to show the origin of a slot (in the lower bracket of an elimination stage).
      */
-    showLowerBracketSlotsOrigin: boolean,
+    showLowerBracketSlotsOrigin?: boolean,
 
     /**
      * Whether to highlight every instance of a participant on hover.
      */
-    highlightParticipantOnHover: boolean,
+    highlightParticipantOnHover?: boolean,
 }
 
 /**
@@ -95,6 +100,7 @@ export interface Connection {
  */
 export interface RankingItem {
     [prop: string]: number,
+
     rank: number,
     id: number,
     played: number,
@@ -126,7 +132,7 @@ export type RankingFormula = (ranking: RankingItem) => number;
  */
 export type RankingHeaders = { [name in keyof RankingItem]: RankingHeader };
 
-/** 
+/**
  * An object mapping a participant id to its row in the ranking.
  */
 export type RankingMap = { [id: number]: RankingItem };
