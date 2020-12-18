@@ -13,28 +13,28 @@ import { FinalType, BracketType, OriginHint, RankingHeaders } from './types';
 export function getOriginHint(roundNumber: number, roundCount: number, skipFirstRound: boolean, matchLocation: BracketType): OriginHint {
     if (roundNumber === 1) {
         if (matchLocation === 'single-bracket')
-            return (position: number) => `Seed ${position}`;
+            return (position: number): string => `Seed ${position}`;
 
         if (matchLocation === 'winner-bracket')
-            return (position: number) => `Seed ${position}`;
+            return (position: number): string => `Seed ${position}`;
 
         if (matchLocation === 'loser-bracket' && skipFirstRound)
-            return (position: number) => `Seed ${position}`;
+            return (position: number): string => `Seed ${position}`;
     }
 
     if (isMajorRound(roundNumber) && matchLocation === 'loser-bracket') {
         if (roundNumber === roundCount - 2)
-            return (position: number) => `Loser of WB Semi ${position}`;
+            return (position: number): string => `Loser of WB Semi ${position}`;
 
         if (roundNumber === roundCount)
-            return () => 'Loser of WB Final';
+            return (): string => 'Loser of WB Final';
 
         const roundNumberWB = Math.ceil((roundNumber + 1) / 2);
 
         if (skipFirstRound)
-            return (position: number) => `Loser of WB ${roundNumberWB - 1}.${position}`;
+            return (position: number): string => `Loser of WB ${roundNumberWB - 1}.${position}`;
 
-        return (position: number) => `Loser of WB ${roundNumberWB}.${position}`;
+        return (position: number): string => `Loser of WB ${roundNumberWB}.${position}`;
     }
 
     return undefined;
@@ -97,11 +97,11 @@ export function getFinalMatchLabel(finalType: FinalType, roundNumber: number, ro
 export function getFinalOriginHint(finalType: FinalType, roundNumber: number): OriginHint {
     // Single elimination.
     if (finalType === 'consolation_final')
-        return position => `Loser of Semi ${position}`;
+        return (position: number): string => `Loser of Semi ${position}`;
 
     // Double elimination.
     if (roundNumber === 1)
-        return () => 'Winner of LB Final';
+        return (): string => 'Winner of LB Final';
 
     return undefined;
 }
