@@ -23,7 +23,9 @@ export class BracketsViewer {
     private skipFirstRound!: boolean;
 
     /**
-     * Renders a stage (round-robin, single or double elimination).
+     * Renders data generated with `brackets-manager.js`. If multiple stages are given, they will all be displayed.
+     *
+     * Stages won't be discriminated visually based on the tournament they belong to.
      *
      * @param data The data to display.
      * @param config An optional configuration for the viewer.
@@ -39,23 +41,38 @@ export class BracketsViewer {
             highlightParticipantOnHover: config && config.highlightParticipantOnHover !== undefined ? config.highlightParticipantOnHover : true,
         };
 
-        this.skipFirstRound = data.stage.settings.skipFirstRound || false;
-
         this.participants = data.participants;
         data.participants.forEach(participant => this.teamRefsDOM[participant.id] = []);
 
+        data.stages.forEach(stage => this.renderStage(root, {
+            ...data,
+            stages: [stage],
+            matches: data.matches.filter(match => match.stage_id === stage.id),
+        }));
+    }
+
+    /**
+     * Renders a stage (round-robin, single or double elimination).
+     *
+     * @param root The root element.
+     * @param data The data to display.
+     */
+    private renderStage(root: HTMLElement, data: ViewerData) {
+        const stage = data.stages[0];
         const matchesByGroup = splitBy(data.matches, 'group_id');
 
-        switch (data.stage.type) {
+        this.skipFirstRound = stage.settings.skipFirstRound || false;
+
+        switch (stage.type) {
             case 'round_robin':
-                this.renderRoundRobin(root, data.stage.name, matchesByGroup);
+                this.renderRoundRobin(root, stage.name, matchesByGroup);
                 break;
             case 'single_elimination':
             case 'double_elimination':
-                this.renderElimination(root, data.stage.name, data.stage.type, matchesByGroup);
+                this.renderElimination(root, stage.name, stage.type, matchesByGroup);
                 break;
             default:
-                throw Error(`Unknown bracket type: ${data.stage.type}`);
+                throw Error(`Unknown bracket type: ${stage.type}`);
         }
     }
 

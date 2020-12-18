@@ -12,7 +12,7 @@
             .then(res => res.json());
 
         bracketsViewer.render({
-            stage: data.stage[0],
+            stages: data.stage,
             groups: data.group,
             rounds: data.round,
             matches: data.match,
