@@ -1,6 +1,6 @@
 import { Match, ParticipantResult } from 'brackets-model';
 import { headers, abbreviations } from './lang';
-import { RankingHeader, Ranking, RankingFormula, RankingItem, RankingMap, Config } from './types';
+import { RankingHeader, Ranking, RankingFormula, RankingItem, RankingMap } from './types';
 
 /**
  * Splits an array based on values of a given key of the objects of the array.
@@ -86,7 +86,7 @@ export function rankingHeader(itemName: keyof RankingItem): RankingHeader {
  */
 export function getRanking(matches: Match[], formula?: RankingFormula): Ranking {
     formula = formula || (
-        (item: RankingItem) => 3 * item.wins + 1 * item.draws + 0 * item.losses
+        (item: RankingItem): number => 3 * item.wins + 1 * item.draws + 0 * item.losses
     );
 
     const rankingMap: RankingMap = {};

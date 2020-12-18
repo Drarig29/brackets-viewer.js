@@ -56,7 +56,7 @@ export class BracketsViewer {
      * @param root The root element.
      * @param data The data to display.
      */
-    private renderStage(root: HTMLElement, data: ViewerData) {
+    private renderStage(root: HTMLElement, data: ViewerData): void {
         const stage = data.stages[0];
         const matchesByGroup = splitBy(data.matches, 'group_id');
 
