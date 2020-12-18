@@ -1,6 +1,6 @@
 import { Match, ParticipantResult } from 'brackets-model';
 import { headers, abbreviations } from './lang';
-import { RankingHeader, Ranking, RankingFormula, RankingItem, RankingMap } from './types';
+import { RankingHeader, Ranking, RankingFormula, RankingItem, RankingMap, Config } from './types';
 
 /**
  * Splits an array based on values of a given key of the objects of the array.
@@ -19,6 +19,28 @@ export function splitBy<T>(array: T[], key: keyof T): T[][] {
     }
 
     return Object.values(obj);
+}
+
+/**
+ * Finds the root element
+ *
+ * @param selector An optional selector to select the root element.
+ */
+export function findRoot(selector?: string): HTMLElement {
+    const queryResult = document.querySelectorAll(selector || '.bracket-viewer');
+
+    if (queryResult.length === 0)
+        throw Error('Root not found. You must have at least one root element.');
+
+    if (queryResult.length > 1)
+        throw Error('Multiple possible roots were found. Please use `config.selector` to choose a specific root.');
+
+    const root = queryResult[0] as HTMLElement;
+
+    if (!root.classList.contains('bracket-viewer'))
+        throw Error('The selected root must have a `.bracket-viewer` class.');
+
+    return root;
 }
 
 /**

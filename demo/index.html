@@ -1,7 +1,7 @@
 <link rel="stylesheet" href="../dist/brackets-viewer.min.css" />
 <script type="text/javascript" src="../dist/brackets-viewer.min.js"></script>
 
-<div class="bracket-viewer">
+<div id="example" class="bracket-viewer">
     <noscript>Oops! Something went wrong.</noscript>
 </div>
 
@@ -13,12 +13,11 @@
 
         bracketsViewer.render({
             stages: data.stage,
-            groups: data.group,
-            rounds: data.round,
             matches: data.match,
             matchGames: data.match_game,
             participants: data.participant,
         }, {
+            selector: '#example',
             participantOriginPlacement: 'before',
             showSlotsOrigin: true,
             showLowerBracketSlotsOrigin: true,
