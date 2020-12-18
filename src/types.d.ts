@@ -11,8 +11,8 @@ declare global {
  * The data to display with `brackets-viewer.js`
  */
 export interface ViewerData {
-    /** The stage to display. */
-    stage: Stage,
+    /** The stages to display. */
+    stages: Stage[],
 
     /** The matches of the stage to display. */
     matches: Match[],
