@@ -1,6 +1,19 @@
+import i18next from 'i18next';
+import LanguageDetector from 'i18next-browser-languagedetector';
+import { locales } from './i18n';
+
 import { Status } from 'brackets-model';
 import { isMajorRound } from './helpers';
 import { FinalType, BracketType, OriginHint, RankingHeaders } from './types';
+
+i18next.use(LanguageDetector).init({
+    fallbackLng: 'en',
+    debug: true,
+    defaultNS: 'common',
+    resources: {},
+});
+
+Object.keys(locales).forEach((lang: string) => i18next.addResourceBundle(lang, 'common', locales[lang]));
 
 /**
  * Returns an origin hint function based on rounds information.
@@ -167,7 +180,7 @@ export function getRoundName(roundNumber: number, roundCount: number): string {
  * @param roundCount Count of rounds.
  */
 export function getWinnerBracketRoundName(roundNumber: number, roundCount: number): string {
-    return roundNumber === roundCount ? 'WB Final Round' : `WB Round ${roundNumber}`;
+    return roundNumber === roundCount ? 'WB Final Round' : `WB Round ${i18next.t('test')} ${roundNumber}`;
 }
 
 /**

@@ -150,3 +150,8 @@ export interface ParticipantContainers {
     name: HTMLElement,
     result: HTMLElement,
 }
+
+/**
+ * An object containing all the locales for the project.
+ */
+export type Locales = { [lang: string]: Record<string, string> };
