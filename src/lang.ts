@@ -233,6 +233,11 @@ export const abbreviations = {
 };
 
 /**
+ * The BYE literal.
+ */
+export const BYE = 'BYE';
+
+/**
  * Headers of the ranking.
  */
 export const headers: RankingHeaders = {

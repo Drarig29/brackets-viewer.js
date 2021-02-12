@@ -342,7 +342,7 @@ export class BracketsViewer {
         };
 
         if (participant === null)
-            containers.name.innerText = 'BYE';
+            containers.name.innerText = lang.BYE;
         else
             this.renderParticipant(containers, participant, originHint, matchLocation, roundNumber);
 
