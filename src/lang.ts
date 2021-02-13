@@ -6,6 +6,8 @@ import { Status } from 'brackets-model';
 import { isMajorRound } from './helpers';
 import { Locales, Locale, FinalType, BracketType, OriginHint, RankingHeaders, RankingHeader } from './types';
 
+export { i18next };
+
 i18next.use(LanguageDetector).init({
     fallbackLng: 'en',
     debug: true,
