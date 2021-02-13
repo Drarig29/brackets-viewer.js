@@ -1,27 +1,36 @@
-<link rel="stylesheet" href="../dist/brackets-viewer.min.css" />
-<script type="text/javascript" src="../dist/brackets-viewer.min.js"></script>
+<html>
 
-<div id="example" class="bracket-viewer">
-    <noscript>Oops! Something went wrong.</noscript>
-</div>
+<head>
+    <meta charset="utf-8">
+    <link rel="stylesheet" href="../dist/brackets-viewer.min.css" />
+    <script type="text/javascript" src="../dist/brackets-viewer.min.js"></script>
+</head>
 
-<script>
-    (async function () {
-        const data = await fetch('http://localhost:3000/db')
-            .catch(() => alert('Failed to fetch localhost. Please do `npm run db` or use json-server your own way.'))
-            .then(res => res.json());
+<body>
+    <div id="example" class="bracket-viewer">
+        <noscript>Please enable JavaScript.</noscript>
+    </div>
 
-        bracketsViewer.render({
-            stages: data.stage,
-            matches: data.match,
-            matchGames: data.match_game,
-            participants: data.participant,
-        }, {
-            selector: '#example',
-            participantOriginPlacement: 'before',
-            showSlotsOrigin: true,
-            showLowerBracketSlotsOrigin: true,
-            highlightParticipantOnHover: true,
-        });
-    })();
-</script>
+    <script>
+        (async function () {
+            const data = await fetch('http://localhost:3000/db')
+                .catch(() => alert('Failed to fetch localhost. Please do `npm run db` or use json-server your own way.'))
+                .then(res => res.json());
+
+            bracketsViewer.render({
+                stages: data.stage,
+                matches: data.match,
+                matchGames: data.match_game,
+                participants: data.participant,
+            }, {
+                selector: '#example',
+                participantOriginPlacement: 'before',
+                showSlotsOrigin: true,
+                showLowerBracketSlotsOrigin: true,
+                highlightParticipantOnHover: true,
+            });
+        })();
+    </script>
+</body>
+
+</html>
