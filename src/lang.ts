@@ -1,10 +1,12 @@
-import i18next from 'i18next';
+import i18next, { TOptions } from 'i18next';
 import LanguageDetector from 'i18next-browser-languagedetector';
 import { locales } from './i18n';
 
 import { Status } from 'brackets-model';
 import { isMajorRound } from './helpers';
-import { FinalType, BracketType, OriginHint, RankingHeaders } from './types';
+import { FinalType, BracketType, OriginHint, RankingHeaders, Locales } from './types';
+
+type Locale = typeof locales['en'];
 
 i18next.use(LanguageDetector).init({
     fallbackLng: 'en',
@@ -13,7 +15,18 @@ i18next.use(LanguageDetector).init({
     resources: {},
 });
 
-Object.keys(locales).forEach((lang: string) => i18next.addResourceBundle(lang, 'common', locales[lang]));
+// Load locale bundles.
+Object.keys(locales).forEach((lang: string) => i18next.addResourceBundle(lang, 'common', (locales as Locales)[lang]));
+
+/**
+ * Returns an internationalized version of a locale key.
+ * 
+ * @param key A locale key.
+ * @param interpolations Data to pass to the i18n process.
+ */
+function i18n<Scope extends keyof Locale>(scope: Scope, key: keyof Locale[Scope], interpolations?: TOptions) {
+    return i18next.t(`${scope}.${key}`, interpolations);
+}
 
 /**
  * Returns an origin hint function based on rounds information.

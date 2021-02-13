@@ -154,4 +154,4 @@ export interface ParticipantContainers {
 /**
  * An object containing all the locales for the project.
  */
-export type Locales = { [lang: string]: Record<string, string> };
+export type Locales = { [lang: string]: Record<string, unknown> };
