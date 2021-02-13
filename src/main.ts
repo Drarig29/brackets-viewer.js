@@ -31,7 +31,7 @@ export class BracketsViewer {
      * @param config An optional configuration for the viewer.
      */
     public render(data: ViewerData, config?: Partial<Config>): void {
-        const root = findRoot(config?.selector);
+        const root = document.createDocumentFragment();
 
         this.config = {
             participantOriginPlacement: config && config.participantOriginPlacement || 'before',
@@ -48,6 +48,8 @@ export class BracketsViewer {
             stages: [stage],
             matches: data.matches.filter(match => match.stage_id === stage.id),
         }));
+
+        findRoot(config?.selector).append(root);
     }
 
     /**
@@ -56,7 +58,7 @@ export class BracketsViewer {
      * @param root The root element.
      * @param data The data to display.
      */
-    private renderStage(root: HTMLElement, data: ViewerData): void {
+    private renderStage(root: DocumentFragment, data: ViewerData): void {
         const stage = data.stages[0];
         const matchesByGroup = splitBy(data.matches, 'group_id');
 
@@ -82,7 +84,7 @@ export class BracketsViewer {
      * @param stageName Name of the stage.
      * @param matchesByGroup A list of matches for each group.
      */
-    private renderRoundRobin(root: HTMLElement, stageName: string, matchesByGroup: Match[][]): void {
+    private renderRoundRobin(root: DocumentFragment, stageName: string, matchesByGroup: Match[][]): void {
         const container = dom.createRoundRobinContainer();
 
         let groupNumber = 1;
@@ -119,7 +121,7 @@ export class BracketsViewer {
      * @param type Type of the stage.
      * @param matchesByGroup A list of matches for each group.
      */
-    private renderElimination(root: HTMLElement, stageName: string, type: StageType, matchesByGroup: Match[][]): void {
+    private renderElimination(root: DocumentFragment, stageName: string, type: StageType, matchesByGroup: Match[][]): void {
         root.append(dom.createTitle(stageName));
 
         if (type === 'single_elimination')
@@ -134,12 +136,12 @@ export class BracketsViewer {
      * @param root The root element.
      * @param matchesByGroup A list of matches for each group.
      */
-    private renderSingleElimination(root: HTMLElement, matchesByGroup: Match[][]): void {
+    private renderSingleElimination(root: DocumentFragment, matchesByGroup: Match[][]): void {
         const hasFinal = matchesByGroup[1] !== undefined;
         this.renderBracket(root, splitBy(matchesByGroup[0], 'round_id'), lang.getRoundName, 'single-bracket');
 
         if (hasFinal)
-            this.renderFinal('consolation_final', matchesByGroup[1]);
+            this.renderFinal(root, 'consolation_final', matchesByGroup[1]);
     }
 
     /**
@@ -148,7 +150,7 @@ export class BracketsViewer {
      * @param root The root element.
      * @param matchesByGroup A list of matches for each group.
      */
-    private renderDoubleElimination(root: HTMLElement, matchesByGroup: Match[][]): void {
+    private renderDoubleElimination(root: DocumentFragment, matchesByGroup: Match[][]): void {
         const hasLoserBracket = matchesByGroup[1] !== undefined;
         const hasFinal = matchesByGroup[2] !== undefined;
 
@@ -158,7 +160,7 @@ export class BracketsViewer {
             this.renderBracket(root, splitBy(matchesByGroup[1], 'round_id'), lang.getLoserBracketRoundName, 'loser-bracket');
 
         if (hasFinal)
-            this.renderFinal('grand_final', matchesByGroup[2]);
+            this.renderFinal(root, 'grand_final', matchesByGroup[2]);
     }
 
     /**
@@ -170,7 +172,7 @@ export class BracketsViewer {
      * @param bracketType Type of the bracket.
      * @param connectFinal Whether to connect the last match of the bracket to the final.
      */
-    private renderBracket(root: HTMLElement, matchesByRound: Match[][], roundName: RoundName, bracketType: BracketType, connectFinal?: boolean): void {
+    private renderBracket(root: DocumentFragment, matchesByRound: Match[][], roundName: RoundName, bracketType: BracketType, connectFinal?: boolean): void {
         const groupId = matchesByRound[0][0].group_id;
         const roundCount = matchesByRound.length;
         const bracketContainer = dom.createBracketContainer(groupId);
@@ -194,11 +196,12 @@ export class BracketsViewer {
     /**
      * Renders a final group.
      *
+     * @param root The root element.
      * @param finalType Type of the final.
      * @param matches Matches of the final.
      */
-    private renderFinal(finalType: FinalType, matches: Match[]): void {
-        const upperBracket = document.querySelector('.bracket');
+    private renderFinal(root: DocumentFragment, finalType: FinalType, matches: Match[]): void {
+        const upperBracket = root.querySelector('.bracket');
         if (!upperBracket) throw Error('Upper bracket not found.');
 
         const winnerWb = matches[0].opponent1;
