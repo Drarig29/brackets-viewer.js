@@ -23,60 +23,55 @@
         {
             "id": 4,
             "tournament_id": 0,
-            "name": "Team 5"
+            "name": "Team 6"
         },
         {
             "id": 5,
             "tournament_id": 0,
-            "name": "Team 6"
+            "name": "Team 7"
         },
         {
             "id": 6,
             "tournament_id": 0,
-            "name": "Team 7"
+            "name": "Team 8"
         },
         {
             "id": 7,
             "tournament_id": 0,
-            "name": "Team 8"
+            "name": "Team 9"
         },
         {
             "id": 8,
             "tournament_id": 0,
-            "name": "Team 9"
+            "name": "Team 10"
         },
         {
             "id": 9,
             "tournament_id": 0,
-            "name": "Team 10"
+            "name": "Team 11"
         },
         {
             "id": 10,
             "tournament_id": 0,
-            "name": "Team 11"
+            "name": "Team 12"
         },
         {
             "id": 11,
             "tournament_id": 0,
-            "name": "Team 12"
+            "name": "Team 13"
         },
         {
             "id": 12,
             "tournament_id": 0,
-            "name": "Team 13"
+            "name": "Team 14"
         },
         {
             "id": 13,
             "tournament_id": 0,
-            "name": "Team 14"
-        },
-        {
-            "id": 14,
-            "tournament_id": 0,
             "name": "Team 15"
         },
         {
-            "id": 15,
+            "id": 14,
             "tournament_id": 0,
             "name": "Team 16"
         }
@@ -85,29 +80,36 @@
         {
             "id": 0,
             "tournament_id": 0,
-            "name": "Amateur",
+            "name": "Example",
             "type": "double_elimination",
             "number": 1,
-            "settings":  {}
+            "settings": {
+                "size": 16,
+                "seedOrdering": [
+                    "natural",
+                    "natural",
+                    "reverse_half_shift",
+                    "reverse"
+                ],
+                "grandFinal": "double",
+                "matchesChildCount": 0
+            }
         }
     ],
     "group": [
         {
             "id": 0,
             "stage_id": 0,
-            "name": "Winner Bracket",
             "number": 1
         },
         {
             "id": 1,
             "stage_id": 0,
-            "name": "Loser Bracket",
             "number": 2
         },
         {
             "id": 2,
             "stage_id": 0,
-            "name": "Grand Final",
             "number": 3
         }
     ],
@@ -177,6 +179,12 @@
             "number": 1,
             "stage_id": 0,
             "group_id": 2
+        },
+        {
+            "id": 11,
+            "number": 2,
+            "stage_id": 0,
+            "group_id": 2
         }
     ],
     "match": [
@@ -187,11 +195,7 @@
             "group_id": 0,
             "round_id": 0,
             "child_count": 0,
-            "status": "pending",
-            "locked": false,
-            "scheduled_datetime": null,
-            "start_datetime": null,
-            "end_datetime": null,
+            "status": 4,
             "opponent1": {
                 "id": 0,
                 "position": 1,
@@ -212,11 +216,7 @@
             "group_id": 0,
             "round_id": 0,
             "child_count": 0,
-            "status": "pending",
-            "locked": false,
-            "scheduled_datetime": null,
-            "start_datetime": null,
-            "end_datetime": null,
+            "status": 3,
             "opponent1": {
                 "id": 2,
                 "position": 3,
@@ -235,14 +235,10 @@
             "group_id": 0,
             "round_id": 0,
             "child_count": 0,
-            "status": "pending",
-            "locked": false,
-            "scheduled_datetime": null,
-            "start_datetime": null,
-            "end_datetime": null,
+            "status": 0,
             "opponent1": null,
             "opponent2": {
-                "id": 5,
+                "id": 4,
                 "position": 6
             }
         },
@@ -253,17 +249,13 @@
             "group_id": 0,
             "round_id": 0,
             "child_count": 0,
-            "status": "pending",
-            "locked": false,
-            "scheduled_datetime": null,
-            "start_datetime": null,
-            "end_datetime": null,
+            "status": 2,
             "opponent1": {
-                "id": 6,
+                "id": 5,
                 "position": 7
             },
             "opponent2": {
-                "id": 7,
+                "id": 6,
                 "position": 8
             }
         },
@@ -274,17 +266,13 @@
             "group_id": 0,
             "round_id": 0,
             "child_count": 0,
-            "status": "pending",
-            "locked": false,
-            "scheduled_datetime": null,
-            "start_datetime": null,
-            "end_datetime": null,
+            "status": 2,
             "opponent1": {
-                "id": 8,
+                "id": 7,
                 "position": 9
             },
             "opponent2": {
-                "id": 9,
+                "id": 8,
                 "position": 10
             }
         },
@@ -295,17 +283,13 @@
             "group_id": 0,
             "round_id": 0,
             "child_count": 0,
-            "status": "pending",
-            "locked": false,
-            "scheduled_datetime": null,
-            "start_datetime": null,
-            "end_datetime": null,
+            "status": 2,
             "opponent1": {
-                "id": 10,
+                "id": 9,
                 "position": 11
             },
             "opponent2": {
-                "id": 11,
+                "id": 10,
                 "position": 12
             }
         },
@@ -316,17 +300,13 @@
             "group_id": 0,
             "round_id": 0,
             "child_count": 0,
-            "status": "pending",
-            "locked": false,
-            "scheduled_datetime": null,
-            "start_datetime": null,
-            "end_datetime": null,
+            "status": 2,
             "opponent1": {
-                "id": 12,
+                "id": 11,
                 "position": 13
             },
             "opponent2": {
-                "id": 13,
+                "id": 12,
                 "position": 14
             }
         },
@@ -337,13 +317,9 @@
             "group_id": 0,
             "round_id": 0,
             "child_count": 0,
-            "status": "pending",
-            "locked": false,
-            "scheduled_datetime": null,
-            "start_datetime": null,
-            "end_datetime": null,
+            "status": 2,
             "opponent1": {
-                "id": 14,
+                "id": 13,
                 "position": 15
             },
             "opponent2": {
@@ -358,11 +334,7 @@
             "group_id": 0,
             "round_id": 1,
             "child_count": 0,
-            "status": "pending",
-            "locked": false,
-            "scheduled_datetime": null,
-            "start_datetime": null,
-            "end_datetime": null,
+            "status": 1,
             "opponent1": {
                 "id": 0
             },
@@ -377,13 +349,9 @@
             "group_id": 0,
             "round_id": 1,
             "child_count": 0,
-            "status": "pending",
-            "locked": false,
-            "scheduled_datetime": null,
-            "start_datetime": null,
-            "end_datetime": null,
+            "status": 1,
             "opponent1": {
-                "id": 5
+                "id": 4
             },
             "opponent2": {
                 "id": null
@@ -396,11 +364,7 @@
             "group_id": 0,
             "round_id": 1,
             "child_count": 0,
-            "status": "pending",
-            "locked": false,
-            "scheduled_datetime": null,
-            "start_datetime": null,
-            "end_datetime": null,
+            "status": 0,
             "opponent1": {
                 "id": null
             },
@@ -415,11 +379,7 @@
             "group_id": 0,
             "round_id": 1,
             "child_count": 0,
-            "status": "pending",
-            "locked": false,
-            "scheduled_datetime": null,
-            "start_datetime": null,
-            "end_datetime": null,
+            "status": 0,
             "opponent1": {
                 "id": null
             },
@@ -434,11 +394,7 @@
             "group_id": 0,
             "round_id": 2,
             "child_count": 0,
-            "status": "pending",
-            "locked": false,
-            "scheduled_datetime": null,
-            "start_datetime": null,
-            "end_datetime": null,
+            "status": 0,
             "opponent1": {
                 "id": null
             },
@@ -453,11 +409,7 @@
             "group_id": 0,
             "round_id": 2,
             "child_count": 0,
-            "status": "pending",
-            "locked": false,
-            "scheduled_datetime": null,
-            "start_datetime": null,
-            "end_datetime": null,
+            "status": 0,
             "opponent1": {
                 "id": null
             },
@@ -472,11 +424,7 @@
             "group_id": 0,
             "round_id": 3,
             "child_count": 0,
-            "status": "pending",
-            "locked": false,
-            "scheduled_datetime": null,
-            "start_datetime": null,
-            "end_datetime": null,
+            "status": 0,
             "opponent1": {
                 "id": null
             },
@@ -491,11 +439,7 @@
             "group_id": 1,
             "round_id": 4,
             "child_count": 0,
-            "status": "pending",
-            "locked": false,
-            "scheduled_datetime": null,
-            "start_datetime": null,
-            "end_datetime": null,
+            "status": 1,
             "opponent1": {
                 "id": 1,
                 "position": 1
@@ -512,11 +456,7 @@
             "group_id": 1,
             "round_id": 4,
             "child_count": 0,
-            "status": "pending",
-            "locked": false,
-            "scheduled_datetime": null,
-            "start_datetime": null,
-            "end_datetime": null,
+            "status": 0,
             "opponent1": null,
             "opponent2": {
                 "id": null,
@@ -530,11 +470,7 @@
             "group_id": 1,
             "round_id": 4,
             "child_count": 0,
-            "status": "pending",
-            "locked": false,
-            "scheduled_datetime": null,
-            "start_datetime": null,
-            "end_datetime": null,
+            "status": 0,
             "opponent1": {
                 "id": null,
                 "position": 5
@@ -551,11 +487,7 @@
             "group_id": 1,
             "round_id": 4,
             "child_count": 0,
-            "status": "pending",
-            "locked": false,
-            "scheduled_datetime": null,
-            "start_datetime": null,
-            "end_datetime": null,
+            "status": 0,
             "opponent1": {
                 "id": null,
                 "position": 7
@@ -572,14 +504,10 @@
             "group_id": 1,
             "round_id": 5,
             "child_count": 0,
-            "status": "pending",
-            "locked": false,
-            "scheduled_datetime": null,
-            "start_datetime": null,
-            "end_datetime": null,
+            "status": 0,
             "opponent1": {
                 "id": null,
-                "position": 4
+                "position": 2
             },
             "opponent2": {
                 "id": null
@@ -592,14 +520,10 @@
             "group_id": 1,
             "round_id": 5,
             "child_count": 0,
-            "status": "pending",
-            "locked": false,
-            "scheduled_datetime": null,
-            "start_datetime": null,
-            "end_datetime": null,
+            "status": 0,
             "opponent1": {
                 "id": null,
-                "position": 3
+                "position": 1
             },
             "opponent2": {
                 "id": null
@@ -612,14 +536,10 @@
             "group_id": 1,
             "round_id": 5,
             "child_count": 0,
-            "status": "pending",
-            "locked": false,
-            "scheduled_datetime": null,
-            "start_datetime": null,
-            "end_datetime": null,
+            "status": 0,
             "opponent1": {
                 "id": null,
-                "position": 2
+                "position": 4
             },
             "opponent2": {
                 "id": null
@@ -632,14 +552,10 @@
             "group_id": 1,
             "round_id": 5,
             "child_count": 0,
-            "status": "pending",
-            "locked": false,
-            "scheduled_datetime": null,
-            "start_datetime": null,
-            "end_datetime": null,
+            "status": 0,
             "opponent1": {
                 "id": null,
-                "position": 1
+                "position": 3
             },
             "opponent2": {
                 "id": null
@@ -652,11 +568,7 @@
             "group_id": 1,
             "round_id": 6,
             "child_count": 0,
-            "status": "pending",
-            "locked": false,
-            "scheduled_datetime": null,
-            "start_datetime": null,
-            "end_datetime": null,
+            "status": 0,
             "opponent1": {
                 "id": null
             },
@@ -671,11 +583,7 @@
             "group_id": 1,
             "round_id": 6,
             "child_count": 0,
-            "status": "pending",
-            "locked": false,
-            "scheduled_datetime": null,
-            "start_datetime": null,
-            "end_datetime": null,
+            "status": 0,
             "opponent1": {
                 "id": null
             },
@@ -690,11 +598,7 @@
             "group_id": 1,
             "round_id": 7,
             "child_count": 0,
-            "status": "pending",
-            "locked": false,
-            "scheduled_datetime": null,
-            "start_datetime": null,
-            "end_datetime": null,
+            "status": 0,
             "opponent1": {
                 "id": null,
                 "position": 2
@@ -710,11 +614,7 @@
             "group_id": 1,
             "round_id": 7,
             "child_count": 0,
-            "status": "pending",
-            "locked": false,
-            "scheduled_datetime": null,
-            "start_datetime": null,
-            "end_datetime": null,
+            "status": 0,
             "opponent1": {
                 "id": null,
                 "position": 1
@@ -730,11 +630,7 @@
             "group_id": 1,
             "round_id": 8,
             "child_count": 0,
-            "status": "pending",
-            "locked": false,
-            "scheduled_datetime": null,
-            "start_datetime": null,
-            "end_datetime": null,
+            "status": 0,
             "opponent1": {
                 "id": null
             },
@@ -749,11 +645,7 @@
             "group_id": 1,
             "round_id": 9,
             "child_count": 0,
-            "status": "pending",
-            "locked": false,
-            "scheduled_datetime": null,
-            "start_datetime": null,
-            "end_datetime": null,
+            "status": 0,
             "opponent1": {
                 "id": null,
                 "position": 1
@@ -769,17 +661,28 @@
             "group_id": 2,
             "round_id": 10,
             "child_count": 0,
-            "status": "pending",
-            "locked": false,
-            "scheduled_datetime": null,
-            "start_datetime": null,
-            "end_datetime": null,
+            "status": 0,
             "opponent1": {
                 "id": null
             },
             "opponent2": {
                 "id": null,
                 "position": 1
+            }
+        },
+        {
+            "id": 30,
+            "number": 1,
+            "stage_id": 0,
+            "group_id": 2,
+            "round_id": 11,
+            "child_count": 0,
+            "status": 0,
+            "opponent1": {
+                "id": null
+            },
+            "opponent2": {
+                "id": null
             }
         }
     ],
