@@ -11,12 +11,11 @@ type Locale = typeof locales['en'];
 i18next.use(LanguageDetector).init({
     fallbackLng: 'en',
     debug: true,
-    defaultNS: 'common',
     resources: {},
 });
 
 // Load locale bundles.
-Object.keys(locales).forEach((lang: string) => i18next.addResourceBundle(lang, 'common', (locales as Locales)[lang]));
+Object.keys(locales).forEach((lang: string) => i18next.addResourceBundle(lang, 'translation', (locales as Locales)[lang]));
 
 /**
  * Returns an internationalized version of a locale key.
