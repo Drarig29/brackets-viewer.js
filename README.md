@@ -8,18 +8,18 @@ It contains all the logic needed to display tournaments.
 
 ## How to use?
 
-Import the library using [jsDelivr](https://www.jsdelivr.com/):
-
-```html
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/Drarig29/brackets-viewer.js/dist/brackets-viewer.min.css" />
-<script type="text/javascript" src="https://cdn.jsdelivr.net/gh/Drarig29/brackets-viewer.js/dist/brackets-viewer.min.js"></script>
-```
-
-Or using [npm](https://www.npmjs.com/package/brackets-viewer):
+Import the library from npm using [jsDelivr](https://www.jsdelivr.com/):
 
 ```html
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/brackets-viewer/dist/brackets-viewer.min.css" />
 <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/brackets-viewer/dist/brackets-viewer.min.js"></script>
+```
+
+Or from GitHub with (you can replace `@master` by any branch name, tag name or commit id):
+
+```html
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/Drarig29/brackets-viewer.js@master/dist/brackets-viewer.min.css" />
+<script type="text/javascript" src="https://cdn.jsdelivr.net/gh/Drarig29/brackets-viewer.js@master/dist/brackets-viewer.min.js"></script>
 ```
 
 Now, you can use it with data generated using [brackets-manager](https://github.com/Drarig29/brackets-manager.js) just like in the `/demo` folder.
