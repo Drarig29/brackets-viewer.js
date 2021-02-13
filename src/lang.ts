@@ -4,7 +4,7 @@ import { locales } from './i18n';
 
 import { Status } from 'brackets-model';
 import { isMajorRound } from './helpers';
-import { FinalType, BracketType, OriginHint, RankingHeaders, Locales } from './types';
+import { Locales, FinalType, BracketType, OriginHint, RankingHeaders } from './types';
 
 type Locale = typeof locales['en'];
 
@@ -21,11 +21,26 @@ Object.keys(locales).forEach((lang: string) => i18next.addResourceBundle(lang, '
 /**
  * Returns an internationalized version of a locale key.
  * 
+ * @param scope A locale scope.
  * @param key A locale key.
  * @param interpolations Data to pass to the i18n process.
  */
-function i18n<Scope extends keyof Locale>(scope: Scope, key: keyof Locale[Scope], interpolations?: TOptions) {
-    return i18next.t(`${scope}.${key}`, interpolations);
+function i18n<Scope extends keyof Locale>(scope: Scope, key: keyof Locale[Scope], interpolations?: TOptions): string;
+
+/**
+ * Returns an internationalized version of a locale key in an object.
+ * 
+ * @param scope A locale scope.
+ * @param key A locale key.
+ * @param returnObject Must be true.
+ */
+function i18n<Scope extends keyof Locale>(scope: Scope, key: keyof Locale[Scope], returnObject: true): object;
+
+function i18n<Scope extends keyof Locale>(scope: Scope, key: keyof Locale[Scope], options?: TOptions | boolean): string | object {
+    if (typeof options === 'boolean')
+        return i18next.t(`${scope}.${key}`, { returnObjects: true });
+
+    return i18next.t(`${scope}.${key}`, options);
 }
 
 /**
