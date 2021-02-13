@@ -13,6 +13,7 @@ import {
     RankingItem,
     RoundName,
     ViewerData,
+    Locale,
 } from './types';
 
 export class BracketsViewer {
@@ -50,6 +51,20 @@ export class BracketsViewer {
         }));
 
         findRoot(config?.selector).append(root);
+    }
+
+    /**
+     * Adds a locale to the available i18n bundles.
+     * 
+     * @param name Name of the locale.
+     * @param locale Contents of the locale.
+     */
+    public addLocale(name: string, locale: Locale): void {
+        lang.i18next.addResourceBundle(name, 'translation', locale);
+
+        // TODO: remove this error suppression when https://github.com/i18next/i18next/pull/1551 is merged.
+        // @ts-ignore
+        lang.i18next.changeLanguage();
     }
 
     /**
@@ -342,7 +357,7 @@ export class BracketsViewer {
         };
 
         if (participant === null)
-            containers.name.innerText = 'BYE';
+            containers.name.innerText = lang.BYE;
         else
             this.renderParticipant(containers, participant, originHint, matchLocation, roundNumber);
 

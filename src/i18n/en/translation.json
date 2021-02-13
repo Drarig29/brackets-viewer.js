@@ -1,0 +1,94 @@
+{
+    "origin-hint": {
+        "seed": "Seed {{position}}",
+        "winner-bracket": "Loser of WB {{round}}.{{position}}",
+        "winner-bracket-semi-final": "Loser of WB Semi {{position}}",
+        "winner-bracket-final": "Loser of WB Final",
+        "consolation-final": "Loser of Semi {{position}}",
+        "grand-final": "Winner of LB Final"
+    },
+    "match-label": {
+        "winner-bracket": "WB",
+        "loser-bracket": "LB",
+        "standard-bracket": "M",
+        "standard-bracket-semi-final": "Semi {{matchNumber}}",
+        "standard-bracket-final": "Final",
+        "double-elimination": "{{matchPrefix}} {{roundNumber}}.{{matchNumber}}",
+        "double-elimination-semi-final": "{{matchPrefix}} Semi {{matchNumber}}",
+        "double-elimination-final": "{{matchPrefix}} Final",
+        "consolation-final": "Consolation Final",
+        "grand-final-single": "Grand Final",
+        "grand-final": "GF Round {{roundNumber}}"
+    },
+    "match-status": {
+        "locked": "Locked",
+        "waiting": "Waiting",
+        "ready": "Ready",
+        "running": "Running",
+        "completed": "Completed",
+        "archived": "Archived"
+    },
+    "abbreviations": {
+        "win": "W",
+        "loss": "L",
+        "forfeit": "F",
+        "position": "P",
+        "seed": "#"
+    },
+    "ranking": {
+        "rank": {
+            "text": "#",
+            "tooltip": "Rank"
+        },
+        "id": {
+            "text": "Name",
+            "tooltip": "Name"
+        },
+        "played": {
+            "text": "P",
+            "tooltip": "Played"
+        },
+        "wins": {
+            "text": "$t(abbreviations.win)",
+            "tooltip": "Wins"
+        },
+        "draws": {
+            "text": "D",
+            "tooltip": "Draws"
+        },
+        "losses": {
+            "text": "$t(abbreviations.loss)",
+            "tooltip": "Losses"
+        },
+        "forfeits": {
+            "text": "$t(abbreviations.forfeit)",
+            "tooltip": "Forfeits"
+        },
+        "score-for": {
+            "text": "SF",
+            "tooltip": "Score For"
+        },
+        "score-against": {
+            "text": "SA",
+            "tooltip": "Score Against"
+        },
+        "score-difference": {
+            "text": "+/-",
+            "tooltip": "Score Difference"
+        },
+        "points": {
+            "text": "Pts",
+            "tooltip": "Points"
+        }
+    },
+    "common": {
+        "bye": "BYE",
+        "group-name": "Group {{groupNumber}}",
+        "round-name": "Round {{roundNumber}}",
+        "round-name-final": "Final Round",
+        "round-name-winner-bracket": "WB Round {{roundNumber}}",
+        "round-name-winner-bracket-final": "WB Final Round",
+        "round-name-loser-bracket": "LB Round {{roundNumber}}",
+        "round-name-loser-bracket-final": "LB Final Round"
+    }
+}
