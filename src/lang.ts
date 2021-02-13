@@ -4,9 +4,7 @@ import { locales } from './i18n';
 
 import { Status } from 'brackets-model';
 import { isMajorRound } from './helpers';
-import { Locales, FinalType, BracketType, OriginHint, RankingHeaders, RankingHeader } from './types';
-
-type Locale = typeof locales['en'];
+import { Locales, Locale, FinalType, BracketType, OriginHint, RankingHeaders, RankingHeader } from './types';
 
 i18next.use(LanguageDetector).init({
     fallbackLng: 'en',

@@ -1,5 +1,6 @@
 import { Stage, Match, MatchGame, Participant } from 'brackets-model';
 import { BracketsViewer } from './main';
+import { locales } from './i18n';
 
 declare global {
     interface Window {
@@ -152,6 +153,11 @@ export interface ParticipantContainers {
 }
 
 /**
+ * The format of a locale.
+ */
+export type Locale = typeof locales['en'];
+
+/**
  * An object containing all the locales for the project.
  */
-export type Locales = { [lang: string]: Record<string, unknown> };
+export type Locales = { [lang: string]: Locale };
