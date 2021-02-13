@@ -1,4 +1,4 @@
-import i18next, { TOptions } from 'i18next';
+import i18next, { StringMap, TOptions } from 'i18next';
 import LanguageDetector from 'i18next-browser-languagedetector';
 import { locales } from './i18n';
 
@@ -34,9 +34,16 @@ function i18n<Scope extends keyof Locale>(scope: Scope, key: keyof Locale[Scope]
  * @param key A locale key.
  * @param returnObject Must be true.
  */
-function i18n<Scope extends keyof Locale>(scope: Scope, key: keyof Locale[Scope], returnObject: true): object;
+function i18n<Scope extends keyof Locale>(scope: Scope, key: keyof Locale[Scope], returnObject: true): StringMap;
 
-function i18n<Scope extends keyof Locale>(scope: Scope, key: keyof Locale[Scope], options?: TOptions | boolean): string | object {
+/**
+ * Returns an internationalized version of a locale key.
+ * 
+ * @param scope A locale scope.
+ * @param key A locale key.
+ * @param options Data to pass to the i18n process or a boolean.
+ */
+function i18n<Scope extends keyof Locale>(scope: Scope, key: keyof Locale[Scope], options?: TOptions | boolean): string | StringMap {
     if (typeof options === 'boolean')
         return i18next.t(`${scope}.${key}`, { returnObjects: true });
 
@@ -82,6 +89,25 @@ export function getOriginHint(roundNumber: number, roundCount: number, skipFirst
 }
 
 /**
+ * Returns an origin hint function for a match in final.
+ *
+ * @param finalType Type of the final.
+ * @param roundNumber Number of the round.
+ */
+export function getFinalOriginHint(finalType: FinalType, roundNumber: number): OriginHint {
+    // Single elimination.
+    if (finalType === 'consolation_final')
+        return (position: number): string => i18n('origin-hint', 'consolation-final', { position });
+
+    // Double elimination.
+    if (roundNumber === 1) // Grand Final round 1
+        return (): string => i18n('origin-hint', 'grand-final');
+
+    // Grand Final round 2 (no hint because it's obvious both participants come from the previous round)
+    return undefined;
+}
+
+/**
  * Returns the label of a match.
  *
  * @param matchNumber Number of the match.
@@ -91,7 +117,7 @@ export function getOriginHint(roundNumber: number, roundCount: number, skipFirst
  */
 export function getMatchLabel(matchNumber: number, roundNumber: number, roundCount: number, matchLocation: BracketType): string {
     const matchPrefix = matchLocation === 'winner-bracket' ? i18n('match-label', 'winner-bracket') :
-        matchLocation === 'loser-bracket' ? i18n('match-label', 'loser-bracket') : i18n('match-label', "standard-bracket");
+        matchLocation === 'loser-bracket' ? i18n('match-label', 'loser-bracket') : i18n('match-label', 'standard-bracket');
 
     const inSemiFinalRound = roundNumber === roundCount - 1;
     const inFinalRound = roundNumber === roundCount;
@@ -126,26 +152,10 @@ export function getFinalMatchLabel(finalType: FinalType, roundNumber: number, ro
         return i18n('match-label', 'consolation-final');
 
     // Double elimination.
-    return getGrandFinalName(roundNumber, roundCount);
-}
+    if (roundCount === 1)
+        return i18n('match-label', 'grand-final-single');
 
-/**
- * Returns an origin hint function for a match in final.
- *
- * @param finalType Type of the final.
- * @param roundNumber Number of the round.
- */
-export function getFinalOriginHint(finalType: FinalType, roundNumber: number): OriginHint {
-    // Single elimination.
-    if (finalType === 'consolation_final')
-        return (position: number): string => i18n('origin-hint', 'consolation-final', { position });
-
-    // Double elimination.
-    if (roundNumber === 1) // Grand Final round 1
-        return (): string => i18n('origin-hint', 'grand-final');
-
-    // Grand Final round 2 (no hint because it's obvious both participants come from the previous round)
-    return undefined;
+    return i18n('match-label', 'grand-final', { roundNumber });
 }
 
 /**
@@ -168,20 +178,6 @@ export function getMatchStatus(status: Status): string {
         case Status.Archived:
             return i18n('match-status', 'archived');
     }
-}
-
-/**
- * Returns the name of a grand final round.
- *
- * @param roundNumber Number of the round.
- * @param roundCount Count of final rounds.
- */
-export function getGrandFinalName(roundNumber: number, roundCount: number): string {
-    // Double elimination.
-    if (roundCount === 1)
-        return i18n('match-label', 'grand-final-single');
-
-    return i18n('match-label', 'grand-final', { roundNumber });
 }
 
 /**
