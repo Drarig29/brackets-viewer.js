@@ -17,6 +17,14 @@
                 .catch(() => alert('Failed to fetch localhost. Please do `npm run db` or use json-server your own way.'))
                 .then(res => res.json());
 
+            // You can manually add locales. English will be used as a fallback if keys are missing.
+            // You can force browser language detection by setting the `i18nextLng` property to a locale key (ex: 'ru') in the localStorage.
+            bracketsViewer.addLocale('ru', {
+                "origin-hint": {
+                    "seed": "семя {{position}}",
+                }
+            });
+
             bracketsViewer.render({
                 stages: data.stage,
                 matches: data.match,
