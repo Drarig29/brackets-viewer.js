@@ -1,0 +1,21 @@
+.bracket-viewer {
+  /* Colors */
+  --primary-background: #101213;
+  --secondary-background: #1c2835;
+  --match-background: #14191f;
+  --font-color: #d9d9d9;
+  --win-color: #50b649;
+  --loss-color: #e61a1a;
+  --label-color: grey;
+  --hint-color: #a7a7a7;
+  --connector-color: #1c2835;
+  --border-color: var(--primary-background);
+  --border-hover-color: #b6b5b5;
+
+  /* Sizes */
+  --round-margin: 50px;
+  --match-width: 192px;
+  --connector-border-width: 2px;
+  --match-border-width: 1px;
+  --match-border-radius: 0.5rem;
+}
