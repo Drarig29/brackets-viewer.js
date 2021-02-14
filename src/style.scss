@@ -1,10 +1,8 @@
 .bracket-viewer {
-  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
-    "Helvetica Neue", Arial, "Noto Sans", sans-serif, "Apple Color Emoji",
-    "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";
-
+  /* Colors */
   --primary-background: #fff;
   --secondary-background: #eceff1;
+  --match-background: var(--primary-background);
   --font-color: #212529;
   --win-color: #50b649;
   --loss-color: #e61a1a;
@@ -14,24 +12,37 @@
   --border-color: #d9d9d9;
   --border-hover-color: #b6b5b5;
 
+  /* Sizes */
+  --round-margin: 50px;
+  --match-width: 192px;
+  --connector-border-width: 2px;
+  --match-border-width: 1px;
+  --match-border-radius: 0.3rem;
+
+  $connector-width: var(--round-margin) / 2;
+  $connector-border: var(--connector-border-width) solid var(--connector-color);
+
+  $match-border: var(--match-border-width) solid var(--border-color);
+
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
+    "Helvetica Neue", Arial, "Noto Sans", sans-serif, "Apple Color Emoji",
+    "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";
+
+  &:empty {
+    // Prevents a FOUC at loading.
+    display: none;
+  }
+
   color: var(--font-color);
-  background-color: var(--primary-background);
+  background: var(--primary-background);
   text-align: left;
   display: flex;
   flex-direction: column;
   align-items: flex-start;
   width: max-content;
-  margin: 0 auto;
   user-select: none;
-
-  $round-margin: 50px;
-  $match-width: 192px;
-
-  $connector-width: $round-margin / 2;
-  $connector-borders: 2px solid var(--border-color);
-
-  $match-borders: 1px solid var(--border-color);
-  $match-borders-radius: 0.3rem;
+  margin: 0 auto;
+  padding: 30px 50px;
 
   *,
   ::after,
@@ -70,7 +81,7 @@
       text-align: center;
 
       &:not(:last-of-type) {
-        margin-right: $round-margin;
+        margin-right: var(--round-margin);
       }
 
       h2 {
@@ -87,7 +98,7 @@
         font-weight: normal;
         text-align: start;
         cursor: help;
-        border-bottom: $match-borders;
+        border-bottom: $match-border;
       }
 
       td.hover {
@@ -128,7 +139,7 @@
       flex-direction: column;
 
       &:not(:last-of-type) {
-        margin-right: $round-margin;
+        margin-right: var(--round-margin);
       }
     }
   }
@@ -138,7 +149,7 @@
     display: flex;
     align-items: center;
     margin: 10px 0;
-    width: $match-width;
+    width: var(--match-width);
     position: relative;
 
     &.connect-next {
@@ -146,27 +157,27 @@
         content: "";
         display: block;
         position: absolute;
-        right: -$connector-width;
-        width: $connector-width;
+        right: calc(-1 * #{$connector-width});
+        width: calc(#{$connector-width});
         height: 50%;
-        border-right: $connector-borders;
+        border-right: $connector-border;
       }
 
       &:nth-of-type(odd)::after {
         top: 50%;
-        border-top: $connector-borders;
+        border-top: $connector-border;
       }
 
       &:nth-of-type(even)::after {
         top: 0;
-        border-bottom: $connector-borders;
+        border-bottom: $connector-border;
       }
 
       &.straight::after {
-        width: $round-margin;
-        right: -$round-margin;
+        width: var(--round-margin);
+        right: calc(-1 * var(--round-margin));
         top: 0;
-        border-bottom: $connector-borders;
+        border-bottom: $connector-border;
         border-top: unset;
         border-right: unset;
       }
@@ -176,9 +187,9 @@
   .opponents {
     width: 100%;
     position: relative;
-
-    border: $match-borders;
-    border-radius: $match-borders-radius;
+    border: $match-border;
+    border-radius: var(--match-border-radius);
+    background: var(--match-background);
 
     &:hover {
       border: 1px solid var(--border-hover-color);
@@ -189,9 +200,9 @@
       top: -10px;
       left: 3px;
       font-size: 0.8rem;
-      background: white;
       padding: 0 5px;
       color: var(--label-color);
+      background: var(--primary-background);
       border-radius: 3px;
     }
 
@@ -200,16 +211,16 @@
         content: "";
         display: block;
         position: absolute;
-        left: -$connector-width;
-        width: $connector-width;
+        left: calc(-1 * #{$connector-width});
+        width: calc(#{$connector-width});
         height: 50%;
-        border-bottom: $connector-borders;
+        border-bottom: $connector-border;
       }
 
       %straight {
         border-left: unset;
-        left: -$round-margin;
-        width: $round-margin;
+        left: -var(--round-margin);
+        width: var(--round-margin);
       }
 
       .bracket:nth-of-type(1) &.straight::before {
@@ -234,7 +245,7 @@
     display: flex;
     justify-content: space-between;
     padding: 2px 8px;
-    background: var(--primary-background);
+    background: var(--match-background);
 
     &.hover {
       background: var(--secondary-background) !important;
@@ -242,15 +253,15 @@
 
     &:nth-of-type(1) {
       border-bottom: none;
-      border-top-left-radius: $match-borders-radius;
-      border-top-right-radius: $match-borders-radius;
+      border-top-left-radius: var(--match-border-radius);
+      border-top-right-radius: var(--match-border-radius);
       padding-top: 8px;
     }
 
     &:nth-of-type(2) {
       border-top: none;
-      border-bottom-left-radius: $match-borders-radius;
-      border-bottom-right-radius: $match-borders-radius;
+      border-bottom-left-radius: var(--match-border-radius);
+      border-bottom-right-radius: var(--match-border-radius);
       padding-bottom: 8px;
     }
 

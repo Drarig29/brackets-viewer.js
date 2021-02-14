@@ -6,10 +6,9 @@
     <script type="text/javascript" src="../dist/brackets-viewer.min.js"></script>
 </head>
 
-<body>
-    <div id="example" class="bracket-viewer">
-        <noscript>Please enable JavaScript.</noscript>
-    </div>
+
+    <!-- This div will be used as the root for the library. It must be **perfectly** empty to prevent a FOUC. -->
+    <div id="example" class="bracket-viewer"></div>
 
     <script>
         (async function () {
