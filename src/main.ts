@@ -437,14 +437,17 @@ export class BracketsViewer {
     private setupMouseHover(participantId: number, element: HTMLElement): void {
         if (!this.config.highlightParticipantOnHover) return;
 
-        this.teamRefsDOM[participantId].push(element);
+        const refs = this.teamRefsDOM[participantId];
+        if (!refs) throw Error(`The participant (id: ${participantId}) does not exist in the participants table.`);
+
+        refs.push(element);
 
         element.addEventListener('mouseover', () => {
-            this.teamRefsDOM[participantId].forEach(el => el.classList.add('hover'));
+            refs.forEach(el => el.classList.add('hover'));
         });
 
         element.addEventListener('mouseleave', () => {
-            this.teamRefsDOM[participantId].forEach(el => el.classList.remove('hover'));
+            refs.forEach(el => el.classList.remove('hover'));
         });
     }
 }
