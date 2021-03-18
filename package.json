@@ -49,7 +49,7 @@
     },
     "dependencies": {
         "brackets-model": "^1.3.5",
-        "i18next": "^19.8.7",
+        "i18next": "^19.9.2",
         "i18next-browser-languagedetector": "^6.0.1"
     }
 }

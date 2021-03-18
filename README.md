@@ -56,7 +56,7 @@ Install all npm dependencies:
 npm install
 ```
 
-Build with webpack:
+Build with Webpack:
 
 ```bash
 npm run build

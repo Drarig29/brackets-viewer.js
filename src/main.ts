@@ -61,9 +61,6 @@ export class BracketsViewer {
      */
     public addLocale(name: string, locale: Locale): void {
         lang.i18next.addResourceBundle(name, 'translation', locale);
-
-        // TODO: remove this error suppression when https://github.com/i18next/i18next/pull/1551 is merged.
-        // @ts-ignore
         lang.i18next.changeLanguage();
     }
 
