@@ -35,10 +35,11 @@ export class BracketsViewer {
         const root = document.createDocumentFragment();
 
         this.config = {
-            participantOriginPlacement: config && config.participantOriginPlacement || 'before',
-            showSlotsOrigin: config && config.showSlotsOrigin !== undefined ? config.showSlotsOrigin : true,
-            showLowerBracketSlotsOrigin: config && config.showLowerBracketSlotsOrigin !== undefined ? config.showLowerBracketSlotsOrigin : true,
-            highlightParticipantOnHover: config && config.highlightParticipantOnHover !== undefined ? config.highlightParticipantOnHover : true,
+            participantOriginPlacement: config?.participantOriginPlacement || 'before',
+            separatedChildCountLabel: config?.separatedChildCountLabel !== undefined ? config.separatedChildCountLabel : false,
+            showSlotsOrigin: config?.showSlotsOrigin !== undefined ? config.showSlotsOrigin : true,
+            showLowerBracketSlotsOrigin: config?.showLowerBracketSlotsOrigin !== undefined ? config.showLowerBracketSlotsOrigin : true,
+            highlightParticipantOnHover: config?.highlightParticipantOnHover !== undefined ? config.highlightParticipantOnHover : true,
         };
 
         this.participants = data.participants;
@@ -113,7 +114,7 @@ export class BracketsViewer {
                 const roundContainer = dom.createRoundContainer(roundId, lang.getRoundName(roundNumber++, 0));
 
                 for (const match of roundMatches)
-                    roundContainer.append(this.createMatch(match));
+                    roundContainer.append(this.createMatch(match, match.child_count));
 
                 groupContainer.append(roundContainer);
             }
@@ -288,7 +289,7 @@ export class BracketsViewer {
         const connection = dom.getBracketConnection(roundNumber, roundCount, matchLocation, connectFinal);
         const matchLabel = lang.getMatchLabel(match.number, roundNumber, roundCount, matchLocation);
         const originHint = lang.getOriginHint(roundNumber, roundCount, this.skipFirstRound, matchLocation);
-        return this.createMatch(match, matchLocation, connection, matchLabel, originHint, roundNumber);
+        return this.createMatch(match, match.child_count, matchLocation, connection, matchLabel, originHint, roundNumber);
     }
 
     /**
@@ -304,28 +305,36 @@ export class BracketsViewer {
         const connection = dom.getFinalConnection(type, roundNumber, matches.length);
         const matchLabel = lang.getFinalMatchLabel(type, roundNumber, roundCount);
         const originHint = lang.getFinalOriginHint(type, roundNumber);
-        return this.createMatch(matches[roundIndex], 'final-group', connection, matchLabel, originHint);
+        return this.createMatch(matches[roundIndex], matches[roundIndex].child_count, 'final-group', connection, matchLabel, originHint);
     }
 
     /**
      * Creates a match based on its results.
      *
      * @param match Results of the match.
+     * @param childCount The number of child games the match has.
      * @param matchLocation Location of the match.
      * @param connection Connection of this match with the others.
      * @param label Label of the match.
      * @param originHint Origin hint for the match.
      * @param roundNumber Number of the round.
      */
-    private createMatch(match: MatchResults, matchLocation?: BracketType, connection?: Connection, label?: string, originHint?: OriginHint, roundNumber?: number): HTMLElement {
+    private createMatch(match: MatchResults, childCount: number, matchLocation?: BracketType, connection?: Connection, label?: string, originHint?: OriginHint, roundNumber?: number): HTMLElement {
         const matchContainer = dom.createMatchContainer(match.id);
         const opponents = dom.createOpponentsContainer();
 
         const team1 = this.createTeam(match.opponent1, originHint, matchLocation, roundNumber);
         const team2 = this.createTeam(match.opponent2, originHint, matchLocation, roundNumber);
 
-        if (label)
+        if (label) {
+            if (childCount > 0 && !this.config.separatedChildCountLabel)
+                label += `, ${lang.bestOfX(childCount)}`;
+
             opponents.append(dom.createMatchLabel(label, lang.getMatchStatus(match.status)));
+        }
+
+        if (childCount > 0 && this.config.separatedChildCountLabel)
+            opponents.append(dom.createChildCountLabel(lang.bestOfX(childCount)));
 
         opponents.append(team1, team2);
         matchContainer.append(opponents);

@@ -83,6 +83,7 @@
     },
     "common": {
         "bye": "BYE",
+        "best-of-x": "Bo{{x}}",
         "group-name": "Group {{groupNumber}}",
         "round-name": "Round {{roundNumber}}",
         "round-name-final": "Final Round",

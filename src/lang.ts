@@ -230,6 +230,13 @@ export const abbreviations = {
 };
 
 /**
+ * The Best of X literal.
+ * 
+ * @param x Child count.
+ */
+export const bestOfX = (x: number): string => i18n('common', 'best-of-x', { x });
+
+/**
  * The BYE literal.
  */
 export const BYE = i18n('common', 'bye');
