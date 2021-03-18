@@ -384,7 +384,7 @@ export class BracketsViewer {
         } else
             this.renderHint(containers.name, participant, originHint, matchLocation);
 
-        containers.result.innerText = `${participant.score || '-'}`;
+        containers.result.innerText = `${participant.score === undefined ? '-' : participant.score}`;
 
         dom.setupWin(containers.participant, containers.result, participant);
         dom.setupLoss(containers.participant, containers.result, participant);
