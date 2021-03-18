@@ -389,6 +389,7 @@ export class BracketsViewer {
 
         if (found) {
             containers.name.innerText = found.name;
+            containers.participant.setAttribute('title', found.name);
             this.renderTeamOrigin(containers.name, participant, matchLocation, roundNumber);
         } else
             this.renderHint(containers.name, participant, originHint, matchLocation);
