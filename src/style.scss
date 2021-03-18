@@ -198,12 +198,19 @@
     & > span {
       position: absolute;
       top: -10px;
-      left: 3px;
       font-size: 0.8rem;
       padding: 0 5px;
       color: var(--label-color);
       background: var(--primary-background);
       border-radius: 3px;
+    }
+
+    & > span:nth-of-type(1) {
+      left: 3px;
+    }
+
+    & > span:nth-of-type(2) {
+      right: 3px;
     }
 
     &.connect-previous {

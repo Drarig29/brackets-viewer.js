@@ -95,6 +95,17 @@ export function createMatchLabel(label: string, status: string): HTMLElement {
 }
 
 /**
+ * Creates a container which contains the child count label of a match.
+ *
+ * @param label The child count label of the match.
+ */
+export function createChildCountLabel(label: string): HTMLElement {
+    const span = document.createElement('span');
+    span.innerText = label;
+    return span;
+}
+
+/**
  * Creates a container which contains the opponents of a match.
  */
 export function createOpponentsContainer(): HTMLElement {

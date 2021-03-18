@@ -48,6 +48,13 @@ export interface Config {
     participantOriginPlacement?: Placement,
 
     /**
+     * Whether to show the child count of a BoX match separately in the match label.
+     * - If `false`, the match label and the child count are in the same place. (Example: "M1.1, Bo3")
+     * - If `true`, the match label and the child count are in an opposite place. (Example: "M1.1   (right-->) Bo3")
+     */
+    separatedChildCountLabel?: boolean,
+
+    /**
      * Whether to show the origin of a slot (wherever possible).
      */
     showSlotsOrigin?: boolean,
