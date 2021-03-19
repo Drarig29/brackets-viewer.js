@@ -320,7 +320,7 @@ export class BracketsViewer {
      * @param roundNumber Number of the round.
      */
     private createMatch(match: MatchResults, childCount: number, matchLocation?: BracketType, connection?: Connection, label?: string, originHint?: OriginHint, roundNumber?: number): HTMLElement {
-        const matchContainer = dom.createMatchContainer(match.id);
+        const matchContainer = dom.createMatchContainer(match.id, match.status);
         const opponents = dom.createOpponentsContainer();
 
         const team1 = this.createTeam(match.opponent1, originHint, matchLocation, roundNumber);
