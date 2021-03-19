@@ -73,11 +73,13 @@ export function createRoundContainer(id: number, title: string): HTMLElement {
  * Creates a container which contains a match.
  *
  * @param id ID of the match.
+ * @param status Status of the match.
  */
-export function createMatchContainer(id: number): HTMLElement {
+export function createMatchContainer(id: number, status: number): HTMLElement {
     const match = document.createElement('div');
     match.classList.add('match');
     match.setAttribute('data-match-id', id.toString());
+    match.setAttribute('data-match-status', status.toString());
     return match;
 }
 
