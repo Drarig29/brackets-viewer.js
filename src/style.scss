@@ -77,6 +77,12 @@
 
   .round-robin {
     display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+
+    h1 {
+      flex-basis: 100%;
+    }
 
     h2 {
       text-align: center;
