@@ -259,6 +259,18 @@ export function addTeamOrigin(nameContainer: HTMLElement, text: string, placemen
 }
 
 /**
+ * Adds the participant image to a name.
+ *
+ * @param nameContainer The name container.
+ * @param src Source of the image.
+ */
+export function addParticipantImage(nameContainer: HTMLElement, src: string): void {
+    const img = document.createElement('img');
+    img.src = src;
+    nameContainer.prepend(img);
+}
+
+/**
  * Returns the connection for a given round in a bracket.
  *
  * @param roundNumber Number of the round.

@@ -160,6 +160,14 @@ export interface ParticipantContainers {
 }
 
 /**
+ * Image associated to a participant.
+ */
+export interface ParticipantImage {
+    participantId: number,
+    imageUrl: string,
+}
+
+/**
  * The format of a locale.
  */
 export type Locale = typeof locales['en'];
