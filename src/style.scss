@@ -17,7 +17,7 @@
   --match-width: 192px;
   --connector-border-width: 2px;
   --match-border-width: 1px;
-  --match-border-radius: 0.3rem;
+  --match-border-radius: 0.3em;
 
   $connector-width: var(--round-margin) / 2;
   $connector-border: var(--connector-border-width) solid var(--connector-color);
@@ -54,7 +54,7 @@
   h1,
   h2,
   h3 {
-    margin-bottom: 0.5rem;
+    margin-bottom: 0.5em;
     font-weight: 500;
     line-height: 1.2;
   }
@@ -199,7 +199,7 @@
     & > span {
       position: absolute;
       top: -10px;
-      font-size: 0.8rem;
+      font-size: 0.8em;
       padding: 0 5px;
       color: var(--label-color);
       background: var(--primary-background);
@@ -284,7 +284,7 @@
 
       & > span {
         color: var(--hint-color);
-        font-size: 0.9rem;
+        font-size: 0.9em;
         font-weight: initial;
       }
     }
