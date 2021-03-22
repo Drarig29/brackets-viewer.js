@@ -113,6 +113,7 @@ export class BracketsViewer {
      */
     private renderRoundRobin(root: DocumentFragment, stage: Stage, matchesByGroup: Match[][]): void {
         const container = dom.createRoundRobinContainer(stage.id);
+        container.append(dom.createTitle(stage.name));
 
         let groupNumber = 1;
 
@@ -137,7 +138,7 @@ export class BracketsViewer {
             container.append(groupContainer);
         }
 
-        root.append(dom.createTitle(stage.name), container);
+        root.append(container);
     }
 
     /**
