@@ -78,9 +78,11 @@
   .round-robin {
     display: flex;
 
-    .group {
+    h2 {
       text-align: center;
+    }
 
+    .group {
       &:not(:last-of-type) {
         margin-right: var(--round-margin);
       }
