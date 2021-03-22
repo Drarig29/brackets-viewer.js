@@ -301,7 +301,7 @@ export class BracketsViewer {
      */
     private createBracketMatch(roundNumber: number, roundCount: number, match: Match, matchLocation: BracketType, connectFinal?: boolean): HTMLElement {
         const connection = dom.getBracketConnection(roundNumber, roundCount, matchLocation, connectFinal);
-        const matchLabel = lang.getMatchLabel(match.number, roundNumber, roundCount, matchLocation);
+        const matchLabel = lang.getMatchLabel(match.number, roundNumber, roundCount, matchLocation) + (match.child_count > 0 ? `, Bo${match.child_count}` : '');
         const originHint = lang.getOriginHint(roundNumber, roundCount, this.skipFirstRound, matchLocation);
         return this.createMatch(match, matchLocation, connection, matchLabel, originHint, roundNumber);
     }
@@ -473,6 +473,9 @@ export class BracketsViewer {
         if (!refs) throw Error(`The participant (id: ${participantId}) does not exist in the participants table.`);
 
         refs.push(element);
+
+        // https://flaviocopes.com/how-to-add-event-listener-multiple-elements-javascript/
+        // Use bubbling to have only one callback
 
         element.addEventListener('mouseover', () => {
             refs.forEach(el => el.classList.add('hover'));
