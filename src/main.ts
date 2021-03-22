@@ -1,5 +1,5 @@
 import './style.scss';
-import { Participant, Match, ParticipantResult, StageType } from 'brackets-model';
+import { Participant, Match, ParticipantResult, Stage } from 'brackets-model';
 import { splitBy, getRanking, getOriginAbbreviation, findRoot } from './helpers';
 import * as dom from './dom';
 import * as lang from './lang';
@@ -93,11 +93,11 @@ export class BracketsViewer {
 
         switch (stage.type) {
             case 'round_robin':
-                this.renderRoundRobin(root, stage.name, matchesByGroup);
+                this.renderRoundRobin(root, stage, matchesByGroup);
                 break;
             case 'single_elimination':
             case 'double_elimination':
-                this.renderElimination(root, stage.name, stage.type, matchesByGroup);
+                this.renderElimination(root, stage, matchesByGroup);
                 break;
             default:
                 throw Error(`Unknown bracket type: ${stage.type}`);
@@ -108,11 +108,11 @@ export class BracketsViewer {
      * Renders a round-robin stage.
      *
      * @param root The root element.
-     * @param stageName Name of the stage.
+     * @param stage The stage to render.
      * @param matchesByGroup A list of matches for each group.
      */
-    private renderRoundRobin(root: DocumentFragment, stageName: string, matchesByGroup: Match[][]): void {
-        const container = dom.createRoundRobinContainer();
+    private renderRoundRobin(root: DocumentFragment, stage: Stage, matchesByGroup: Match[][]): void {
+        const container = dom.createRoundRobinContainer(stage.id);
 
         let groupNumber = 1;
 
@@ -137,21 +137,20 @@ export class BracketsViewer {
             container.append(groupContainer);
         }
 
-        root.append(dom.createTitle(stageName), container);
+        root.append(dom.createTitle(stage.name), container);
     }
 
     /**
      * Renders an elimination stage (single or double).
      *
      * @param root The root element.
-     * @param stageName Name of the stage.
-     * @param type Type of the stage.
+     * @param stage The stage to render.
      * @param matchesByGroup A list of matches for each group.
      */
-    private renderElimination(root: DocumentFragment, stageName: string, type: StageType, matchesByGroup: Match[][]): void {
-        root.append(dom.createTitle(stageName));
+    private renderElimination(root: DocumentFragment, stage: Stage, matchesByGroup: Match[][]): void {
+        root.append(dom.createTitle(stage.name));
 
-        if (type === 'single_elimination')
+        if (stage.type === 'single_elimination')
             this.renderSingleElimination(root, matchesByGroup);
         else
             this.renderDoubleElimination(root, matchesByGroup);
