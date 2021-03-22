@@ -122,13 +122,13 @@ export function createOpponentsContainer(): HTMLElement {
  * @param id ID of the participant.
  */
 export function createParticipantContainer(id: number | null): HTMLElement {
-    const team = document.createElement('div');
-    team.classList.add('participant');
+    const participant = document.createElement('div');
+    participant.classList.add('participant');
 
     if (id !== null)
-        team.setAttribute('data-participant-id', id.toString());
+        participant.setAttribute('data-participant-id', id.toString());
 
-    return team;
+    return participant;
 }
 
 /**
@@ -246,7 +246,7 @@ export function setupLoss(participantContainer: HTMLElement, resultContainer: HT
  * @param text The text to set (origin).
  * @param placement The placement of the participant origin.
  */
-export function addTeamOrigin(nameContainer: HTMLElement, text: string, placement: Placement): void {
+export function addParticipantOrigin(nameContainer: HTMLElement, text: string, placement: Placement): void {
     const span = document.createElement('span');
 
     if (placement === 'before') {
@@ -309,19 +309,19 @@ export function getFinalConnection(finalType: FinalType, roundNumber: number, ma
 /**
  * Sets the connection a match containers.
  *
- * @param teamsContainer The opponents container.
+ * @param opponentsContainer The opponents container.
  * @param matchContainer The match container.
  * @param connection The connection to set.
  */
-export function setupConnection(teamsContainer: HTMLElement, matchContainer: HTMLElement, connection: Connection): void {
+export function setupConnection(opponentsContainer: HTMLElement, matchContainer: HTMLElement, connection: Connection): void {
     if (connection.connectPrevious)
-        teamsContainer.classList.add('connect-previous');
+        opponentsContainer.classList.add('connect-previous');
 
     if (connection.connectNext)
         matchContainer.classList.add('connect-next');
 
     if (connection.connectPrevious === 'straight')
-        teamsContainer.classList.add('straight');
+        opponentsContainer.classList.add('straight');
 
     if (connection.connectNext === 'straight')
         matchContainer.classList.add('straight');

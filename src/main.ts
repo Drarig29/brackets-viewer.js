@@ -336,8 +336,8 @@ export class BracketsViewer {
         const matchContainer = dom.createMatchContainer(match.id, match.status);
         const opponents = dom.createOpponentsContainer();
 
-        const team1 = this.createTeam(match.opponent1, originHint, matchLocation, roundNumber);
-        const team2 = this.createTeam(match.opponent2, originHint, matchLocation, roundNumber);
+        const participant1 = this.createParticipant(match.opponent1, originHint, matchLocation, roundNumber);
+        const participant2 = this.createParticipant(match.opponent2, originHint, matchLocation, roundNumber);
 
         if (label) {
             if (match.child_count > 0 && !this.config.separatedChildCountLabel)
@@ -349,7 +349,7 @@ export class BracketsViewer {
         if (match.child_count > 0 && this.config.separatedChildCountLabel)
             opponents.append(dom.createChildCountLabel(lang.bestOfX(match.child_count)));
 
-        opponents.append(team1, team2);
+        opponents.append(participant1, participant2);
         matchContainer.append(opponents);
 
         if (!connection)
@@ -368,7 +368,7 @@ export class BracketsViewer {
      * @param matchLocation Location of the match.
      * @param roundNumber Number of the round.
      */
-    private createTeam(participant: ParticipantResult | null, originHint: OriginHint, matchLocation?: BracketType, roundNumber?: number): HTMLElement {
+    private createParticipant(participant: ParticipantResult | null, originHint: OriginHint, matchLocation?: BracketType, roundNumber?: number): HTMLElement {
         const containers: ParticipantContainers = {
             participant: dom.createParticipantContainer(participant && participant.id),
             name: dom.createNameContainer(),
@@ -404,7 +404,7 @@ export class BracketsViewer {
             containers.name.innerText = found.name;
             containers.participant.setAttribute('title', found.name);
             this.renderParticipantImage(containers.name, found.id);
-            this.renderTeamOrigin(containers.name, participant, matchLocation, roundNumber);
+            this.renderParticipantOrigin(containers.name, participant, matchLocation, roundNumber);
         } else
             this.renderHint(containers.name, participant, originHint, matchLocation);
 
@@ -449,7 +449,7 @@ export class BracketsViewer {
      * @param matchLocation Location of the match.
      * @param roundNumber Number of the round.
      */
-    private renderTeamOrigin(nameContainer: HTMLElement, participant: ParticipantResult, matchLocation?: BracketType, roundNumber?: number): void {
+    private renderParticipantOrigin(nameContainer: HTMLElement, participant: ParticipantResult, matchLocation?: BracketType, roundNumber?: number): void {
         if (participant.position === undefined || matchLocation === undefined) return;
         if (!this.config.participantOriginPlacement || this.config.participantOriginPlacement === 'none') return;
         if (!this.config.showSlotsOrigin) return;
@@ -457,7 +457,7 @@ export class BracketsViewer {
 
         const abbreviation = getOriginAbbreviation(matchLocation, this.skipFirstRound, roundNumber);
         const origin = abbreviation + participant.position;
-        dom.addTeamOrigin(nameContainer, origin, this.config.participantOriginPlacement);
+        dom.addParticipantOrigin(nameContainer, origin, this.config.participantOriginPlacement);
     }
 
     /**
