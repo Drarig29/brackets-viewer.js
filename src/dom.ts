@@ -16,38 +16,41 @@ export function createTitle(title: string): HTMLElement {
 
 /**
  * Creates a container which contains a round-robin stage.
+ * 
+ * @param stageId ID of the stage.
  */
-export function createRoundRobinContainer(): HTMLElement {
-    const container = document.createElement('div');
-    container.classList.add('round-robin');
-    return container;
+export function createRoundRobinContainer(stageId: number): HTMLElement {
+    const stage = document.createElement('div');
+    stage.classList.add('round-robin');
+    stage.setAttribute('data-stage-id', stageId.toString());
+    return stage;
 }
 
 /**
- * Creates a container which contains a single bracket of a single or double elimination.
+ * Creates a container which contains one bracket of a single or double elimination.
  *
- * @param id ID of the group.
+ * @param groupId ID of the group.
  */
-export function createBracketContainer(id: number): HTMLElement {
+export function createBracketContainer(groupId: number): HTMLElement {
     const bracket = document.createElement('section');
     bracket.classList.add('bracket');
-    bracket.setAttribute('data-group-id', id.toString());
+    bracket.setAttribute('data-group-id', groupId.toString());
     return bracket;
 }
 
 /**
  * Creates a container which contains a group.
  *
- * @param id ID of the group.
+ * @param groupId ID of the group.
  * @param title Title of the group.
  */
-export function createGroupContainer(id: number, title: string): HTMLElement {
+export function createGroupContainer(groupId: number, title: string): HTMLElement {
     const h2 = document.createElement('h2');
     h2.innerText = title;
 
     const group = document.createElement('section');
     group.classList.add('group');
-    group.setAttribute('data-group-id', id.toString());
+    group.setAttribute('data-group-id', groupId.toString());
     group.append(h2);
     return group;
 }
@@ -55,16 +58,16 @@ export function createGroupContainer(id: number, title: string): HTMLElement {
 /**
  * Creates a container which contains a round.
  *
- * @param id ID of the round.
+ * @param roundId ID of the round.
  * @param title Title of the round.
  */
-export function createRoundContainer(id: number, title: string): HTMLElement {
+export function createRoundContainer(roundId: number, title: string): HTMLElement {
     const h3 = document.createElement('h3');
     h3.innerText = title;
 
     const round = document.createElement('article');
     round.classList.add('round');
-    round.setAttribute('data-round-id', id.toString());
+    round.setAttribute('data-round-id', roundId.toString());
     round.append(h3);
     return round;
 }
@@ -72,13 +75,13 @@ export function createRoundContainer(id: number, title: string): HTMLElement {
 /**
  * Creates a container which contains a match.
  *
- * @param id ID of the match.
+ * @param matchId ID of the match.
  * @param status Status of the match.
  */
-export function createMatchContainer(id: number, status: number): HTMLElement {
+export function createMatchContainer(matchId: number, status: number): HTMLElement {
     const match = document.createElement('div');
     match.classList.add('match');
-    match.setAttribute('data-match-id', id.toString());
+    match.setAttribute('data-match-id', matchId.toString());
     match.setAttribute('data-match-status', status.toString());
     return match;
 }
@@ -119,14 +122,14 @@ export function createOpponentsContainer(): HTMLElement {
 /**
  * Creates a container which contains a participant.
  *
- * @param id ID of the participant.
+ * @param participantId ID of the participant.
  */
-export function createParticipantContainer(id: number | null): HTMLElement {
+export function createParticipantContainer(participantId: number | null): HTMLElement {
     const participant = document.createElement('div');
     participant.classList.add('participant');
 
-    if (id !== null)
-        participant.setAttribute('data-participant-id', id.toString());
+    if (participantId !== null)
+        participant.setAttribute('data-participant-id', participantId.toString());
 
     return participant;
 }
