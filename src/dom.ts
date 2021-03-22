@@ -27,6 +27,18 @@ export function createRoundRobinContainer(stageId: number): HTMLElement {
 }
 
 /**
+ * Creates a container which contains an elimination stage.
+ * 
+ * @param stageId ID of the stage.
+ */
+export function createEliminationContainer(stageId: number): HTMLElement {
+    const stage = document.createElement('div');
+    stage.classList.add('elimination');
+    stage.setAttribute('data-stage-id', stageId.toString());
+    return stage;
+}
+
+/**
  * Creates a container which contains one bracket of a single or double elimination.
  *
  * @param groupId ID of the group.
