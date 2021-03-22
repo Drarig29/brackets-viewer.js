@@ -114,7 +114,7 @@ export class BracketsViewer {
                 const roundContainer = dom.createRoundContainer(roundId, lang.getRoundName(roundNumber++, 0));
 
                 for (const match of roundMatches)
-                    roundContainer.append(this.createMatch(match, match.child_count));
+                    roundContainer.append(this.createMatch(match));
 
                 groupContainer.append(roundContainer);
             }
@@ -289,7 +289,7 @@ export class BracketsViewer {
         const connection = dom.getBracketConnection(roundNumber, roundCount, matchLocation, connectFinal);
         const matchLabel = lang.getMatchLabel(match.number, roundNumber, roundCount, matchLocation);
         const originHint = lang.getOriginHint(roundNumber, roundCount, this.skipFirstRound, matchLocation);
-        return this.createMatch(match, match.child_count, matchLocation, connection, matchLabel, originHint, roundNumber);
+        return this.createMatch(match, matchLocation, connection, matchLabel, originHint, roundNumber);
     }
 
     /**
@@ -305,7 +305,7 @@ export class BracketsViewer {
         const connection = dom.getFinalConnection(type, roundNumber, matches.length);
         const matchLabel = lang.getFinalMatchLabel(type, roundNumber, roundCount);
         const originHint = lang.getFinalOriginHint(type, roundNumber);
-        return this.createMatch(matches[roundIndex], matches[roundIndex].child_count, 'final-group', connection, matchLabel, originHint);
+        return this.createMatch(matches[roundIndex], 'final-group', connection, matchLabel, originHint);
     }
 
     /**
@@ -319,7 +319,7 @@ export class BracketsViewer {
      * @param originHint Origin hint for the match.
      * @param roundNumber Number of the round.
      */
-    private createMatch(match: MatchResults, childCount: number, matchLocation?: BracketType, connection?: Connection, label?: string, originHint?: OriginHint, roundNumber?: number): HTMLElement {
+    private createMatch(match: Match, matchLocation?: BracketType, connection?: Connection, label?: string, originHint?: OriginHint, roundNumber?: number): HTMLElement {
         const matchContainer = dom.createMatchContainer(match.id, match.status);
         const opponents = dom.createOpponentsContainer();
 
@@ -327,14 +327,14 @@ export class BracketsViewer {
         const team2 = this.createTeam(match.opponent2, originHint, matchLocation, roundNumber);
 
         if (label) {
-            if (childCount > 0 && !this.config.separatedChildCountLabel)
-                label += `, ${lang.bestOfX(childCount)}`;
+            if (match.child_count > 0 && !this.config.separatedChildCountLabel)
+                label += `, ${lang.bestOfX(match.child_count)}`;
 
             opponents.append(dom.createMatchLabel(label, lang.getMatchStatus(match.status)));
         }
 
-        if (childCount > 0 && this.config.separatedChildCountLabel)
-            opponents.append(dom.createChildCountLabel(lang.bestOfX(childCount)));
+        if (match.child_count > 0 && this.config.separatedChildCountLabel)
+            opponents.append(dom.createChildCountLabel(lang.bestOfX(match.child_count)));
 
         opponents.append(team1, team2);
         matchContainer.append(opponents);
