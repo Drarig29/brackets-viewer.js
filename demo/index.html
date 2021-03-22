@@ -30,6 +30,12 @@
                 }
             });
 
+            // This is optional. You must do it before render().
+            bracketsViewer.setParticipantImages(data.participant.map(participant => ({
+                participantId: participant.id,
+                imageUrl: 'https://github.githubassets.com/pinned-octocat.svg',
+            })));
+
             bracketsViewer.render({
                 stages: data.stage,
                 matches: data.match,
