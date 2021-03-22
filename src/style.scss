@@ -282,6 +282,17 @@
         color: var(--hint-color);
       }
 
+      & > img {
+        width: 1em;
+        height: 1em;
+        margin-right: 4px;
+        object-fit: cover;
+        border-radius: 4px;
+        vertical-align: middle;
+        position: relative;
+        bottom: 1px;
+      }
+
       & > span {
         color: var(--hint-color);
         font-size: 0.9em;

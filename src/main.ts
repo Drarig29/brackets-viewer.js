@@ -1,5 +1,5 @@
 import './style.scss';
-import { Participant, Match, MatchResults, ParticipantResult, StageType } from 'brackets-model';
+import { Participant, Match, ParticipantResult, StageType } from 'brackets-model';
 import { splitBy, getRanking, getOriginAbbreviation, findRoot } from './helpers';
 import * as dom from './dom';
 import * as lang from './lang';
@@ -14,12 +14,16 @@ import {
     RoundName,
     ViewerData,
     Locale,
+    ParticipantImage,
 } from './types';
 
 export class BracketsViewer {
 
-    readonly teamRefsDOM: { [participantId: number]: HTMLElement[] } = {};
-    private participants!: Participant[];
+    readonly participantRefs: { [participantId: number]: HTMLElement[] } = {};
+
+    private participants: Participant[] = [];
+    private participantImages: ParticipantImage[] = [];
+
     private config!: Config;
     private skipFirstRound!: boolean;
 
@@ -43,7 +47,8 @@ export class BracketsViewer {
         };
 
         this.participants = data.participants;
-        data.participants.forEach(participant => this.teamRefsDOM[participant.id] = []);
+
+        data.participants.forEach(participant => this.participantRefs[participant.id] = []);
 
         data.stages.forEach(stage => this.renderStage(root, {
             ...data,
@@ -63,6 +68,15 @@ export class BracketsViewer {
     public addLocale(name: string, locale: Locale): void {
         lang.i18next.addResourceBundle(name, 'translation', locale);
         lang.i18next.changeLanguage();
+    }
+
+    /**
+     * Sets the images which will be rendered for every participant.
+     * 
+     * @param images The participant images.
+     */
+    public setParticipantImages(images: ParticipantImage[]): void {
+        this.participantImages = images;
     }
 
     /**
@@ -312,7 +326,6 @@ export class BracketsViewer {
      * Creates a match based on its results.
      *
      * @param match Results of the match.
-     * @param childCount The number of child games the match has.
      * @param matchLocation Location of the match.
      * @param connection Connection of this match with the others.
      * @param label Label of the match.
@@ -390,6 +403,7 @@ export class BracketsViewer {
         if (found) {
             containers.name.innerText = found.name;
             containers.participant.setAttribute('title', found.name);
+            this.renderParticipantImage(containers.name, found.id);
             this.renderTeamOrigin(containers.name, participant, matchLocation, roundNumber);
         } else
             this.renderHint(containers.name, participant, originHint, matchLocation);
@@ -398,6 +412,17 @@ export class BracketsViewer {
 
         dom.setupWin(containers.participant, containers.result, participant);
         dom.setupLoss(containers.participant, containers.result, participant);
+    }
+
+    /**
+     * Renders a participant image.
+     * 
+     * @param nameContainer The name container.
+     * @param participantId ID of the participant.
+     */
+    private renderParticipantImage(nameContainer: HTMLElement, participantId: number): void {
+        const found = this.participantImages.find(item => item.participantId === participantId);
+        if (found) dom.addParticipantImage(nameContainer, found.imageUrl);
     }
 
     /**
@@ -444,7 +469,7 @@ export class BracketsViewer {
     private setupMouseHover(participantId: number, element: HTMLElement): void {
         if (!this.config.highlightParticipantOnHover) return;
 
-        const refs = this.teamRefsDOM[participantId];
+        const refs = this.participantRefs[participantId];
         if (!refs) throw Error(`The participant (id: ${participantId}) does not exist in the participants table.`);
 
         refs.push(element);
