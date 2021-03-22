@@ -43,7 +43,7 @@
   overflow: auto;
   user-select: none;
   margin: 0 auto;
-  padding: 30px 50px;
+  padding: 10px 50px;
 
   *,
   ::after,
@@ -61,7 +61,8 @@
 
   h1 {
     font-size: 26px;
-    margin-bottom: 40px;
+    margin-top: 30px;
+    margin-bottom: 20px;
   }
 
   h2 {
@@ -138,7 +139,7 @@
     display: flex;
 
     &:not(:last-of-type) {
-      margin-bottom: 30px;
+      margin-bottom: 15px;
     }
 
     .round {
