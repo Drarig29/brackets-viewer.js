@@ -27,7 +27,7 @@ export function splitBy<T>(array: T[], key: keyof T): T[][] {
  * @param selector An optional selector to select the root element.
  */
 export function findRoot(selector?: string): HTMLElement {
-    const queryResult = document.querySelectorAll(selector || '.bracket-viewer');
+    const queryResult = document.querySelectorAll(selector || '.brackets-viewer');
 
     if (queryResult.length === 0)
         throw Error('Root not found. You must have at least one root element.');
@@ -37,8 +37,8 @@ export function findRoot(selector?: string): HTMLElement {
 
     const root = queryResult[0] as HTMLElement;
 
-    if (!root.classList.contains('bracket-viewer'))
-        throw Error('The selected root must have a `.bracket-viewer` class.');
+    if (!root.classList.contains('brackets-viewer'))
+        throw Error('The selected root must have a `.brackets-viewer` class.');
 
     return root;
 }
