@@ -39,7 +39,6 @@
   display: flex;
   flex-direction: column;
   align-items: flex-start;
-  width: max-content;
   overflow: auto;
   user-select: none;
   margin: 0 auto;
@@ -80,6 +79,7 @@
     display: flex;
     flex-wrap: wrap;
     justify-content: center;
+    row-gap: 24px;
 
     h1 {
       flex-basis: 100%;
