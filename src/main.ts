@@ -272,8 +272,10 @@ export class BracketsViewer {
      */
     private createRankingRow(item: RankingItem): HTMLElement {
         const row = dom.createRow();
+        const notRanked = item.played === 0;
 
-        for (const prop in item) {
+        for (const key in item) {
+            const prop = key as keyof RankingItem;
             const data = item[prop];
 
             if (prop === 'id') {
@@ -285,6 +287,11 @@ export class BracketsViewer {
                     row.append(cell);
                     continue;
                 }
+            }
+
+            if (notRanked && (prop === 'rank' || prop === 'points')) {
+                row.append(dom.createCell('-'));
+                continue;
             }
 
             row.append(dom.createCell(data));

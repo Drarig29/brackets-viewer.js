@@ -1,7 +1,7 @@
 import { ParticipantResult } from 'brackets-model';
 import { rankingHeader } from './helpers';
 import { abbreviations } from './lang';
-import { Connection, FinalType, BracketType, Placement, Ranking } from './types';
+import { Connection, FinalType, BracketType, Placement, Ranking, RankingItem } from './types';
 
 /**
  * Creates the title of the viewer.
@@ -198,7 +198,8 @@ export function createRankingHeaders(ranking: Ranking): HTMLElement {
     const headers = document.createElement('tr');
     const firstItem = ranking[0];
 
-    for (const prop in firstItem) {
+    for (const key in firstItem) {
+        const prop = key as keyof RankingItem;
         const header = rankingHeader(prop);
         const th = document.createElement('th');
         th.innerText = header.text;
