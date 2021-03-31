@@ -107,8 +107,6 @@ export interface Connection {
  * An item of the ranking.
  */
 export interface RankingItem {
-    [prop: string]: number,
-
     rank: number,
     id: number,
     played: number,
