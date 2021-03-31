@@ -125,7 +125,9 @@ function processParticipant(rankingMap: RankingMap, formula: RankingFormula, cur
     };
 
     state.id = current.id;
-    state.played++;
+
+    if (current.forfeit || current.result)
+        state.played++;
 
     if (current.result === 'win')
         state.wins++;
@@ -154,7 +156,7 @@ function processParticipant(rankingMap: RankingMap, formula: RankingFormula, cur
  * @param rankingMap The ranking map (object).
  */
 function createRanking(rankingMap: RankingMap): RankingItem[] {
-    const ranking = Object.values(rankingMap).sort((a, b) => b.points - a.points);
+    const ranking = Object.values(rankingMap).sort((a, b) => a.points !== b.points ? b.points - a.points : b.played - a.played);
 
     const rank = {
         value: 0,
