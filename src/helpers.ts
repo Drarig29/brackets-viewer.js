@@ -1,6 +1,6 @@
 import { Match, ParticipantResult } from 'brackets-model';
 import { headers, abbreviations } from './lang';
-import { RankingHeader, Ranking, RankingFormula, RankingItem, RankingMap } from './types';
+import { RankingHeader, Ranking, RankingFormula, RankingItem, RankingMap, BracketType } from './types';
 
 /**
  * Splits an array based on values of a given key of the objects of the array.
@@ -41,6 +41,34 @@ export function findRoot(selector?: string): HTMLElement {
         throw Error('The selected root must have a `.brackets-viewer` class.');
 
     return root;
+}
+
+/**
+ * Completes a list of matches with blank matches based on the next matches.
+ * 
+ * Toornament can generate first rounds with an odd number of matches and the seeding is partially distributed in the second round.
+ * This function adds a blank match in the first round as if it was the source match of a seeded match of the second round.
+ * 
+ * @param matches The list of first round matches.
+ * @param nextMatches The list of second round matches.
+ * @param bracketType Type of the bracket.
+ * @param roundNumber Number of the round.
+ */
+export function completeWithBlankMatches(matches: Match[], nextMatches: Match[], bracketType: BracketType, roundNumber: number): (Match | null)[] {
+    if (roundNumber !== 1)
+        return matches;
+
+    if (bracketType === 'single-bracket' || bracketType === 'winner-bracket') {
+        const sources = nextMatches.map(match => [match.opponent1?.position || null, match.opponent2?.position || null]).flat();
+        return sources.map(source => source && matches.find(match => match.number === source) || null);
+    }
+
+    if (bracketType === 'loser-bracket') {
+        const sources = nextMatches.map(match => match.opponent2?.position || null);
+        return sources.map(source => source && matches.find(match => match.number === source) || null);
+    }
+
+    return matches;
 }
 
 /**
