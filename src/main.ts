@@ -15,6 +15,7 @@ import {
     ViewerData,
     Locale,
     ParticipantImage,
+    Side,
 } from './types';
 
 export class BracketsViewer {
@@ -339,8 +340,8 @@ export class BracketsViewer {
         const matchContainer = dom.createMatchContainer();
         const opponents = dom.createOpponentsContainer();
 
-        const participant1 = this.createParticipant(null, undefined);
-        const participant2 = this.createParticipant(null, undefined);
+        const participant1 = this.createParticipant(null);
+        const participant2 = this.createParticipant(null);
 
         opponents.append(participant1, participant2);
         matchContainer.append(opponents);
@@ -363,8 +364,8 @@ export class BracketsViewer {
         const matchContainer = dom.createMatchContainer(match.id, match.status);
         const opponents = dom.createOpponentsContainer();
 
-        const participant1 = this.createParticipant(match.opponent1, originHint, matchLocation, roundNumber);
-        const participant2 = this.createParticipant(match.opponent2, originHint, matchLocation, roundNumber);
+        const participant1 = this.createParticipant(match.opponent1, 'opponent1', originHint, matchLocation, roundNumber);
+        const participant2 = this.createParticipant(match.opponent2, 'opponent2', originHint, matchLocation, roundNumber);
 
         if (label) {
             if (match.child_count > 0 && !this.config.separatedChildCountLabel)
@@ -391,11 +392,12 @@ export class BracketsViewer {
      * Creates a participant for a match.
      *
      * @param participant Information about the participant.
+     * @param side Side of the participant.
      * @param originHint Origin hint for the match.
      * @param matchLocation Location of the match.
      * @param roundNumber Number of the round.
      */
-    private createParticipant(participant: ParticipantResult | null, originHint: OriginHint, matchLocation?: BracketType, roundNumber?: number): HTMLElement {
+    private createParticipant(participant: ParticipantResult | null, side?: Side, originHint?: OriginHint, matchLocation?: BracketType, roundNumber?: number): HTMLElement {
         const containers: ParticipantContainers = {
             participant: dom.createParticipantContainer(participant && participant.id),
             name: dom.createNameContainer(),
@@ -405,7 +407,7 @@ export class BracketsViewer {
         if (participant === null)
             containers.name.innerText = lang.BYE;
         else
-            this.renderParticipant(containers, participant, originHint, matchLocation, roundNumber);
+            this.renderParticipant(containers, participant, side, originHint, matchLocation, roundNumber);
 
         containers.participant.append(containers.name, containers.result);
 
@@ -420,18 +422,19 @@ export class BracketsViewer {
      *
      * @param containers Containers for the participant.
      * @param participant The participant result.
+     * @param side Side of the participant.
      * @param originHint Origin hint for the match.
      * @param matchLocation Location of the match.
      * @param roundNumber Number of the round.
      */
-    private renderParticipant(containers: ParticipantContainers, participant: ParticipantResult, originHint: OriginHint, matchLocation?: BracketType, roundNumber?: number): void {
+    private renderParticipant(containers: ParticipantContainers, participant: ParticipantResult, side?: Side, originHint?: OriginHint, matchLocation?: BracketType, roundNumber?: number): void {
         const found = this.participants.find(item => item.id === participant.id);
 
         if (found) {
             containers.name.innerText = found.name;
             containers.participant.setAttribute('title', found.name);
             this.renderParticipantImage(containers.name, found.id);
-            this.renderParticipantOrigin(containers.name, participant, matchLocation, roundNumber);
+            this.renderParticipantOrigin(containers.name, participant, side, matchLocation, roundNumber);
         } else
             this.renderHint(containers.name, participant, originHint, matchLocation);
 
@@ -460,7 +463,7 @@ export class BracketsViewer {
      * @param originHint Origin hint for the participant.
      * @param matchLocation Location of the match.
      */
-    private renderHint(nameContainer: HTMLElement, participant: ParticipantResult, originHint: OriginHint, matchLocation?: BracketType): void {
+    private renderHint(nameContainer: HTMLElement, participant: ParticipantResult, originHint?: OriginHint, matchLocation?: BracketType): void {
         if (originHint === undefined || participant.position === undefined) return;
         if (!this.config.showSlotsOrigin) return;
         if (!this.config.showLowerBracketSlotsOrigin && matchLocation === 'loser-bracket') return;
@@ -473,16 +476,19 @@ export class BracketsViewer {
      *
      * @param nameContainer The name container.
      * @param participant The participant result.
+     * @param side Side of the participant.Side of the participant.
      * @param matchLocation Location of the match.
      * @param roundNumber Number of the round.
      */
-    private renderParticipantOrigin(nameContainer: HTMLElement, participant: ParticipantResult, matchLocation?: BracketType, roundNumber?: number): void {
+    private renderParticipantOrigin(nameContainer: HTMLElement, participant: ParticipantResult, side?: Side, matchLocation?: BracketType, roundNumber?: number): void {
         if (participant.position === undefined || matchLocation === undefined) return;
         if (!this.config.participantOriginPlacement || this.config.participantOriginPlacement === 'none') return;
         if (!this.config.showSlotsOrigin) return;
         if (!this.config.showLowerBracketSlotsOrigin && matchLocation === 'loser-bracket') return;
 
-        const abbreviation = getOriginAbbreviation(matchLocation, this.skipFirstRound, roundNumber);
+        const abbreviation = getOriginAbbreviation(matchLocation, this.skipFirstRound, roundNumber, side);
+        if (!abbreviation) return;
+
         const origin = abbreviation + participant.position;
         dom.addParticipantOrigin(nameContainer, origin, this.config.participantOriginPlacement);
     }

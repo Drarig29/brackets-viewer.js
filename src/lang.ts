@@ -57,7 +57,7 @@ function i18n<Scope extends keyof Locale>(scope: Scope, key: keyof Locale[Scope]
  * @param skipFirstRound Whether to skip the first round.
  * @param matchLocation Location of the match.
  */
-export function getOriginHint(roundNumber: number, roundCount: number, skipFirstRound: boolean, matchLocation: BracketType): OriginHint {
+export function getOriginHint(roundNumber: number, roundCount: number, skipFirstRound: boolean, matchLocation: BracketType): OriginHint | undefined {
     if (roundNumber === 1) {
         if (matchLocation === 'single-bracket')
             return (position: number): string => i18n('origin-hint', 'seed', { position });
@@ -93,7 +93,7 @@ export function getOriginHint(roundNumber: number, roundCount: number, skipFirst
  * @param finalType Type of the final.
  * @param roundNumber Number of the round.
  */
-export function getFinalOriginHint(finalType: FinalType, roundNumber: number): OriginHint {
+export function getFinalOriginHint(finalType: FinalType, roundNumber: number): OriginHint | undefined {
     // Single elimination.
     if (finalType === 'consolation_final')
         return (position: number): string => i18n('origin-hint', 'consolation-final', { position });
