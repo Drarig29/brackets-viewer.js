@@ -1,4 +1,4 @@
-import { ParticipantResult } from 'brackets-model';
+import { Match, ParticipantResult } from 'brackets-model';
 import { rankingHeader } from './helpers';
 import { abbreviations } from './lang';
 import { Connection, FinalType, BracketType, Placement, Ranking, RankingItem } from './types';
@@ -90,11 +90,11 @@ export function createRoundContainer(roundId: number, title: string): HTMLElemen
  * @param matchId ID of the match.
  * @param status Status of the match.
  */
-export function createMatchContainer(matchId: number, status: number): HTMLElement {
+export function createMatchContainer(matchId?: number, status?: number): HTMLElement {
     const match = document.createElement('div');
     match.classList.add('match');
-    match.setAttribute('data-match-id', matchId.toString());
-    match.setAttribute('data-match-status', status.toString());
+    matchId !== undefined && match.setAttribute('data-match-id', matchId.toString());
+    status !== undefined && match.setAttribute('data-match-status', status.toString());
     return match;
 }
 
@@ -291,21 +291,36 @@ export function addParticipantImage(nameContainer: HTMLElement, src: string): vo
  *
  * @param roundNumber Number of the round.
  * @param roundCount Count of rounds.
+ * @param match The match to connect to other matches.
  * @param matchLocation Location of the match.
  * @param connectFinal Whether to connect to the final.
  */
-export function getBracketConnection(roundNumber: number, roundCount: number, matchLocation?: BracketType, connectFinal?: boolean): Connection {
+export function getBracketConnection(roundNumber: number, roundCount: number, match: Match, matchLocation?: BracketType, connectFinal?: boolean): Connection {
+    const connection: Connection = {
+        connectPrevious: false,
+        connectNext: false,
+    };
+
     if (matchLocation === 'loser-bracket') {
-        return {
-            connectPrevious: roundNumber > 1 && (roundNumber % 2 === 1 ? 'square' : 'straight'),
-            connectNext: roundNumber < roundCount && (roundNumber % 2 === 0 ? 'square' : 'straight'),
-        };
+        connection.connectPrevious = roundNumber > 1 && (roundNumber % 2 === 1 ? 'square' : 'straight');
+        connection.connectNext = roundNumber < roundCount && (roundNumber % 2 === 0 ? 'square' : 'straight');
+    } else {
+        connection.connectPrevious = roundNumber > 1 && 'square';
+        connection.connectNext = roundNumber < roundCount ? 'square' : (connectFinal ? 'straight' : false);
     }
 
-    return {
-        connectPrevious: roundNumber > 1 && 'square',
-        connectNext: roundNumber < roundCount ? 'square' : (connectFinal ? 'straight' : false),
-    };
+    if (roundNumber !== 2)
+        return connection;
+
+    const upperBracket = matchLocation === 'single-bracket' || matchLocation === 'winner-bracket';
+
+    if (upperBracket && match.opponent1?.position === undefined && match.opponent2?.position === undefined)
+        connection.connectPrevious = false;
+
+    if (matchLocation === 'loser-bracket' && match.opponent2?.position === undefined)
+        connection.connectPrevious = false;
+
+    return connection;
 }
 
 /**
