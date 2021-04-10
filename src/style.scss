@@ -1,3 +1,5 @@
+// Default integrated theme.
+
 .brackets-viewer {
   /* Colors */
   --primary-background: #fff;
@@ -13,12 +15,15 @@
   --border-hover-color: #b6b5b5;
 
   /* Sizes */
+  --text-size: 16px;
   --round-margin: 50px;
   --match-width: 192px;
   --connector-border-width: 2px;
   --match-border-width: 1px;
   --match-border-radius: 0.3em;
+}
 
+.brackets-viewer {
   $connector-width: var(--round-margin) / 2;
   $connector-border: var(--connector-border-width) solid var(--connector-color);
 
@@ -29,12 +34,13 @@
     "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";
 
   &:empty {
-    // Prevents a FOUC at loading.
+    // Prevents a FOUC during loading.
     display: none;
   }
 
-  color: var(--font-color);
   background: var(--primary-background);
+  color: var(--font-color);
+  font-size: var(--text-size);
   text-align: left;
   display: flex;
   flex-direction: column;
@@ -59,19 +65,19 @@
   }
 
   h1 {
-    font-size: 26px;
+    font-size: 2em;
     margin-top: 30px;
     margin-bottom: 20px;
   }
 
   h2 {
-    font-size: 21px;
+    font-size: 1.7em;
   }
 
   h3 {
     text-align: center;
     background: var(--secondary-background);
-    font-size: 16px;
+    font-size: 1.1em;
     padding: 10px;
   }
 
@@ -99,6 +105,7 @@
       }
 
       table {
+        font-size: 1em;
         margin: 30px 0 20px 0;
         color: #a7a7a7;
         border-collapse: collapse;

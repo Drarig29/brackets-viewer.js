@@ -13,6 +13,7 @@
   --border-hover-color: #b6b5b5;
 
   /* Sizes */
+  --text-size: 16px;
   --round-margin: 50px;
   --match-width: 192px;
   --connector-border-width: 2px;
