@@ -1,5 +1,5 @@
 import './style.scss';
-import { Participant, Match, ParticipantResult, Stage } from 'brackets-model';
+import { Participant, Match, ParticipantResult, Stage, Status } from 'brackets-model';
 import { splitBy, getRanking, getOriginAbbreviation, findRoot, completeWithBlankMatches } from './helpers';
 import * as dom from './dom';
 import * as lang from './lang';
@@ -363,6 +363,9 @@ export class BracketsViewer {
     private createMatch(match: Match, matchLocation?: BracketType, connection?: Connection, label?: string, originHint?: OriginHint, roundNumber?: number): HTMLElement {
         const matchContainer = dom.createMatchContainer(match.id, match.status);
         const opponents = dom.createOpponentsContainer();
+
+        if (match.status >= Status.Completed)
+            originHint = undefined;
 
         const participant1 = this.createParticipant(match.opponent1, 'opponent1', originHint, matchLocation, roundNumber);
         const participant2 = this.createParticipant(match.opponent2, 'opponent2', originHint, matchLocation, roundNumber);
