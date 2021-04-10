@@ -289,13 +289,14 @@ export function addParticipantImage(nameContainer: HTMLElement, src: string): vo
 /**
  * Returns the connection for a given round in a bracket.
  *
+ * @param alwaysConnectFirstRound Whether to always connect the first round with the second round.
  * @param roundNumber Number of the round.
  * @param roundCount Count of rounds.
  * @param match The match to connect to other matches.
  * @param matchLocation Location of the match.
  * @param connectFinal Whether to connect to the final.
  */
-export function getBracketConnection(roundNumber: number, roundCount: number, match: Match, matchLocation?: BracketType, connectFinal?: boolean): Connection {
+export function getBracketConnection(alwaysConnectFirstRound: boolean, roundNumber: number, roundCount: number, match: Match, matchLocation?: BracketType, connectFinal?: boolean): Connection {
     const connection: Connection = {
         connectPrevious: false,
         connectNext: false,
@@ -309,7 +310,7 @@ export function getBracketConnection(roundNumber: number, roundCount: number, ma
         connection.connectNext = roundNumber < roundCount ? 'square' : (connectFinal ? 'straight' : false);
     }
 
-    if (roundNumber !== 2)
+    if (alwaysConnectFirstRound || roundNumber !== 2)
         return connection;
 
     const upperBracket = matchLocation === 'single-bracket' || matchLocation === 'winner-bracket';
