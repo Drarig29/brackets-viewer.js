@@ -13,9 +13,11 @@
   --border-hover-color: #b6b5b5;
 
   /* Sizes */
-  --text-size: 16px;
-  --round-margin: 50px;
-  --match-width: 192px;
+  --text-size: 12px;
+  --round-margin: 40px;
+  --match-width: 150px;
+  --match-horizontal-padding: 8px;
+  --match-vertical-padding: 6px;
   --connector-border-width: 2px;
   --match-border-width: 1px;
   --match-border-radius: 0.3em;
