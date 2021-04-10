@@ -1,6 +1,6 @@
 import './style.scss';
 import { Participant, Match, ParticipantResult, Stage } from 'brackets-model';
-import { splitBy, getRanking, getOriginAbbreviation, findRoot } from './helpers';
+import { splitBy, getRanking, getOriginAbbreviation, findRoot, completeWithBlankMatches } from './helpers';
 import * as dom from './dom';
 import * as lang from './lang';
 import {
@@ -207,17 +207,17 @@ export class BracketsViewer {
         const roundCount = matchesByRound.length;
         const bracketContainer = dom.createBracketContainer(groupId);
 
-        let roundNumber = 1;
-
-        for (const matches of matchesByRound) {
-            const roundId = matches[0].round_id;
+        for (let roundIndex = 0; roundIndex < matchesByRound.length; roundIndex++) {
+            const roundId = matchesByRound[roundIndex][0].round_id;
+            const roundNumber = roundIndex + 1;
             const roundContainer = dom.createRoundContainer(roundId, roundName(roundNumber, roundCount));
 
-            for (const match of matches)
-                roundContainer.append(this.createBracketMatch(roundNumber, roundCount, match, bracketType, connectFinal));
+            const allMatches = completeWithBlankMatches(matchesByRound[roundIndex], matchesByRound[roundIndex + 1], bracketType, roundNumber);
+
+            for (const match of allMatches)
+                roundContainer.append(match && this.createBracketMatch(roundNumber, roundCount, match, bracketType, connectFinal) || this.skipBracketMatch());
 
             bracketContainer.append(roundContainer);
-            roundNumber++;
         }
 
         container.append(bracketContainer);
@@ -310,7 +310,7 @@ export class BracketsViewer {
      * @param connectFinal Whether to connect this match to the final if it happens to be the last one of the bracket.
      */
     private createBracketMatch(roundNumber: number, roundCount: number, match: Match, matchLocation: BracketType, connectFinal?: boolean): HTMLElement {
-        const connection = dom.getBracketConnection(roundNumber, roundCount, matchLocation, connectFinal);
+        const connection = dom.getBracketConnection(roundNumber, roundCount, match, matchLocation, connectFinal);
         const matchLabel = lang.getMatchLabel(match.number, roundNumber, roundCount, matchLocation) + (match.child_count > 0 ? `, Bo${match.child_count}` : '');
         const originHint = lang.getOriginHint(roundNumber, roundCount, this.skipFirstRound, matchLocation);
         return this.createMatch(match, matchLocation, connection, matchLabel, originHint, roundNumber);
@@ -330,6 +330,23 @@ export class BracketsViewer {
         const matchLabel = lang.getFinalMatchLabel(type, roundNumber, roundCount);
         const originHint = lang.getFinalOriginHint(type, roundNumber);
         return this.createMatch(matches[roundIndex], 'final-group', connection, matchLabel, originHint);
+    }
+
+    /**
+     * Creates a hidden empty match to act as a placeholder.
+     */
+    private skipBracketMatch(): HTMLElement {
+        const matchContainer = dom.createMatchContainer();
+        const opponents = dom.createOpponentsContainer();
+
+        const participant1 = this.createParticipant(null, undefined);
+        const participant2 = this.createParticipant(null, undefined);
+
+        opponents.append(participant1, participant2);
+        matchContainer.append(opponents);
+        matchContainer.style.visibility = 'hidden';
+
+        return matchContainer;
     }
 
     /**
