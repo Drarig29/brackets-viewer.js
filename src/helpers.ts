@@ -1,6 +1,6 @@
 import { Match, ParticipantResult } from 'brackets-model';
 import { headers, abbreviations } from './lang';
-import { RankingHeader, Ranking, RankingFormula, RankingItem, RankingMap, BracketType } from './types';
+import { RankingHeader, Ranking, RankingFormula, RankingItem, RankingMap, BracketType, Side } from './types';
 
 /**
  * Splits an array based on values of a given key of the objects of the array.
@@ -77,15 +77,21 @@ export function completeWithBlankMatches(matches: Match[], nextMatches: Match[],
  * @param matchLocation Location of the match.
  * @param skipFirstRound Whether to skip the first round.
  * @param roundNumber Number of the round.
+ * @param side Side of the participant.
  */
-export function getOriginAbbreviation(matchLocation: string, skipFirstRound: boolean, roundNumber?: number): string {
-    if (skipFirstRound && matchLocation === 'lower-bracket' && roundNumber === 1)
+export function getOriginAbbreviation(matchLocation: BracketType, skipFirstRound: boolean, roundNumber?: number, side?: Side): string | null {
+    roundNumber = roundNumber || -1;
+
+    if (skipFirstRound && matchLocation === 'loser-bracket' && roundNumber === 1)
         return abbreviations.seed;
 
-    if (matchLocation === 'lower-bracket' || matchLocation === 'final-group')
+    if (matchLocation === 'single-bracket' || matchLocation === 'winner-bracket' && roundNumber === 1)
+        return abbreviations.seed;
+
+    if (matchLocation === 'loser-bracket' && roundNumber % 2 === 0 && side === 'opponent1')
         return abbreviations.position;
 
-    return abbreviations.seed;
+    return null;
 }
 
 /**

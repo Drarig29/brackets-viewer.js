@@ -31,6 +31,11 @@ export interface ViewerData {
 export type Placement = 'none' | 'before' | 'after';
 
 /**
+ * The possible sides of a participant.
+ */
+export type Side = 'opponent1' | 'opponent2';
+
+/**
  * An optional config to provide to `brackets-viewer.js`
  */
 export interface Config {
@@ -88,7 +93,7 @@ export type BracketType = 'single-bracket' | 'winner-bracket' | 'loser-bracket' 
 /**
  * A function returning an origin hint based on a participant's position.
  */
-export type OriginHint = ((position: number) => string) | undefined;
+export type OriginHint = (position: number) => string;
 
 /**
  * A function returning a round name based on its number and the count of rounds.
