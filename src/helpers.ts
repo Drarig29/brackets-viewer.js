@@ -52,23 +52,27 @@ export function findRoot(selector?: string): HTMLElement {
  * @param matches The list of first round matches.
  * @param nextMatches The list of second round matches.
  * @param bracketType Type of the bracket.
- * @param roundNumber Number of the round.
  */
-export function completeWithBlankMatches(matches: Match[], nextMatches: Match[], bracketType: BracketType, roundNumber: number): (Match | null)[] {
-    if (roundNumber !== 1)
-        return matches;
+export function completeWithBlankMatches(matches: Match[], nextMatches: Match[], bracketType: BracketType): {
+    matches: (Match | null)[],
+    fromToornament: boolean,
+} {
+    let sources: (number | null)[] = [];
 
-    if (bracketType === 'single-bracket' || bracketType === 'winner-bracket') {
-        const sources = nextMatches.map(match => [match.opponent1?.position || null, match.opponent2?.position || null]).flat();
-        return sources.map(source => source && matches.find(match => match.number === source) || null);
-    }
+    if (bracketType === 'single-bracket' || bracketType === 'winner-bracket')
+        sources = nextMatches.map(match => [match.opponent1?.position || null, match.opponent2?.position || null]).flat();
 
-    if (bracketType === 'loser-bracket') {
-        const sources = nextMatches.map(match => match.opponent2?.position || null);
-        return sources.map(source => source && matches.find(match => match.number === source) || null);
-    }
+    if (bracketType === 'loser-bracket')
+        sources = nextMatches.map(match => match.opponent2?.position || null);
 
-    return matches;
+    // The manager does not set positions where the Toornament layer does.
+    if (sources.filter(source => source !== null).length === 0)
+        return { matches, fromToornament: false };
+
+    return {
+        matches: sources.map(source => source && matches.find(match => match.number === source) || null),
+        fromToornament: true,
+    };
 }
 
 /**

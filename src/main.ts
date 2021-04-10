@@ -26,7 +26,8 @@ export class BracketsViewer {
     private participantImages: ParticipantImage[] = [];
 
     private config!: Config;
-    private skipFirstRound!: boolean;
+    private skipFirstRound = false;
+    private alwaysConnectFirstRound = false;
 
     /**
      * Renders data generated with `brackets-manager.js`. If multiple stages are given, they will all be displayed.
@@ -208,14 +209,18 @@ export class BracketsViewer {
         const roundCount = matchesByRound.length;
         const bracketContainer = dom.createBracketContainer(groupId);
 
+        const { matches: completedMatches, fromToornament } = completeWithBlankMatches(matchesByRound[0], matchesByRound[1], bracketType);
+
+        this.alwaysConnectFirstRound = !fromToornament;
+
         for (let roundIndex = 0; roundIndex < matchesByRound.length; roundIndex++) {
             const roundId = matchesByRound[roundIndex][0].round_id;
             const roundNumber = roundIndex + 1;
             const roundContainer = dom.createRoundContainer(roundId, roundName(roundNumber, roundCount));
 
-            const allMatches = completeWithBlankMatches(matchesByRound[roundIndex], matchesByRound[roundIndex + 1], bracketType, roundNumber);
+            const matches = fromToornament && roundNumber === 1 ? completedMatches : matchesByRound[roundIndex];
 
-            for (const match of allMatches)
+            for (const match of matches)
                 roundContainer.append(match && this.createBracketMatch(roundNumber, roundCount, match, bracketType, connectFinal) || this.skipBracketMatch());
 
             bracketContainer.append(roundContainer);
@@ -311,7 +316,7 @@ export class BracketsViewer {
      * @param connectFinal Whether to connect this match to the final if it happens to be the last one of the bracket.
      */
     private createBracketMatch(roundNumber: number, roundCount: number, match: Match, matchLocation: BracketType, connectFinal?: boolean): HTMLElement {
-        const connection = dom.getBracketConnection(roundNumber, roundCount, match, matchLocation, connectFinal);
+        const connection = dom.getBracketConnection(this.alwaysConnectFirstRound, roundNumber, roundCount, match, matchLocation, connectFinal);
         const matchLabel = lang.getMatchLabel(match.number, roundNumber, roundCount, matchLocation) + (match.child_count > 0 ? `, Bo${match.child_count}` : '');
         const originHint = lang.getOriginHint(roundNumber, roundCount, this.skipFirstRound, matchLocation);
         return this.createMatch(match, matchLocation, connection, matchLabel, originHint, roundNumber);
