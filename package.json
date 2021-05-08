@@ -31,25 +31,25 @@
     },
     "homepage": "https://github.com/Drarig29/brackets-viewer.js#readme",
     "devDependencies": {
-        "@babel/core": "^7.12.16",
-        "@typescript-eslint/eslint-plugin": "^4.15.0",
-        "@typescript-eslint/parser": "^4.15.0",
+        "@babel/core": "^7.14.0",
+        "@typescript-eslint/eslint-plugin": "^4.22.1",
+        "@typescript-eslint/parser": "^4.22.1",
         "babel-loader": "^8.2.2",
-        "css-loader": "^5.0.2",
-        "eslint": "^7.19.0",
+        "css-loader": "^5.2.4",
+        "eslint": "^7.26.0",
         "eslint-plugin-jsdoc": "^33.1.0",
         "json-server": "^0.16.3",
-        "mini-css-extract-plugin": "^1.3.6",
-        "sass": "^1.32.7",
+        "mini-css-extract-plugin": "^1.6.0",
+        "sass": "^1.32.12",
         "sass-loader": "^11.0.1",
-        "ts-loader": "^9.0.0",
-        "typescript": "^4.1.5",
-        "webpack": "^5.21.2",
-        "webpack-cli": "^4.5.0"
+        "ts-loader": "^9.1.2",
+        "typescript": "^4.2.4",
+        "webpack": "^5.36.2",
+        "webpack-cli": "^4.7.0"
     },
     "dependencies": {
         "brackets-model": "^1.3.7",
-        "i18next": "^20.0.0",
-        "i18next-browser-languagedetector": "^6.0.1"
+        "i18next": "^20.2.2",
+        "i18next-browser-languagedetector": "^6.1.0"
     }
 }
