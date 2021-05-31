@@ -37,7 +37,7 @@
         "babel-loader": "^8.2.2",
         "css-loader": "^5.2.4",
         "eslint": "^7.26.0",
-        "eslint-plugin-jsdoc": "^34.0.0",
+        "eslint-plugin-jsdoc": "^35.1.0",
         "json-server": "^0.16.3",
         "mini-css-extract-plugin": "^1.6.0",
         "sass": "^1.32.12",
