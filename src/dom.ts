@@ -90,11 +90,12 @@ export function createRoundContainer(roundId: number, title: string): HTMLElemen
  * @param matchId ID of the match.
  * @param status Status of the match.
  */
-export function createMatchContainer(matchId?: number, status?: number): HTMLElement {
+export function createMatchContainer(matchId?: number, status?: number, onClick?: () => void): HTMLElement {
     const match = document.createElement('div');
     match.classList.add('match');
     matchId !== undefined && match.setAttribute('data-match-id', matchId.toString());
     status !== undefined && match.setAttribute('data-match-status', status.toString());
+    onClick && match.addEventListener('click', () => onClick());
     return match;
 }
 

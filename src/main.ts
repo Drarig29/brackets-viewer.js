@@ -29,6 +29,8 @@ export class BracketsViewer {
     private skipFirstRound = false;
     private alwaysConnectFirstRound = false;
 
+    public onMatchClicked = (_: Match) => { };
+
     /**
      * Renders data generated with `brackets-manager.js`. If multiple stages are given, they will all be displayed.
      *
@@ -366,7 +368,7 @@ export class BracketsViewer {
      * @param roundNumber Number of the round.
      */
     private createMatch(match: Match, matchLocation?: BracketType, connection?: Connection, label?: string, originHint?: OriginHint, roundNumber?: number): HTMLElement {
-        const matchContainer = dom.createMatchContainer(match.id, match.status);
+        const matchContainer = dom.createMatchContainer(match.id, match.status, () => this.onMatchClicked(match));
         const opponents = dom.createOpponentsContainer();
 
         if (match.status >= Status.Completed)
