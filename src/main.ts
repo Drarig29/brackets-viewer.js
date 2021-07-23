@@ -29,7 +29,7 @@ export class BracketsViewer {
     private skipFirstRound = false;
     private alwaysConnectFirstRound = false;
 
-    public onMatchClicked = (_: Match) => { };
+    public onMatchClicked = (_: Match): void => { };
 
     /**
      * Renders data generated with `brackets-manager.js`. If multiple stages are given, they will all be displayed.
@@ -377,12 +377,8 @@ export class BracketsViewer {
         const participant1 = this.createParticipant(match.opponent1, 'opponent1', originHint, matchLocation, roundNumber);
         const participant2 = this.createParticipant(match.opponent2, 'opponent2', originHint, matchLocation, roundNumber);
 
-        if (label) {
-            if (match.child_count > 0 && !this.config.separatedChildCountLabel)
-                label += `, ${lang.bestOfX(match.child_count)}`;
-
+        if (label)
             opponents.append(dom.createMatchLabel(label, lang.getMatchStatus(match.status)));
-        }
 
         if (match.child_count > 0 && this.config.separatedChildCountLabel)
             opponents.append(dom.createChildCountLabel(lang.bestOfX(match.child_count)));
