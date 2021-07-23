@@ -13,8 +13,9 @@ module.exports = {
     'curly': ['error', 'multi-or-nest'],
     'brace-style': ['error', '1tbs'],
     'quotes': ['error', 'single'],
-    'semi': 'error',
     'eqeqeq': 'error',
+    'semi': 'off',
+    '@typescript-eslint/semi': ['error'],
 
     'comma-dangle': ['error', {
       'arrays': 'always-multiline',
