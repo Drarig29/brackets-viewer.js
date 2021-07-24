@@ -368,8 +368,8 @@ export class BracketsViewer {
      * @param roundNumber Number of the round.
      */
     private createMatch(match: Match, matchLocation?: BracketType, connection?: Connection, label?: string, originHint?: OriginHint, roundNumber?: number): HTMLElement {
-        const matchContainer = dom.createMatchContainer(match.id, match.status, () => this.onMatchClicked(match));
-        const opponents = dom.createOpponentsContainer();
+        const matchContainer = dom.createMatchContainer(match.id, match.status);
+        const opponents = dom.createOpponentsContainer(() => this.onMatchClicked(match));
 
         if (match.status >= Status.Completed)
             originHint = undefined;

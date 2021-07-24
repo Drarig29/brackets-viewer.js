@@ -89,14 +89,12 @@ export function createRoundContainer(roundId: number, title: string): HTMLElemen
  *
  * @param matchId ID of the match.
  * @param status Status of the match.
- * @param onClick Called when the match is clicked.
  */
-export function createMatchContainer(matchId?: number, status?: number, onClick?: () => void): HTMLElement {
+export function createMatchContainer(matchId?: number, status?: number): HTMLElement {
     const match = document.createElement('div');
     match.classList.add('match');
     matchId !== undefined && match.setAttribute('data-match-id', matchId.toString());
     status !== undefined && match.setAttribute('data-match-status', status.toString());
-    onClick && match.addEventListener('click', onClick);
     return match;
 }
 
@@ -126,10 +124,13 @@ export function createChildCountLabel(label: string): HTMLElement {
 
 /**
  * Creates a container which contains the opponents of a match.
+ *
+ * @param onClick Called when the match is clicked.
  */
-export function createOpponentsContainer(): HTMLElement {
+export function createOpponentsContainer(onClick?: () => void): HTMLElement {
     const opponents = document.createElement('div');
     opponents.classList.add('opponents');
+    onClick && opponents.addEventListener('click', onClick);
     return opponents;
 }
 
