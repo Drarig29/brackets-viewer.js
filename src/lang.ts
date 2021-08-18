@@ -176,6 +176,8 @@ export function getMatchStatus(status: Status): string {
             return i18n('match-status', 'completed');
         case Status.Archived:
             return i18n('match-status', 'archived');
+        default:
+            return 'Unknown status';
     }
 }
 
