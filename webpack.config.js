@@ -1,4 +1,5 @@
 const path = require('path');
+const webpack = require('webpack');
 const MiniCssExtractPlugin = require('mini-css-extract-plugin');
 
 module.exports = {
@@ -6,9 +7,17 @@ module.exports = {
         new MiniCssExtractPlugin({
             filename: 'brackets-viewer.min.css',
         }),
+        new webpack.ProvidePlugin({
+            process: 'process/browser',
+        }),
     ],
     resolve: {
         extensions: ['.ts', '.js'],
+        fallback: {
+            path: require.resolve("path-browserify"),
+            util: require.resolve("util/"),
+            fs: false
+        }
     },
     entry: './src/main.ts',
     output: {

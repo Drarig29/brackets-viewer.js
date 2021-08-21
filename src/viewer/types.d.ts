@@ -1,6 +1,6 @@
 import { Stage, Match, MatchGame, Participant } from 'brackets-model';
 import { BracketsViewer } from './main';
-import { locales } from './i18n';
+import { locales } from '../i18n';
 
 declare global {
     interface Window {

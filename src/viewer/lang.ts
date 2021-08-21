@@ -1,6 +1,6 @@
 import i18next, { StringMap, TOptions } from 'i18next';
 import LanguageDetector from 'i18next-browser-languagedetector';
-import { locales } from './i18n';
+import { locales } from '../i18n';
 
 import { Status } from 'brackets-model';
 import { isMajorRound } from './helpers';
