@@ -3,7 +3,6 @@ const webpack = require('webpack');
 const MiniCssExtractPlugin = require('mini-css-extract-plugin');
 
 var config = {
-    // TODO: Add common Configuration
     module: {},
 };
 
@@ -79,43 +78,3 @@ var stageFormCreatorConfig = Object.assign({}, config,{
 module.exports = [
     bracketsViewerConfig, stageFormCreatorConfig,
 ];
-
-// module.exports = {
-//     plugins: [
-//         new MiniCssExtractPlugin({
-//             filename: 'brackets-viewer.min.css',
-//         }),
-//         new webpack.ProvidePlugin({
-//             process: 'process/browser',
-//         }),
-//     ],
-//     resolve: {
-//         extensions: ['.ts', '.js'],
-//         fallback: {
-//             path: require.resolve("path-browserify"),
-//             util: require.resolve("util/"),
-//             fs: false
-//         }
-//     },
-//     entry: './src/main.ts',
-//     output: {
-//         path: path.resolve(__dirname, 'dist'),
-//         filename: 'brackets-viewer.min.js',
-//     },
-//     module: {
-//         rules: [
-//             {
-//                 test: /\.ts$/,
-//                 use: ['babel-loader', 'ts-loader'],
-//             },
-//             {
-//                 test: /\.scss$/,
-//                 use: [
-//                     MiniCssExtractPlugin.loader,
-//                     'css-loader',
-//                     'sass-loader',
-//                 ],
-//             },
-//         ],
-//     },
-// };

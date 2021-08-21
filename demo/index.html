@@ -6,7 +6,7 @@
     <link rel="stylesheet" href="../dist/brackets-viewer.min.css"/>
     <script type="text/javascript" src="../dist/brackets-viewer.min.js"></script>
 
-    <title>Create and view Brackets</title>
+    <title>Create and view Stages</title>
 
     <link rel="stylesheet" href="themes/global.css"/>
 
@@ -26,11 +26,40 @@
     const config = {
         parent_id: 'createNewBracket',
         html_name_id: 'name',
-        html_stage_type_selector_id: 'selector'
+        html_stage_type_selector_id: 'selector',
+        html_team_input_id: 'teams',
+        html_group_id: 'groups',
+        html_seed_order_id: 'seeds',
+        html_round_robin_mode_id: 'round-robin-mode',
+
+        group_default_size: 0
     }
 
     window.stageFormCreator(config, function (config) {
-        console.log(config);
+        (async function () {
+            await window.bracketsManager.create(config)
+                .then(() => {
+                    const rawStoredBrackets = localStorage.getItem(BRACKETS);
+
+                    if (null === rawStoredBrackets || '' === rawStoredBrackets) {
+                        localStorage.setItem(BRACKETS, JSON.stringify({
+                            0: window.inMemoryDatabase.data,
+                        }));
+
+                        window.location.href = '?id=0';
+                    }
+
+                    let storedBrackets = JSON.parse(rawStoredBrackets);
+                    console.log(storedBrackets);
+
+                    let index = Object.keys(storedBrackets).length;
+                    storedBrackets[index] = window.inMemoryDatabase.data;
+
+                    localStorage.setItem(BRACKETS, JSON.stringify(storedBrackets));
+
+                    window.location.href = '?id=' + index;
+                });
+        })();
     });
 </script>
 

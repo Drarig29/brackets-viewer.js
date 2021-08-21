@@ -96,6 +96,12 @@
         "stage_name_label": "Name your stage",
         "stage_name_placeholder": "Give a name for your stage",
         "stage_selector_label": "Select a bracket",
-        "submit": "Submit"
+        "team_label": "Name your teams",
+        "team_placeholder": "Comma seperated List of Team Names (must be 2^n)",
+        "group_label": "How many groups?",
+        "group_placeholder": "How many groups do you want?",
+        "seed_order_label": "How would you like to order your seeds?",
+        "round_robin_mode_label": "Which round robin mode do you like?",
+        "submit": "Create"
     }
 }

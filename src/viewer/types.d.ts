@@ -1,4 +1,4 @@
-import {Stage, Match, MatchGame, Participant, InputStage} from 'brackets-model';
+import {Stage, Match, MatchGame, Participant} from 'brackets-model';
 import InMemoryDatabase from '../manager/inMemoryDatabase';
 import BracketsViewer from './braketsViewer';
 import { locales } from '../i18n';

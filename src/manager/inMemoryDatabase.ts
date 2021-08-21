@@ -11,17 +11,6 @@ export default class InMemoryDatabase implements CrudInterface{
         match_game: [],
     };
 
-    constructor() {
-        this.data = {
-            participant: [],
-            stage: [],
-            group: [],
-            round: [],
-            match: [],
-            match_game: [],
-        };
-    }
-
     setData(data: Database): void {
         this.data = data;
     }
