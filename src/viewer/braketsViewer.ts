@@ -410,10 +410,11 @@ export default class BracketsViewer {
             result: dom.createResultContainer(),
         };
 
-        if (participant === null)
+        if (participant === null || participant === undefined) {
             containers.name.innerText = lang.BYE;
-        else
+        } else {
             this.renderParticipant(containers, participant, side, originHint, matchLocation, roundNumber);
+        }
 
         containers.participant.append(containers.name, containers.result);
 

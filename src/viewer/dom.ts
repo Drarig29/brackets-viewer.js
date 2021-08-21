@@ -143,7 +143,7 @@ export function createParticipantContainer(participantId: number | null): HTMLEl
     const participant = document.createElement('div');
     participant.classList.add('participant');
 
-    if (participantId !== null)
+    if (participantId !== null && participantId !== undefined)
         participant.setAttribute('data-participant-id', participantId.toString());
 
     return participant;
