@@ -7,7 +7,7 @@ import {BracketsManager} from 'brackets-manager';
 declare global {
     interface Window {
         bracketsViewer: BracketsViewer,
-        inMemoryDatabase: InMemoryDatabase.InMemoryDatabase,
+        inMemoryDatabase: InMemoryDatabase,
         bracketsManager: BracketsManager,
     }
 }
