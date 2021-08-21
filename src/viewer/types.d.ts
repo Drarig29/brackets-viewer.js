@@ -1,10 +1,14 @@
 import { Stage, Match, MatchGame, Participant } from 'brackets-model';
-import { BracketsViewer } from './main';
+import InMemoryDatabase from '../manager/inMemoryDatabase';
+import BracketsViewer from './braketsViewer';
 import { locales } from '../i18n';
+import {BracketsManager} from 'brackets-manager';
 
 declare global {
     interface Window {
         bracketsViewer: BracketsViewer,
+        inMemoryDatabase: InMemoryDatabase.InMemoryDatabase,
+        bracketsManager: BracketsManager,
     }
 }
 

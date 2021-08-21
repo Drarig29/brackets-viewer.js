@@ -18,38 +18,48 @@
 
     <script>
         (async function () {
-            const data = await fetch('http://localhost:3000/db')
-                .catch(() => alert('Failed to fetch localhost. Please do `npm run db` or use json-server your own way.'))
-                .then(res => res.json());
+            console.log(inMemoryDatabase);
 
-            // You can manually add locales. English will be used as a fallback if keys are missing.
-            // You can force browser language detection by setting the `i18nextLng` property to a locale key (ex: 'ru') in the localStorage.
-            bracketsViewer.addLocale('ru', {
-                "origin-hint": {
-                    "seed": "семя {{position}}",
-                }
-            });
+            const example = {
+                name: 'Example',
+                tournamentId: 0,
+                type: 'single_elimination',
+                seeding: [
+                    'Team 1', 'Team 2',
+                    'Team 3', 'Team 4',
+                    'Team 5', 'Team 6',
+                    'Team 7', 'Team 8',
+                    'Team 9', 'Team 10',
+                    'Team 11', 'Team 12',
+                    'Team 13', 'Team 14',
+                    'Team 15', 'Team 16',
+                ],
+                settings: { seedOrdering: ['natural'] },
+            };
 
-            // This is optional. You must do it before render().
-            bracketsViewer.setParticipantImages(data.participant.map(participant => ({
-                participantId: participant.id,
-                imageUrl: 'https://github.githubassets.com/pinned-octocat.svg',
-            })));
+            const data = await bracketsManager.create(example)
+            .then(() => {
+                // This is optional. You must do it before render().
+                bracketsViewer.setParticipantImages(inMemoryDatabase.data.participant.map(participant => ({
+                    participantId: participant.id,
+                    imageUrl: 'https://github.githubassets.com/pinned-octocat.svg',
+                })));
 
-            bracketsViewer.onMatchClicked = match => console.log(match)
+                bracketsViewer.onMatchClicked = match => console.log(match)
 
-            bracketsViewer.render({
-                stages: data.stage,
-                matches: data.match,
-                matchGames: data.match_game,
-                participants: data.participant,
-            }, {
-                selector: '#example',
-                participantOriginPlacement: 'before',
-                separatedChildCountLabel: true,
-                showSlotsOrigin: true,
-                showLowerBracketSlotsOrigin: true,
-                highlightParticipantOnHover: true,
+                bracketsViewer.render({
+                    stages: inMemoryDatabase.data.stage,
+                    matches: inMemoryDatabase.data.match,
+                    matchGames: inMemoryDatabase.data.match_game,
+                    participants: inMemoryDatabase.data.participant,
+                }, {
+                    selector: '#example',
+                    participantOriginPlacement: 'before',
+                    separatedChildCountLabel: true,
+                    showSlotsOrigin: true,
+                    showLowerBracketSlotsOrigin: true,
+                    highlightParticipantOnHover: true,
+                });
             });
         })();
     </script>
