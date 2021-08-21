@@ -91,5 +91,11 @@
         "round-name-winner-bracket-final": "WB Final Round",
         "round-name-loser-bracket": "LB Round {{roundNumber}}",
         "round-name-loser-bracket-final": "LB Final Round"
+    },
+    "form-creator": {
+        "stage_name_label": "Name your stage",
+        "stage_name_placeholder": "Give a name for your stage",
+        "stage_selector_label": "Select a bracket",
+        "submit": "Submit"
     }
 }
