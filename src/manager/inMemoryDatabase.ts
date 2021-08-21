@@ -11,6 +11,9 @@ export default class InMemoryDatabase implements CrudInterface{
         match_game: [],
     };
 
+    /**
+     * @param data "import" data from external
+     */
     setData(data: Database): void {
         this.data = data;
     }
@@ -25,6 +28,9 @@ export default class InMemoryDatabase implements CrudInterface{
         };
     }
 
+    /**
+     * Clearing all of the data
+     */
     reset() {
         this.data = {
             participant: [],
@@ -48,8 +54,8 @@ export default class InMemoryDatabase implements CrudInterface{
     /**
      * Implementation of insert
      *
-     * @param table
-     * @param values
+     * @param table Where to insert.
+     * @param values What to insert.
      */
     insert<T>(table: Table, values: OmitId<T>|OmitId<T>[]): Promise<number>|Promise<boolean> {
         let id: number;
@@ -109,7 +115,8 @@ export default class InMemoryDatabase implements CrudInterface{
     select<T>(table: Table, filter: Partial<T>): Promise<T[] | null>;
 
     /**
-     *
+     * @param table Where to get from.
+     * @param arg
      */
     select<T>(table: Table, arg?: number|Partial<T>): Promise<T[] | null>  {
         try {
@@ -159,6 +166,13 @@ export default class InMemoryDatabase implements CrudInterface{
      */
     update<T>(table: Table, filter: Partial<T>, value: Partial<T>): Promise<boolean>;
 
+    /**
+     * Updates data in a table.
+     *
+     * @param table Where to update.
+     * @param arg
+     * @param value How to update.
+     */
     update<T>(table: Table, arg: number|Partial<T>, value?: Partial<T>): Promise<boolean> {
         if (typeof arg === 'number') {
             try {
@@ -213,6 +227,12 @@ export default class InMemoryDatabase implements CrudInterface{
      */
     delete<T>(table: Table, filter: Partial<T>): Promise<boolean>;
 
+    /**
+     * Delete data in a table, based on a filter.
+     *
+     * @param table Where to delete in.
+     * @param filter An object to filter data.
+     */
     delete<T>(table: Table, filter?: Partial<T>): Promise<boolean> {
         const values = this.data[table];
         if (!values) {
