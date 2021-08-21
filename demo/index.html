@@ -19,13 +19,45 @@
 
 <!-- This div will be used as the root for the library. It must be **perfectly** empty to prevent a FOUC. -->
 <div id="bracketsViewerExample" class="brackets-viewer"></div>
+<div id="createNewBracket">
+    <label for="bracket-name">Name:</label>
+    <input type="text" id="bracket-name"><br>
+
+    <label for="bracket-choice">Which bracket type?</label>
+    <select name="bracket-choice" id="bracket-choice">
+        <option>single_elimination</option>
+        <option>double_elimination</option>
+        <option>round_robin</option>
+    </select><br>
+
+    <label for="team-amount">How many teams?</label>
+    <input type="number" id="team-amount" value="8"><br>
+
+    <label for="group-amount">How many groups?</label>
+    <input type="number" id="group-amount" value="0"><br>
+
+    <label for="seed-order">Seed order</label>
+    <select id="seed-order">
+        <option>none</option>
+        <option>natural</option>
+        <option>reverse</option>
+        <option>half_shift</option>
+        <option>reverse_half_shift</option>
+        <option>pair_flip</option>
+        <option>inner_outer</option>
+    </select><br>
+
+    <button id="create-new-bracket">Create</button>
+</div>
+
 
 <div id="input-mask">
     <div>
         <label id="opponent1-label" for="opponent1">Opponent 1: </label><input type="number" id="opponent1"><br>
         <label id="opponent2-label" for="opponent2">Opponent 2: </label><input type="number" id="opponent2"><br>
         <p>Who won?</p>
-        <input type="radio" id="won-opponent1" value="opponent1" name="won" checked><label for="won-opponent1">Opponent1</label><br>
+        <input type="radio" id="won-opponent1" value="opponent1" name="won" checked><label
+            for="won-opponent1">Opponent1</label><br>
         <input type="radio" id="won-opponent2" value="opponent2" name="won"><label for="won-opponent2">Opponent2</label><br>
         <input type="radio" id="won-draw" value="draw" name="won"><label for="won-draw">Draw</label><br><br>
         <button id="input-submit">Submit</button>
@@ -44,6 +76,109 @@
     const ELEMENT_ID = 'bracketsViewerExample';
     const urlParams = new URLSearchParams(window.location.search);
     const id = urlParams.get('id');
+
+    let groupAmount = document.getElementById('group-amount');
+    groupAmount.onchange = () => {
+        if (groupAmount.value > 0) {
+            let optionGroupsBalanced = document.createElement('option');
+            optionGroupsBalanced.id = 'groups_balanced';
+            optionGroupsBalanced.innerText = 'groups.effort_balanced';
+
+            let optionGroupsSeedOptimized = document.createElement('option');
+            optionGroupsSeedOptimized.id = 'groups_seed_optimized';
+            optionGroupsSeedOptimized.innerText = 'groups.seed_optimized';
+
+            let optionGroupsBracketsOptimized = document.createElement('option');
+            optionGroupsBracketsOptimized.id = 'groups_brackets_optimized';
+            optionGroupsBracketsOptimized.innerText = 'groups.bracket_optimized';
+
+            let optionSwitch = document.getElementById('seed-order');
+            optionSwitch.appendChild(optionGroupsBalanced);
+            optionSwitch.appendChild(optionGroupsSeedOptimized);
+            optionSwitch.appendChild(optionGroupsBracketsOptimized);
+        } else {
+            let optionGroupsBalanced = document.getElementById('groups_balanced');
+            let optionGroupsSeedOptimized = document.getElementById('groups_seed_optimized');
+            let optionGroupsBracketsOptimized = document.getElementById('groups_brackets_optimized');
+
+            optionGroupsBalanced.remove();
+            optionGroupsSeedOptimized.remove();
+            optionGroupsBracketsOptimized.remove();
+        }
+    }
+
+    let createNewBracketBtn = document.getElementById('create-new-bracket');
+    createNewBracketBtn.onclick = () => {
+        const name = document.getElementById('bracket-name').value;
+        const type = document.getElementById('bracket-choice').value;
+
+        let seeding = [];
+        for (var i = 0; i < document.getElementById('team-amount').value; i++) {
+            seeding.push('Team ' + (i + 1));
+        }
+
+        let settings = {};
+        const seedOrder = document.getElementById('seed-order').value;
+        const groupCount = document.getElementById('group-amount').value;
+
+        if (seedOrder !== 'none') {
+            settings['seedOrdering'] = [ seedOrder ];
+        }
+
+        if (groupCount > 0) {
+            settings['groupCount'] = groupCount;
+        }
+
+        (async function () {
+            const data = {
+                name: name,
+                tournamentId: 0,
+                type: type,
+                seeding: seeding,
+                settings: settings,
+            };
+
+            await window.bracketsManager.create(data)
+                .then(() => {
+                    const rawStoredBrackets = localStorage.getItem(BRACKETS);
+
+                    if (null === rawStoredBrackets || '' === rawStoredBrackets) {
+                        localStorage.setItem(BRACKETS, JSON.stringify({
+                            0: window.inMemoryDatabase.data,
+                        }));
+
+                        window.location.href = '?id=0';
+                    }
+
+                    let storedBrackets = JSON.parse(rawStoredBrackets);
+                    console.log(storedBrackets);
+
+                    let index = Object.keys(storedBrackets).length;
+                    storedBrackets[index] = window.inMemoryDatabase.data;
+
+                    localStorage.setItem(BRACKETS, JSON.stringify(storedBrackets));
+
+                    window.location.href = '?id=' + index;
+                });
+        })();
+    }
+
+    function listBrackets() {
+        const storageData = JSON.parse(localStorage.getItem(BRACKETS));
+        let bracketsList = document.createElement('ul');
+
+        for (const [key, value] of Object.entries(storageData)) {
+            let bracketItem = document.createElement('li');
+            let bracketLink = document.createElement('a');
+            bracketLink.href = '?id=' + key;
+            bracketLink.innerText = 'Go to ID: ' + key;
+
+            bracketItem.appendChild(bracketLink);
+            bracketsList.appendChild(bracketItem);
+        }
+
+        document.body.insertBefore(bracketsList, document.getElementById(ELEMENT_ID));
+    }
 
     function renderBracket(data) {
         window.bracketsViewer.render({
@@ -79,7 +214,7 @@
         })));
 
         window.bracketsViewer.onMatchClicked = match => {
-            (async function() {
+            (async function () {
                 console.log(match);
                 let inputMask = document.getElementById(INPUT_MASK);
                 inputMask.style.display = 'flex';
@@ -137,64 +272,19 @@
 
     (() => {
         if (null === id || '' === id) {
-            console.log('new creation');
+            listBrackets();
 
             return;
         }
 
+        backLink = document.createElement('a');
+        backLink.href = '?id';
+        backLink.innerText = 'Go back';
+        document.body.insertBefore(backLink, document.getElementById(ELEMENT_ID));
+
         createBracket(id);
     })();
 </script>
-
-<!--<script>-->
-<!--    (async function () {-->
-<!--        const example = {-->
-<!--            name: 'Example',-->
-<!--            tournamentId: 0,-->
-<!--            type: 'round_robin',-->
-<!--            seeding: [-->
-<!--                'Team 1', 'Team 2',-->
-<!--                'Team 3', 'Team 4',-->
-<!--                'Team 5', 'Team 6',-->
-<!--                'Team 7', 'Team 8',-->
-<!--            ],-->
-<!--            settings: {groupCount: 2},-->
-<!--        };-->
-
-<!--        const data = await bracketsManager.create(example)-->
-<!--            .then(() => {-->
-<!--                const storedBrackets = localStorage.getItem(BRACKETS);-->
-
-<!--                if (null === storedBrackets || '' === storedBrackets) {-->
-<!--                    localStorage.setItem(BRACKETS, JSON.stringify({-->
-<!--                        0: window.inMemoryDatabase.data,-->
-<!--                    }));-->
-<!--                }-->
-
-<!--                // This is optional. You must do it before render().-->
-<!--                bracketsViewer.setParticipantImages(inMemoryDatabase.data.participant.map(participant => ({-->
-<!--                    participantId: participant.id,-->
-<!--                    imageUrl: 'https://github.githubassets.com/pinned-octocat.svg',-->
-<!--                })));-->
-
-<!--                //bracketsViewer.onMatchClicked = match => console.log(match)-->
-
-<!--                bracketsViewer.render({-->
-<!--                    stages: inMemoryDatabase.data.stage,-->
-<!--                    matches: inMemoryDatabase.data.match,-->
-<!--                    matchGames: inMemoryDatabase.data.match_game,-->
-<!--                    participants: inMemoryDatabase.data.participant,-->
-<!--                }, {-->
-<!--                    selector: '#example',-->
-<!--                    participantOriginPlacement: 'before',-->
-<!--                    separatedChildCountLabel: true,-->
-<!--                    showSlotsOrigin: true,-->
-<!--                    showLowerBracketSlotsOrigin: true,-->
-<!--                    highlightParticipantOnHover: true,-->
-<!--                });-->
-<!--            });-->
-<!--    })();-->
-<!--</script>-->
 </body>
 
 </html>
