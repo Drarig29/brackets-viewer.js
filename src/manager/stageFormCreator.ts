@@ -1,4 +1,4 @@
-import {InputStage, RoundRobinMode, SeedOrdering, StageSettings, StageType} from 'brackets-model';
+import {GrandFinalType, InputStage, RoundRobinMode, SeedOrdering, StageSettings, StageType} from 'brackets-model';
 import {i18n} from '../viewer/lang';
 
 const stages = ['round_robin', 'single_elimination', 'double_elimination'];
@@ -7,6 +7,8 @@ const roundRobinMode = ['simple', 'double'];
 const roundRobinSeeds = ['groups.effort_balanced', 'groups.seed_optimized', 'groups.bracket_optimized'];
 
 const eliminationSeeds = ['natural', 'reverse', 'half_shift', 'reverse_half_shift', 'pair_flip', 'inner_outer'];
+
+const grandFinalTypes = ['none', 'simple', 'double'];
 
 export type CallbackFunction = (config: InputStage) => void;
 
@@ -19,6 +21,9 @@ export type FormConfiguration = {
     html_seed_order_id: string
     html_round_robin_mode_id: string
     html_consolation_final_checkbox_id: string
+    html_skip_first_round_checkbox_id: string
+    html_grand_final_type_id: string
+    html_double_elimination_seed_textarea_id: string
 
     group_default_size: number
 };
@@ -149,6 +154,22 @@ function createMaskFields(config: FormConfiguration, stage: StageType, parent: H
 
             break;
         case 'double_elimination':
+            // Consolation Final
+            createInput(parent, 'checkbox', config.html_consolation_final_checkbox_id, i18n('form-creator', 'consolation_final_label'));
+
+            // Skip first round
+            createInput(parent, 'checkbox', config.html_skip_first_round_checkbox_id, i18n('form-creator', 'skip_first_round_label'));
+
+            // Grand final types
+            createSelect(parent, config.html_grand_final_type_id, i18n('form-creator', 'grand_final_type_label'), grandFinalTypes);
+
+            // Seed orders
+            createTextarea(
+                parent,
+                config.html_double_elimination_seed_textarea_id,
+                i18n('form-creator', 'seed_order_label'),
+                i18n('form-creator', 'double_elimination_seed_order_placeholder'),
+            );
 
             break;
         case 'single_elimination':
@@ -199,8 +220,31 @@ function createMaskFields(config: FormConfiguration, stage: StageType, parent: H
                 };
 
                 break;
-            case 'double_elimination': // TODO
-                throw new DOMException('not implemented yet');
+            case 'double_elimination':
+                validateDoubleElimination(config);
+
+                const rawSeedOrder = (<HTMLTextAreaElement>document.getElementById(config.html_double_elimination_seed_textarea_id)).value.split(',');
+                const seedOrder: SeedOrdering[] = [];
+
+                for (const i in rawSeedOrder)
+                    seedOrder.push(<SeedOrdering>rawSeedOrder[i].trim());
+
+                const doubleEliminationSettings: StageSettings = {
+                    seedOrdering: seedOrder,
+                    consolationFinal: (<HTMLInputElement>document.getElementById(config.html_consolation_final_checkbox_id)).checked,
+                    skipFirstRound: (<HTMLInputElement>document.getElementById(config.html_skip_first_round_checkbox_id)).checked,
+                    grandFinal: <GrandFinalType>(<HTMLSelectElement>document.getElementById(config.html_grand_final_type_id)).value,
+                };
+
+                responsingData = {
+                    name: (<HTMLInputElement>document.getElementById(config.html_name_id)).value ?? '',
+                    seeding: (<HTMLTextAreaElement>document.getElementById(config.html_team_input_id)).value.split(','),
+                    settings: doubleEliminationSettings,
+                    tournamentId: 0,
+                    type: stage,
+                };
+
+                break;
             case 'single_elimination':
                 validateSingleElimination(config);
 
@@ -228,6 +272,33 @@ function createMaskFields(config: FormConfiguration, stage: StageType, parent: H
     };
 
     parent.appendChild(submitBtnWrapper);
+}
+
+/**
+ * validates everything for the double_elimination stage
+ *
+ * @param config FormConfig
+ */
+function validateDoubleElimination(config: FormConfiguration): void {
+    baseValidation(config);
+
+    const grandFinalType = (<HTMLSelectElement>document.getElementById(config.html_grand_final_type_id)).value;
+    if (!grandFinalType || !grandFinalTypes.includes(grandFinalType))
+        throw new DOMException('grand_final_type must be one of: ' + grandFinalTypes.toString());
+
+    const seedOrder = (<HTMLTextAreaElement>document.getElementById(config.html_double_elimination_seed_textarea_id)).value.split(',');
+    for (const i in seedOrder) {
+        if (seedOrder[i] === '') {
+            delete seedOrder[i];
+            continue;
+        }
+
+        const seed = seedOrder[i].trim();
+
+        if (!eliminationSeeds.includes(seed))
+            throw new DOMException('elimination seed_order wrong found: ' + seed + 'must be one of: ' + eliminationSeeds.toString());
+
+    }
 }
 
 /**
