@@ -284,3 +284,15 @@
 #input-mask > div {
   text-align: center;
 }
+
+#createNewBracket > div {
+  display: grid;
+  grid-template-columns: 1fr 2fr;
+  margin: 5px;
+  align-items: center;
+  justify-content: center;
+}
+
+#createNewBracket > div:last-child {
+  grid-template-columns: 1fr;
+}
