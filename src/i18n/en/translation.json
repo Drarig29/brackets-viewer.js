@@ -102,6 +102,7 @@
         "group_placeholder": "How many groups do you want?",
         "seed_order_label": "How would you like to order your seeds?",
         "round_robin_mode_label": "Which round robin mode do you like?",
+        "consolation_final_label": "Consolation Final",
         "submit": "Create"
     }
 }

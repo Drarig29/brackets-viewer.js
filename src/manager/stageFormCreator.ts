@@ -18,6 +18,7 @@ export type FormConfiguration = {
     html_group_id: string
     html_seed_order_id: string
     html_round_robin_mode_id: string
+    html_consolation_final_checkbox_id: string
 
     group_default_size: number
 };
@@ -154,6 +155,9 @@ function createMaskFields(config: FormConfiguration, stage: StageType, parent: H
             // Seed ordering
             createSelect(parent, config.html_seed_order_id, i18n('form-creator', 'seed_order_label'), eliminationSeeds);
 
+            // Consolation Final
+            createInput(parent, 'checkbox', config.html_consolation_final_checkbox_id, i18n('form-creator', 'consolation_final_label'));
+
             break;
         default:
             throw new DOMException('stage ' + stage + ' seems to be not implemented yet.');
@@ -197,13 +201,14 @@ function createMaskFields(config: FormConfiguration, stage: StageType, parent: H
                 break;
             case 'double_elimination': // TODO
                 throw new DOMException('not implemented yet');
-            case 'single_elimination': // TODO
+            case 'single_elimination':
                 validateSingleElimination(config);
 
                 const singleEliminationSettings: StageSettings = {
                     seedOrdering: [
                         (<SeedOrdering>(<HTMLInputElement>document.getElementById(config.html_seed_order_id)).value ?? 'natural'),
                     ],
+                    consolationFinal: (<HTMLInputElement>document.getElementById(config.html_consolation_final_checkbox_id)).checked,
                 };
 
                 responsingData = {
@@ -311,12 +316,12 @@ function createTextarea(parent: HTMLElement, textareaId: string, labelText: stri
  * @param inputType input type
  * @param inputId the id for the input
  * @param labelText the label text for the input
- * @param inputPlaceholder the placeholder for the input
+ * @param inputPlaceholder the placeholder for the input - if NULL or UNDEFINED this is not set
  * @param inputDefaultValue the default value for the input - if NULL or UNDEFINED this is not set
  * @param inputMinValue the min value for the input - if NULL or UNDEFINED this is not set
  * @param inputMinLengthValue the minLength value for the input - if NULL or UNDEFINED this is not set
  */
-function createInput(parent: HTMLElement, inputType: string, inputId: string, labelText: string, inputPlaceholder: string, inputDefaultValue?: string, inputMinValue?: string, inputMinLengthValue?: number): void {
+function createInput(parent: HTMLElement, inputType: string, inputId: string, labelText: string, inputPlaceholder?: string, inputDefaultValue?: string, inputMinValue?: string, inputMinLengthValue?: number): void {
     const wrapper = document.createElement('div');
 
     const label = document.createElement('label');
@@ -325,8 +330,10 @@ function createInput(parent: HTMLElement, inputType: string, inputId: string, la
 
     const input = document.createElement('input');
     input.type = inputType;
-    input.placeholder = inputPlaceholder;
     input.id = inputId;
+
+    if (null !== inputPlaceholder && undefined !== inputPlaceholder)
+        input.placeholder = inputPlaceholder;
 
     if (null !== inputDefaultValue && undefined !== inputDefaultValue) 
         input.value = inputDefaultValue;
