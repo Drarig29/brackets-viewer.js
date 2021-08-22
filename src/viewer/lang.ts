@@ -1,21 +1,35 @@
 import i18next, { StringMap, TOptions } from 'i18next';
 import LanguageDetector from 'i18next-browser-languagedetector';
-import { locales } from '../i18n';
 
 import { Status } from 'brackets-model';
 import { isMajorRound } from './helpers';
-import { Locales, Locale, FinalType, BracketType, OriginHint, RankingHeaders, RankingHeader } from './types';
+import { FinalType, BracketType, OriginHint, RankingHeaders, RankingHeader } from './types';
 
-export { i18next };
+import en from '../i18n/en/translation.json';
+import fr from '../i18n/fr/translation.json';
+
+export const locales = {
+    en,
+    fr,
+};
+
+export type Locale = typeof locales['en'];
 
 i18next.use(LanguageDetector).init({
     fallbackLng: 'en',
-    debug: true,
-    resources: {},
-});
+    debug: false,
+    resources: {
+        en: {
+            translation: locales.en,
+        },
+        fr: {
+            translation: locales.fr,
+        },
+    },
+},
+    undefined);
 
-// Load locale bundles.
-Object.keys(locales).forEach((lang: string) => i18next.addResourceBundle(lang, 'translation', (locales as Locales)[lang]));
+export { i18next };
 
 /**
  * Returns an internationalized version of a locale key.

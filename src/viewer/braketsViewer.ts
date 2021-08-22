@@ -13,7 +13,6 @@ import {
     RankingItem,
     RoundName,
     ViewerData,
-    Locale,
     ParticipantImage,
     Side,
 } from './types';
@@ -61,17 +60,6 @@ export default class BracketsViewer {
         }));
 
         findRoot(config?.selector).append(root);
-    }
-
-    /**
-     * Adds a locale to the available i18n bundles.
-     *
-     * @param name Name of the locale.
-     * @param locale Contents of the locale.
-     */
-    public addLocale(name: string, locale: Locale): void {
-        lang.i18next.addResourceBundle(name, 'translation', locale);
-        lang.i18next.changeLanguage();
     }
 
     /**
@@ -410,11 +398,11 @@ export default class BracketsViewer {
             result: dom.createResultContainer(),
         };
 
-        if (participant === null || participant === undefined) {
+        if (participant === null || participant === undefined) 
             containers.name.innerText = lang.BYE;
-        } else {
+         else 
             this.renderParticipant(containers, participant, side, originHint, matchLocation, roundNumber);
-        }
+        
 
         containers.participant.append(containers.name, containers.result);
 
