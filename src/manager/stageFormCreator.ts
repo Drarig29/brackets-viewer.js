@@ -1,6 +1,11 @@
 import {InputStage, RoundRobinMode, SeedOrdering, StageSettings, StageType} from 'brackets-model';
 import {i18n} from '../viewer/lang';
 
+const stages = ['round_robin', 'single_elimination', 'double_elimination'];
+
+const roundRobinMode = ['simple', 'double'];
+const roundRobinSeeds = ['groups.effort_balanced', 'groups.seed_optimized', 'groups.bracket_optimized'];
+
 export type CallbackFunction = (config: InputStage) => void;
 
 export type FormConfiguration = {
@@ -35,6 +40,9 @@ export default function stageFormCreator(configuration: FormConfiguration, submi
         configuration.html_name_id,
         i18n('form-creator', 'stage_name_label'),
         i18n('form-creator', 'stage_name_placeholder'),
+        undefined,
+        undefined,
+        1,
     );
 
     // Teams
@@ -46,7 +54,6 @@ export default function stageFormCreator(configuration: FormConfiguration, submi
     );
 
     // Stage selector
-    const stages = ['round_robin', 'single_elimination', 'double_elimination'];
     createSelect(parent, configuration.html_stage_type_selector_id, i18n('form-creator', 'stage_selector_label'), stages);
 
     const stageSelector = document.getElementById(configuration.html_stage_type_selector_id);
@@ -112,14 +119,13 @@ function createMaskFields(config: FormConfiguration, stage: StageType, parent: H
                 i18n('form-creator', 'group_label'),
                 i18n('form-creator', 'group_placeholder'),
                 config.group_default_size.toString(),
+                '1',
             );
 
             // Seed ordering
-            const roundRobinSeeds = ['groups.effort_balanced', 'groups.seed_optimized', 'groups.bracket_optimized'];
             createSelect(parent, config.html_seed_order_id, i18n('form-creator', 'seed_order_label'), roundRobinSeeds);
 
             // Round robin mode
-            const roundRobinMode = ['simple', 'double'];
             createSelect(parent, config.html_round_robin_mode_id, i18n('form-creator', 'round_robin_mode_label'), roundRobinMode);
 
             break;
@@ -136,6 +142,7 @@ function createMaskFields(config: FormConfiguration, stage: StageType, parent: H
     const submitBtnWrapper = document.createElement('div');
     const submitBtn = document.createElement('button');
     submitBtn.innerText = i18n('form-creator', 'submit');
+    submitBtn.type = 'submit';
 
     submitBtnWrapper.appendChild(submitBtn);
 
@@ -144,7 +151,12 @@ function createMaskFields(config: FormConfiguration, stage: StageType, parent: H
 
         switch (stage) {
             case 'round_robin':
-                // TODO !Number.isInteger(Math.log2(participantCount)) in validator
+                try {
+                    validateRoundRobin(config);
+                } catch (e) {
+                    alert(e.message);
+                    return;
+                }
 
                 const settings: StageSettings = {
                     seedOrdering: [
@@ -178,6 +190,46 @@ function createMaskFields(config: FormConfiguration, stage: StageType, parent: H
 }
 
 /**
+ * validates everything for a round_robin stage
+ *
+ * @param config FormConfiguration
+ */
+function validateRoundRobin(config: FormConfiguration): void {
+    baseValidation(config);
+
+    const groupAmount = parseInt((<HTMLInputElement>document.getElementById(config.html_group_id)).value);
+    if (groupAmount <= 0)
+        throw new DOMException('group_amount must be equal or bigger than 1');
+
+    const seedOrder = (<HTMLSelectElement>document.getElementById(config.html_seed_order_id)).value;
+    if (!roundRobinSeeds.includes(seedOrder))
+        throw new DOMException('seed_order must be one of ' + roundRobinSeeds.toString());
+
+    const roundRobinMode = (<HTMLSelectElement>document.getElementById(config.html_round_robin_mode_id)).value;
+    if (!roundRobinMode.includes(roundRobinMode))
+        throw new DOMException('round_robin_mode must be one of ' + roundRobinMode.toString());
+}
+
+/**
+ * validates the field every specification has (name, teams and stage)
+ *
+ * @param config FormConfiguration
+ */
+function baseValidation(config: FormConfiguration): void {
+    const name = (<HTMLInputElement>document.getElementById(config.html_name_id)).value;
+    if (!name || name === '') 
+        throw new DOMException('no name provided');
+
+    const teams = (<HTMLInputElement>document.getElementById(config.html_team_input_id)).value.split(',');
+    if (teams.length < 2 || !Number.isInteger(Math.log2(teams.length))) 
+        throw new DOMException('invalid team amount provided');
+
+    const stage = (<HTMLInputElement>document.getElementById(config.html_stage_type_selector_id)).value;
+    if(!stage && stages.includes(stage)) 
+        throw new DOMException('invalid stage');
+}
+
+/**
  * @param parent the parent DOM element to render to
  * @param textareaId the id of the textarea
  * @param labelText the text for the label of the textarea
@@ -195,9 +247,9 @@ function createTextarea(parent: HTMLElement, textareaId: string, labelText: stri
     textarea.placeholder = textareaPlaceholder;
     textarea.id = textareaId;
 
-    if (null !== textareaDefaultValue && undefined !== textareaDefaultValue) {
+    if (null !== textareaDefaultValue && undefined !== textareaDefaultValue) 
         textarea.value = textareaDefaultValue;
-    }
+    
 
     wrapper.appendChild(label);
     wrapper.appendChild(textarea);
@@ -212,8 +264,10 @@ function createTextarea(parent: HTMLElement, textareaId: string, labelText: stri
  * @param labelText the label text for the input
  * @param inputPlaceholder the placeholder for the input
  * @param inputDefaultValue the default value for the input - if NULL or UNDEFINED this is not set
+ * @param inputMinValue the min value for the input - if NULL or UNDEFINED this is not set
+ * @param inputMinLengthValue the minLength value for the input - if NULL or UNDEFINED this is not set
  */
-function createInput(parent: HTMLElement, inputType: string, inputId: string, labelText: string, inputPlaceholder: string, inputDefaultValue?: string): void {
+function createInput(parent: HTMLElement, inputType: string, inputId: string, labelText: string, inputPlaceholder: string, inputDefaultValue?: string, inputMinValue?: string, inputMinLengthValue?: number): void {
     const wrapper = document.createElement('div');
 
     const label = document.createElement('label');
@@ -225,9 +279,17 @@ function createInput(parent: HTMLElement, inputType: string, inputId: string, la
     input.placeholder = inputPlaceholder;
     input.id = inputId;
 
-    if (null !== inputDefaultValue && undefined !== inputDefaultValue) {
+    if (null !== inputDefaultValue && undefined !== inputDefaultValue) 
         input.value = inputDefaultValue;
-    }
+    
+
+    if (null !== inputMinValue && undefined !== inputMinValue) 
+        input.min = inputMinValue;
+    
+
+    if (null !== inputMinLengthValue && undefined !== inputMinLengthValue) 
+        input.minLength = inputMinLengthValue;
+    
 
     wrapper.appendChild(label);
     wrapper.appendChild(input);

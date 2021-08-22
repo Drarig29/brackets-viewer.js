@@ -95,7 +95,7 @@
     "form-creator": {
         "stage_name_label": "Name your stage",
         "stage_name_placeholder": "Give a name for your stage",
-        "stage_selector_label": "Select a bracket",
+        "stage_selector_label": "Select a stage",
         "team_label": "Name your teams",
         "team_placeholder": "Comma seperated List of Team Names (must be 2^n)",
         "group_label": "How many groups?",
