@@ -101,6 +101,7 @@
         "group_label": "How many groups?",
         "group_placeholder": "How many groups do you want?",
         "seed_order_label": "How would you like to order your seeds?",
+        "double_elimination_seed_order_placeholder": "Seed order for double elimination comma seperated",
         "round_robin_mode_label": "Which round robin mode do you like?",
         "consolation_final_label": "Consolation Final",
         "skip_first_round_label": "Skip first round",
