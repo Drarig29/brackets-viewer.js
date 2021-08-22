@@ -6,6 +6,8 @@ const stages = ['round_robin', 'single_elimination', 'double_elimination'];
 const roundRobinMode = ['simple', 'double'];
 const roundRobinSeeds = ['groups.effort_balanced', 'groups.seed_optimized', 'groups.bracket_optimized'];
 
+const eliminationSeeds = ['natural', 'reverse', 'half_shift', 'reverse_half_shift', 'pair_flip', 'inner_outer'];
+
 export type CallbackFunction = (config: InputStage) => void;
 
 export type FormConfiguration = {
@@ -32,29 +34,7 @@ export default function stageFormCreator(configuration: FormConfiguration, submi
     if (null === parent)
         throw new DOMException('parent with ID: ' + configuration.parent_id + ' was not found!');
 
-
-    // Name
-    createInput(
-        parent,
-        'text',
-        configuration.html_name_id,
-        i18n('form-creator', 'stage_name_label'),
-        i18n('form-creator', 'stage_name_placeholder'),
-        undefined,
-        undefined,
-        1,
-    );
-
-    // Teams
-    createTextarea(
-        parent,
-        configuration.html_team_input_id,
-        i18n('form-creator', 'team_label'),
-        i18n('form-creator', 'team_placeholder'),
-    );
-
-    // Stage selector
-    createSelect(parent, configuration.html_stage_type_selector_id, i18n('form-creator', 'stage_selector_label'), stages);
+    createBaseMask(parent, configuration);
 
     const stageSelector = document.getElementById(configuration.html_stage_type_selector_id);
 
@@ -81,6 +61,7 @@ export default function stageFormCreator(configuration: FormConfiguration, submi
                 throw new DOMException('stage ' + (<HTMLInputElement>stageSelector).value + ' seems to be not implemented yet.');
         }
 
+        //createBaseMask(parent, configuration);
         createMaskFields(configuration, stage, parent, submitCallable);
     };
 
@@ -94,10 +75,47 @@ export default function stageFormCreator(configuration: FormConfiguration, submi
  * @param parent The HTML parent to hold the elements
  */
 function removeMaskFields(parent: HTMLElement): void {
-    // Remove everything after the second element cause we want to keep the name and the stage selector
-    for (let i = 3; i < parent.children.length + 1; i++)
-        parent.children[i].remove();
+    // while (parent.firstChild)
+    //     parent.removeChild(parent.firstChild);
+    for (let i = 0; i < parent.children.length; i++) {
+        // lets keep the first 3 "base" items
+        if (i > 2) {
+            parent.children[i].remove();
 
+            // reset i cause we removed one entry
+            i--;
+        }
+    }
+}
+
+
+/**
+ * @param parent HTMLElement
+ * @param configuration FormConfiguration
+ */
+function createBaseMask(parent: HTMLElement, configuration: FormConfiguration): void {
+    // Name
+    createInput(
+        parent,
+        'text',
+        configuration.html_name_id,
+        i18n('form-creator', 'stage_name_label'),
+        i18n('form-creator', 'stage_name_placeholder'),
+        undefined,
+        undefined,
+        1,
+    );
+
+    // Teams
+    createTextarea(
+        parent,
+        configuration.html_team_input_id,
+        i18n('form-creator', 'team_label'),
+        i18n('form-creator', 'team_placeholder'),
+    );
+
+    // Stage selector
+    createSelect(parent, configuration.html_stage_type_selector_id, i18n('form-creator', 'stage_selector_label'), stages);
 }
 
 /**
@@ -133,6 +151,8 @@ function createMaskFields(config: FormConfiguration, stage: StageType, parent: H
 
             break;
         case 'single_elimination':
+            // Seed ordering
+            createSelect(parent, config.html_seed_order_id, i18n('form-creator', 'seed_order_label'), eliminationSeeds);
 
             break;
         default:
@@ -158,7 +178,7 @@ function createMaskFields(config: FormConfiguration, stage: StageType, parent: H
                     return;
                 }
 
-                const settings: StageSettings = {
+                const roundRobinSettings: StageSettings = {
                     seedOrdering: [
                         (<SeedOrdering>(<HTMLInputElement>document.getElementById(config.html_seed_order_id)).value ?? 'groups.effort_balanced'),
                     ],
@@ -169,7 +189,7 @@ function createMaskFields(config: FormConfiguration, stage: StageType, parent: H
                 responsingData = {
                     name: (<HTMLInputElement>document.getElementById(config.html_name_id)).value ?? '',
                     seeding: (<HTMLTextAreaElement>document.getElementById(config.html_team_input_id)).value.split(','),
-                    settings: settings,
+                    settings: roundRobinSettings,
                     tournamentId: 0,
                     type: stage,
                 };
@@ -178,7 +198,23 @@ function createMaskFields(config: FormConfiguration, stage: StageType, parent: H
             case 'double_elimination': // TODO
                 throw new DOMException('not implemented yet');
             case 'single_elimination': // TODO
-                throw new DOMException('not implemented yet');
+                validateSingleElimination(config);
+
+                const singleEliminationSettings: StageSettings = {
+                    seedOrdering: [
+                        (<SeedOrdering>(<HTMLInputElement>document.getElementById(config.html_seed_order_id)).value ?? 'natural'),
+                    ],
+                };
+
+                responsingData = {
+                    name: (<HTMLInputElement>document.getElementById(config.html_name_id)).value ?? '',
+                    seeding: (<HTMLTextAreaElement>document.getElementById(config.html_team_input_id)).value.split(','),
+                    settings: singleEliminationSettings,
+                    tournamentId: 0,
+                    type: stage,
+                };
+
+                break;
             default:
                 throw new DOMException('stage ' + stage + ' seems to be not implemented yet.');
         }
@@ -187,6 +223,19 @@ function createMaskFields(config: FormConfiguration, stage: StageType, parent: H
     };
 
     parent.appendChild(submitBtnWrapper);
+}
+
+/**
+ * validates everything for a single_elimination stage
+ *
+ * @param config FormConfiguration
+ */
+function validateSingleElimination(config: FormConfiguration): void {
+    baseValidation(config);
+
+    const seedOrder = (<HTMLSelectElement>document.getElementById(config.html_seed_order_id)).value;
+    if (!seedOrder || !eliminationSeeds.includes(seedOrder))
+        throw new DOMException('seed_order must be one of: ' + eliminationSeeds.toString());
 }
 
 /**
