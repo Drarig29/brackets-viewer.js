@@ -93,19 +93,19 @@
         "round-name-loser-bracket-final": "LB Round final"
     },
     "form-creator": {
-        "stage_name_label": "Name your stage",
-        "stage_name_placeholder": "Give a name for your stage",
-        "stage_selector_label": "Select a stage",
-        "team_label": "Name your teams",
-        "team_placeholder": "Comma seperated List of Team Names (must be 2^n)",
-        "group_label": "How many groups?",
-        "group_placeholder": "How many groups do you want?",
-        "seed_order_label": "How would you like to order your seeds?",
-        "double_elimination_seed_order_placeholder": "Seed order for double elimination comma seperated",
-        "round_robin_mode_label": "Which round robin mode do you like?",
-        "consolation_final_label": "Consolation Final",
-        "skip_first_round_label": "Skip first round",
-        "grand_final_type_label": "Grand final type",
-        "submit": "Create"
+        "stage_name_label": "Nom de la phase",
+        "stage_name_placeholder": "Donnez un nom pour la phase",
+        "stage_selector_label": "Sélectionnez une phase",
+        "team_label": "Noms des équipes",
+        "team_placeholder": "Liste des noms d'équipes séparés par des virgules (maximum 2^n)",
+        "group_label": "Combien de groupes ?",
+        "group_placeholder": "Combien de groupes voulez-vous ?",
+        "seed_order_label": "Comment ordonner les seeds ?",
+        "double_elimination_seed_order_placeholder": "Ordre des seeds pour la double élimination (séparée par des virgules)",
+        "round_robin_mode_label": "Quel mode de round-robin voulez-vous ?",
+        "consolation_final_label": "Finale de consolation",
+        "skip_first_round_label": "Sauter le premier round",
+        "grand_final_type_label": "Type de grande finale",
+        "submit": "Créer"
     }
 }

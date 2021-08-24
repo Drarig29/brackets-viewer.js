@@ -149,7 +149,7 @@ function createMaskFields(config: FormConfiguration, stage: StageType, parent: H
             // Seed ordering
             createSelect(parent, config.html_seed_order_id, i18next.t('form-creator.seed_order_label'), roundRobinSeeds);
 
-            // Round robin mode
+            // Round-robin mode
             createSelect(parent, config.html_round_robin_mode_id, i18next.t('form-creator.round_robin_mode_label'), roundRobinMode);
 
             break;
