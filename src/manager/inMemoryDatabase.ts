@@ -1,5 +1,5 @@
-import {CrudInterface} from 'brackets-manager';
-import {Database, OmitId, Table} from 'brackets-manager/dist/types';
+import {CrudInterface, OmitId, Table} from 'brackets-manager';
+import {Database} from 'brackets-manager/dist/types';
 
 export default class InMemoryDatabase implements CrudInterface{
     protected data: Database = {
