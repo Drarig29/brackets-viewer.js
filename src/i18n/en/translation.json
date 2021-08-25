@@ -91,5 +91,21 @@
         "round-name-winner-bracket-final": "WB Final Round",
         "round-name-loser-bracket": "LB Round {{roundNumber}}",
         "round-name-loser-bracket-final": "LB Final Round"
+    },
+    "form-creator": {
+        "stage-name-label": "Name your stage",
+        "stage-name-placeholder": "Give a name for your stage",
+        "stage-selector-label": "Select a stage",
+        "team-label": "Name your teams",
+        "team-placeholder": "Comma seperated List of Team Names (must be 2^n)",
+        "group-label": "How many groups?",
+        "group-placeholder": "How many groups do you want?",
+        "seed-order-label": "How would you like to order your seeds?",
+        "double-elimination-seed-order-placeholder": "Seed order for double elimination comma seperated",
+        "round-robin-mode-label": "Which round robin mode do you like?",
+        "consolation-final-label": "Consolation Final",
+        "skip-first-round-label": "Skip first round",
+        "grand-final-type-label": "Grand final type",
+        "submit": "Create"
     }
 }

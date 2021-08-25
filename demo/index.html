@@ -3,56 +3,217 @@
 <head>
     <meta charset="utf-8">
 
-    <link rel="stylesheet" href="../dist/brackets-viewer.min.css" />
+    <link rel="stylesheet" href="../dist/brackets-viewer.min.css"/>
     <script type="text/javascript" src="../dist/brackets-viewer.min.js"></script>
 
+    <title>Create and view Stages</title>
+
     <!-- You can choose a default theme or make you own. -->
-    <link rel="stylesheet" href="themes/light.css" />
+    <link rel="stylesheet" href="themes/light.css"/>
 
 </head>
 
 <body style="background: gray;">
 
-    <!-- This div will be used as the root for the library. It must be **perfectly** empty to prevent a FOUC. -->
-    <div id="example" class="brackets-viewer"></div>
+<!-- This div will be used as the root for the library. It must be **perfectly** empty to prevent a FOUC. -->
+<div id="bracketsViewerExample" class="brackets-viewer"></div>
 
-    <script>
+<div id="createNewBracket"></div>
+<script type="text/javascript" src="../dist/stage-form-creator.min.js"></script>
+<script type="text/javascript">
+    const config = {
+        parent_id: 'createNewBracket',
+        html_name_id: 'name',
+        html_stage_type_selector_id: 'selector',
+        html_team_input_id: 'teams',
+        html_group_id: 'groups',
+        html_seed_order_id: 'seeds',
+        html_round_robin_mode_id: 'round-robin-mode',
+        html_consolation_final_checkbox_id: 'consolation_final',
+        html_skip_first_round_checkbox_id: 'skip_first',
+        html_grand_final_type_id: 'grand_final',
+        html_double_elimination_seed_textarea_id: 'double_elimination_seeds',
+
+        group_default_size: 1
+    }
+
+    window.stageFormCreator(config, function (config) {
         (async function () {
-            const data = await fetch('http://localhost:3000/db')
-                .catch(() => alert('Failed to fetch localhost. Please do `npm run db` or use json-server your own way.'))
-                .then(res => res.json());
+            await window.bracketsManager.create(config)
+                .then(() => {
+                    const rawStoredBrackets = localStorage.getItem(BRACKETS);
 
-            // You can manually add locales. English will be used as a fallback if keys are missing.
-            // You can force browser language detection by setting the `i18nextLng` property to a locale key (ex: 'ru') in the localStorage.
-            bracketsViewer.addLocale('ru', {
-                "origin-hint": {
-                    "seed": "семя {{position}}",
-                }
-            });
+                    if (null === rawStoredBrackets || '' === rawStoredBrackets) {
+                        localStorage.setItem(BRACKETS, JSON.stringify({
+                            0: window.inMemoryDatabase.data,
+                        }));
 
-            // This is optional. You must do it before render().
-            bracketsViewer.setParticipantImages(data.participant.map(participant => ({
-                participantId: participant.id,
-                imageUrl: 'https://github.githubassets.com/pinned-octocat.svg',
-            })));
+                        window.location.href = '?id=0';
+                    }
 
-            bracketsViewer.onMatchClicked = match => console.log(match)
+                    let storedBrackets = JSON.parse(rawStoredBrackets);
+                    console.log(storedBrackets);
 
-            bracketsViewer.render({
-                stages: data.stage,
-                matches: data.match,
-                matchGames: data.match_game,
-                participants: data.participant,
-            }, {
-                selector: '#example',
-                participantOriginPlacement: 'before',
-                separatedChildCountLabel: true,
-                showSlotsOrigin: true,
-                showLowerBracketSlotsOrigin: true,
-                highlightParticipantOnHover: true,
-            });
+                    let index = Object.keys(storedBrackets).length;
+                    storedBrackets[index] = window.inMemoryDatabase.data;
+
+                    localStorage.setItem(BRACKETS, JSON.stringify(storedBrackets));
+
+                    window.location.href = '?id=' + index;
+                });
         })();
-    </script>
+    });
+</script>
+
+
+<div id="input-mask">
+    <div>
+        <label id="opponent1-label" for="opponent1">Opponent 1: </label><input type="number" id="opponent1"><br>
+        <label id="opponent2-label" for="opponent2">Opponent 2: </label><input type="number" id="opponent2"><br>
+        <p>Who won?</p>
+        <input type="radio" id="won-opponent1" value="opponent1" name="won" checked><label
+            for="won-opponent1">Opponent1</label><br>
+        <input type="radio" id="won-opponent2" value="opponent2" name="won"><label for="won-opponent2">Opponent2</label><br>
+        <input type="radio" id="won-draw" value="draw" name="won"><label for="won-draw">Draw</label><br><br>
+        <button id="input-submit">Submit</button>
+    </div>
+</div>
+
+<script type="text/javascript">
+    const BRACKETS = 'brackets';
+    const INPUT_MASK = 'input-mask';
+    const INPUT_SUBMIT = 'input-submit';
+    const OPPONENT1 = 'opponent1';
+    const OPPONENT2 = 'opponent2';
+    const RADIO_OPPONENT1 = 'won-opponent1';
+    const RADIO_OPPONENT2 = 'won-opponent2';
+    const RADIO_DRAW = 'won-draw';
+    const ELEMENT_ID = 'bracketsViewerExample';
+    const urlParams = new URLSearchParams(window.location.search);
+    const id = urlParams.get('id');
+
+    function listBrackets() {
+        const storageData = JSON.parse(localStorage.getItem(BRACKETS));
+        let bracketsList = document.createElement('ul');
+
+        for (const [key, value] of Object.entries(storageData)) {
+            let bracketItem = document.createElement('li');
+            let bracketLink = document.createElement('a');
+            bracketLink.href = '?id=' + key;
+            bracketLink.innerText = 'Go to ID: ' + key;
+
+            bracketItem.appendChild(bracketLink);
+            bracketsList.appendChild(bracketItem);
+        }
+
+        document.body.insertBefore(bracketsList, document.getElementById(ELEMENT_ID));
+    }
+
+    function renderBracket(data) {
+        window.bracketsViewer.render({
+            stages: data.stage,
+            matches: data.match,
+            matchGames: data.match_game,
+            participants: data.participant,
+        }, {
+            selector: '#' + ELEMENT_ID,
+            participantOriginPlacement: 'before',
+            separatedChildCountLabel: true,
+            showSlotsOrigin: true,
+            showLowerBracketSlotsOrigin: true,
+            highlightParticipantOnHover: true,
+        });
+    }
+
+    function createBracket(id) {
+        const bracketsStore = JSON.parse(localStorage.getItem(BRACKETS));
+
+        if (null === bracketsStore || !(id in bracketsStore)) {
+            alert('Key is not found in data!');
+            return;
+        }
+
+        const data = bracketsStore[id];
+        console.log(data);
+
+        // This is optional. You must do it before render().
+        window.bracketsViewer.setParticipantImages(data.participant.map(participant => ({
+            participantId: participant.id,
+            imageUrl: 'https://github.githubassets.com/pinned-octocat.svg',
+        })));
+
+        window.bracketsViewer.onMatchClicked = match => {
+            (async function () {
+                console.log(match);
+                let inputMask = document.getElementById(INPUT_MASK);
+                inputMask.style.display = 'flex';
+                let inputButton = document.getElementById(INPUT_SUBMIT);
+                inputButton.onclick = async () => {
+                    const opponent1 = document.getElementById(OPPONENT1).value;
+                    const opponent2 = document.getElementById(OPPONENT2).value;
+
+                    let opponent1Data = {
+                        score: opponent1
+                    }
+
+                    let opponent2Data = {
+                        score: opponent2
+                    }
+
+                    if (document.getElementById(RADIO_OPPONENT1).checked) {
+                        opponent1Data['result'] = 'win';
+                    }
+
+                    if (document.getElementById(RADIO_OPPONENT2).checked) {
+                        opponent2Data['result'] = 'win';
+                    }
+
+                    if (document.getElementById(RADIO_DRAW).checked) {
+                        opponent1Data['result'] = 'draw';
+                        opponent2Data['result'] = 'draw';
+                    }
+
+                    console.log(document.getElementById(RADIO_OPPONENT1).checked);
+                    console.log(document.getElementById(RADIO_OPPONENT2).checked);
+
+                    await window.bracketsManager.import(data);
+
+                    await window.bracketsManager.update.match({
+                        id: match.id,
+                        opponent1: opponent1Data,
+                        opponent2: opponent2Data,
+                    });
+
+                    window.bracketsManager.export().then((data) => {
+                        let storeData = bracketsStore;
+                        storeData[id] = data
+                        localStorage.setItem(BRACKETS, JSON.stringify(storeData));
+                    });
+
+                    location.reload();
+                }
+            })();
+        }
+
+        renderBracket(data);
+
+    }
+
+    (() => {
+        if (null === id || '' === id) {
+            listBrackets();
+
+            return;
+        }
+
+        backLink = document.createElement('a');
+        backLink.href = '?id';
+        backLink.innerText = 'Go back';
+        document.body.insertBefore(backLink, document.getElementById(ELEMENT_ID));
+
+        createBracket(id);
+    })();
+</script>
 </body>
 
 </html>

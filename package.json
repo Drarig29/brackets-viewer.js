@@ -31,9 +31,13 @@
     },
     "homepage": "https://github.com/Drarig29/brackets-viewer.js#readme",
     "dependencies": {
+        "brackets-manager": "github:Drarig29/brackets-manager.js",
         "brackets-model": "^1.3.8",
         "i18next": "^20.3.4",
-        "i18next-browser-languagedetector": "^6.1.2"
+        "i18next-browser-languagedetector": "^6.1.2",
+        "path-browserify": "^1.0.1",
+        "process": "^0.11.10",
+        "util": "^0.12.4"
     },
     "devDependencies": {
         "@babel/core": "^7.14.8",

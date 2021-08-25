@@ -1,21 +1,35 @@
 import i18next, { StringMap, TOptions } from 'i18next';
 import LanguageDetector from 'i18next-browser-languagedetector';
-import { locales } from './i18n';
 
 import { Status } from 'brackets-model';
 import { isMajorRound } from './helpers';
-import { Locales, Locale, FinalType, BracketType, OriginHint, RankingHeaders, RankingHeader } from './types';
+import { FinalType, BracketType, OriginHint, RankingHeaders, RankingHeader } from './types';
 
-export { i18next };
+import en from '../i18n/en/translation.json';
+import fr from '../i18n/fr/translation.json';
+
+export const locales = {
+    en,
+    fr,
+};
+
+export type Locale = typeof locales['en'];
 
 i18next.use(LanguageDetector).init({
     fallbackLng: 'en',
-    debug: true,
-    resources: {},
-});
+    debug: false,
+    resources: {
+        en: {
+            translation: locales.en,
+        },
+        fr: {
+            translation: locales.fr,
+        },
+    },
+},
+    undefined);
 
-// Load locale bundles.
-Object.keys(locales).forEach((lang: string) => i18next.addResourceBundle(lang, 'translation', (locales as Locales)[lang]));
+export { i18next };
 
 /**
  * Returns an internationalized version of a locale key.
@@ -24,7 +38,7 @@ Object.keys(locales).forEach((lang: string) => i18next.addResourceBundle(lang, '
  * @param key A locale key.
  * @param interpolations Data to pass to the i18n process.
  */
-function i18n<Scope extends keyof Locale>(scope: Scope, key: keyof Locale[Scope], interpolations?: TOptions): string;
+export function i18n<Scope extends keyof Locale>(scope: Scope, key: keyof Locale[Scope], interpolations?: TOptions): string;
 
 /**
  * Returns an internationalized version of a locale key in an object.
@@ -33,7 +47,7 @@ function i18n<Scope extends keyof Locale>(scope: Scope, key: keyof Locale[Scope]
  * @param key A locale key.
  * @param returnObject Must be true.
  */
-function i18n<Scope extends keyof Locale>(scope: Scope, key: keyof Locale[Scope], returnObject: true): StringMap;
+export function i18n<Scope extends keyof Locale>(scope: Scope, key: keyof Locale[Scope], returnObject: true): StringMap;
 
 /**
  * Returns an internationalized version of a locale key.
@@ -42,7 +56,7 @@ function i18n<Scope extends keyof Locale>(scope: Scope, key: keyof Locale[Scope]
  * @param key A locale key.
  * @param options Data to pass to the i18n process or a boolean.
  */
-function i18n<Scope extends keyof Locale>(scope: Scope, key: keyof Locale[Scope], options?: TOptions | boolean): string | StringMap {
+export function i18n<Scope extends keyof Locale>(scope: Scope, key: keyof Locale[Scope], options?: TOptions | boolean): string | StringMap {
     if (typeof options === 'boolean')
         return i18next.t(`${scope}.${key}`, { returnObjects: true });
 
