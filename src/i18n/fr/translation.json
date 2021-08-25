@@ -93,19 +93,19 @@
         "round-name-loser-bracket-final": "LB Round final"
     },
     "form-creator": {
-        "stage_name_label": "Name your stage",
-        "stage_name_placeholder": "Give a name for your stage",
-        "stage_selector_label": "Select a stage",
-        "team_label": "Name your teams",
-        "team_placeholder": "Comma seperated List of Team Names (must be 2^n)",
-        "group_label": "How many groups?",
-        "group_placeholder": "How many groups do you want?",
-        "seed_order_label": "How would you like to order your seeds?",
-        "double_elimination_seed_order_placeholder": "Seed order for double elimination comma seperated",
-        "round_robin_mode_label": "Which round robin mode do you like?",
-        "consolation_final_label": "Consolation Final",
-        "skip_first_round_label": "Skip first round",
-        "grand_final_type_label": "Grand final type",
+        "stage-name-label": "Name your stage",
+        "stage-name-placeholder": "Give a name for your stage",
+        "stage-selector-label": "Select a stage",
+        "team-label": "Name your teams",
+        "team-placeholder": "Comma seperated List of Team Names (must be 2^n)",
+        "group-label": "How many groups?",
+        "group-placeholder": "How many groups do you want?",
+        "seed-order-label": "How would you like to order your seeds?",
+        "double-elimination-seed-order-placeholder": "Seed order for double elimination comma seperated",
+        "round-robin-mode-label": "Which round robin mode do you like?",
+        "consolation-final-label": "Consolation Final",
+        "skip-first-round-label": "Skip first round",
+        "grand-final-type-label": "Grand final type",
         "submit": "Create"
     }
 }

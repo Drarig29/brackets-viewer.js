@@ -105,8 +105,8 @@ function createBaseMask(parent: HTMLElement, configuration: FormConfiguration): 
         parent,
         'text',
         configuration.html_name_id,
-        i18next.t('form-creator.stage_name_label'),
-        i18next.t('form-creator.stage_name_placeholder'),
+        i18next.t('form-creator.stage-name-label'),
+        i18next.t('form-creator.stage-name-placeholder'),
         undefined,
         undefined,
         1,
@@ -116,12 +116,12 @@ function createBaseMask(parent: HTMLElement, configuration: FormConfiguration): 
     createTextarea(
         parent,
         configuration.html_team_input_id,
-        i18next.t('form-creator.team_label'),
-        i18next.t('form-creator.team_placeholder'),
+        i18next.t('form-creator.team-label'),
+        i18next.t('form-creator.team-placeholder'),
     );
 
     // Stage selector
-    createSelect(parent, configuration.html_stage_type_selector_id, i18next.t('form-creator.stage_selector_label'), stages);
+    createSelect(parent, configuration.html_stage_type_selector_id, i18next.t('form-creator.stage-selector-label'), stages);
 }
 
 /**
@@ -140,44 +140,44 @@ function createMaskFields(config: FormConfiguration, stage: StageType, parent: H
                 parent,
                 'number',
                 config.html_group_id,
-                i18next.t('form-creator.group_label'),
-                i18next.t('form-creator.group_placeholder'),
+                i18next.t('form-creator.group-label'),
+                i18next.t('form-creator.group-placeholder'),
                 config.group_default_size.toString(),
                 '1',
             );
 
             // Seed ordering
-            createSelect(parent, config.html_seed_order_id, i18next.t('form-creator.seed_order_label'), roundRobinSeeds);
+            createSelect(parent, config.html_seed_order_id, i18next.t('form-creator.seed-order-label'), roundRobinSeeds);
 
             // Round robin mode
-            createSelect(parent, config.html_round_robin_mode_id, i18next.t('form-creator.round_robin_mode_label'), roundRobinMode);
+            createSelect(parent, config.html_round_robin_mode_id, i18next.t('form-creator.round-robin-mode-label'), roundRobinMode);
 
             break;
         case 'double_elimination':
             // Consolation Final
-            createInput(parent, 'checkbox', config.html_consolation_final_checkbox_id, i18next.t('form-creator.consolation_final_label'));
+            createInput(parent, 'checkbox', config.html_consolation_final_checkbox_id, i18next.t('form-creator.consolation-final-label'));
 
             // Skip first round
-            createInput(parent, 'checkbox', config.html_skip_first_round_checkbox_id, i18next.t('form-creator.skip_first_round_label'));
+            createInput(parent, 'checkbox', config.html_skip_first_round_checkbox_id, i18next.t('form-creator.skip-first-round-label'));
 
             // Grand final types
-            createSelect(parent, config.html_grand_final_type_id, i18next.t('form-creator.grand_final_type_label'), grandFinalTypes);
+            createSelect(parent, config.html_grand_final_type_id, i18next.t('form-creator.grand-final-type-label'), grandFinalTypes);
 
             // Seed orders
             createTextarea(
                 parent,
                 config.html_double_elimination_seed_textarea_id,
-                i18next.t('form-creator.seed_order_label'),
-                i18next.t('form-creator.double_elimination_seed_order_placeholder'),
+                i18next.t('form-creator.seed-order-label'),
+                i18next.t('form-creator.double-elimination-seed-order-placeholder'),
             );
 
             break;
         case 'single_elimination':
             // Seed ordering
-            createSelect(parent, config.html_seed_order_id, i18next.t('form-creator.seed_order_label'), eliminationSeeds);
+            createSelect(parent, config.html_seed_order_id, i18next.t('form-creator.seed-order-label'), eliminationSeeds);
 
             // Consolation Final
-            createInput(parent, 'checkbox', config.html_consolation_final_checkbox_id, i18next.t('form-creator.consolation_final_label'));
+            createInput(parent, 'checkbox', config.html_consolation_final_checkbox_id, i18next.t('form-creator.consolation-final-label'));
 
             break;
         default:
