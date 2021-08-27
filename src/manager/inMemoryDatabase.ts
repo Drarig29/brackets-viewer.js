@@ -1,7 +1,7 @@
-import {CrudInterface, OmitId, Table} from 'brackets-manager';
-import {Database} from 'brackets-manager/dist/types';
+import { CrudInterface, OmitId, Table } from 'brackets-manager';
+import { Database } from 'brackets-manager/dist/types';
 
-export default class InMemoryDatabase implements CrudInterface{
+export class InMemoryDatabase implements CrudInterface {
     protected data: Database = {
         participant: [],
         stage: [],
@@ -57,7 +57,7 @@ export default class InMemoryDatabase implements CrudInterface{
      * @param table Where to insert.
      * @param values What to insert.
      */
-    insert<T>(table: Table, values: OmitId<T>|OmitId<T>[]): Promise<number>|Promise<boolean> {
+    insert<T>(table: Table, values: OmitId<T> | OmitId<T>[]): Promise<number> | Promise<boolean> {
         let id: number;
         id = this.data[table].length;
 
@@ -118,7 +118,7 @@ export default class InMemoryDatabase implements CrudInterface{
      * @param table Where to get from.
      * @param arg
      */
-    select<T>(table: Table, arg?: number|Partial<T>): Promise<T[] | null>  {
+    select<T>(table: Table, arg?: number | Partial<T>): Promise<T[] | null> {
         try {
             if (arg === undefined) {
                 return new Promise<T[]>((resolve) => {
@@ -136,7 +136,7 @@ export default class InMemoryDatabase implements CrudInterface{
                 });
             }
 
-            return new Promise<T[]|null>((resolve) => {
+            return new Promise<T[] | null>((resolve) => {
                 // eslint-disable-next-line @typescript-eslint/ban-ts-comment
                 // @ts-ignore
                 resolve(this.data[table].filter(this.makeFilter(arg)) || null);
@@ -173,7 +173,7 @@ export default class InMemoryDatabase implements CrudInterface{
      * @param arg
      * @param value How to update.
      */
-    update<T>(table: Table, arg: number|Partial<T>, value?: Partial<T>): Promise<boolean> {
+    update<T>(table: Table, arg: number | Partial<T>, value?: Partial<T>): Promise<boolean> {
         if (typeof arg === 'number') {
             try {
                 // eslint-disable-next-line @typescript-eslint/ban-ts-comment

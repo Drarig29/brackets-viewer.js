@@ -1,8 +1,8 @@
-import {Stage, Match, MatchGame, Participant} from 'brackets-model';
-import InMemoryDatabase from '../manager/inMemoryDatabase';
-import BracketsViewer from './braketsViewer';
-import {BracketsManager} from 'brackets-manager';
-import {CallbackFunction, FormConfiguration} from '../manager/stageFormCreator';
+import { Stage, Match, MatchGame, Participant } from 'brackets-model';
+import { InMemoryDatabase } from '../manager/inMemoryDatabase';
+import { BracketsViewer } from './bracketsViewer';
+import { BracketsManager } from 'brackets-manager';
+import { CallbackFunction, FormConfiguration } from '../manager/stageFormCreator';
 
 declare global {
     interface Window {

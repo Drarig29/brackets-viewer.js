@@ -1,6 +1,6 @@
-import BracketsViewer from './viewer/braketsViewer';
-import InMemoryDatabase from './manager/inMemoryDatabase';
-import {BracketsManager} from 'brackets-manager';
+import { BracketsViewer } from './viewer/bracketsViewer';
+import { InMemoryDatabase } from './manager/inMemoryDatabase';
+import { BracketsManager } from 'brackets-manager';
 
 window.bracketsViewer = new BracketsViewer();
 window.inMemoryDatabase = new InMemoryDatabase();
