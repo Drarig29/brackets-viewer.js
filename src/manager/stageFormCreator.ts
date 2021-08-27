@@ -1,14 +1,14 @@
 import { GrandFinalType, InputStage, RoundRobinMode, SeedOrdering, StageSettings, StageType } from 'brackets-model';
 import { t } from '../viewer/lang';
 
-const stages = ['round_robin', 'single_elimination', 'double_elimination'];
+const stageTypes: StageType[] = ['round_robin', 'single_elimination', 'double_elimination'];
 
-const roundRobinMode = ['simple', 'double'];
-const roundRobinSeeds = ['groups.effort_balanced', 'groups.seed_optimized', 'groups.bracket_optimized'];
+const roundRobinMode: RoundRobinMode[] = ['simple', 'double'];
+const roundRobinSeeds: SeedOrdering[] = ['groups.effort_balanced', 'groups.seed_optimized', 'groups.bracket_optimized'];
 
-const eliminationSeeds = ['natural', 'reverse', 'half_shift', 'reverse_half_shift', 'pair_flip', 'inner_outer'];
+const eliminationOrderings: SeedOrdering[] = ['natural', 'reverse', 'half_shift', 'reverse_half_shift', 'pair_flip', 'inner_outer'];
 
-const grandFinalTypes = ['none', 'simple', 'double'];
+const grandFinalTypes: GrandFinalType[] = ['none', 'simple', 'double'];
 
 export type CallbackFunction = (config: InputStage) => void;
 
@@ -119,7 +119,7 @@ function createBaseMask(parent: HTMLElement, configuration: FormConfiguration): 
     );
 
     // Stage selector
-    createSelect(parent, configuration.html_stage_type_selector_id, t('form-creator.stage-selector-label'), stages);
+    createSelect(parent, configuration.html_stage_type_selector_id, t('form-creator.stage-selector-label'), stageTypes);
 }
 
 /**
@@ -128,9 +128,9 @@ function createBaseMask(parent: HTMLElement, configuration: FormConfiguration): 
  * @param config HTML element IDs to render this form to
  * @param stage Which type of stage are we building?
  * @param parent The parent DOM
- * @param submitCallable the callable to call when the data got created
+ * @param submitCallback the callable to call when the data got created
  */
-function createMaskFields(config: FormConfiguration, stage: StageType, parent: HTMLElement, submitCallable: CallbackFunction): void {
+function createMaskFields(config: FormConfiguration, stage: StageType, parent: HTMLElement, submitCallback: CallbackFunction): void {
     switch (stage) {
         case 'round_robin':
             // Teams amount
@@ -172,7 +172,7 @@ function createMaskFields(config: FormConfiguration, stage: StageType, parent: H
             break;
         case 'single_elimination':
             // Seed ordering
-            createSelect(parent, config.html_seed_order_id, t('form-creator.seed-order-label'), eliminationSeeds);
+            createSelect(parent, config.html_seed_order_id, t('form-creator.seed-order-label'), eliminationOrderings);
 
             // Consolation Final
             createInput(parent, 'checkbox', config.html_consolation_final_checkbox_id, t('form-creator.consolation-final-label'));
@@ -190,7 +190,7 @@ function createMaskFields(config: FormConfiguration, stage: StageType, parent: H
     submitBtnWrapper.appendChild(submitBtn);
 
     submitBtn.onclick = (): void => {
-        let responsingData: InputStage;
+        let query: InputStage;
 
         switch (stage) {
             case 'round_robin':
@@ -209,7 +209,7 @@ function createMaskFields(config: FormConfiguration, stage: StageType, parent: H
                     groupCount: parseInt((<HTMLInputElement>document.getElementById(config.html_group_id)).value ?? '0'),
                 };
 
-                responsingData = {
+                query = {
                     name: (<HTMLInputElement>document.getElementById(config.html_name_id)).value ?? '',
                     seeding: (<HTMLTextAreaElement>document.getElementById(config.html_team_input_id)).value.split(','),
                     settings: roundRobinSettings,
@@ -234,7 +234,7 @@ function createMaskFields(config: FormConfiguration, stage: StageType, parent: H
                     grandFinal: <GrandFinalType>(<HTMLSelectElement>document.getElementById(config.html_grand_final_type_id)).value,
                 };
 
-                responsingData = {
+                query = {
                     name: (<HTMLInputElement>document.getElementById(config.html_name_id)).value ?? '',
                     seeding: (<HTMLTextAreaElement>document.getElementById(config.html_team_input_id)).value.split(','),
                     settings: doubleEliminationSettings,
@@ -253,7 +253,7 @@ function createMaskFields(config: FormConfiguration, stage: StageType, parent: H
                     consolationFinal: (<HTMLInputElement>document.getElementById(config.html_consolation_final_checkbox_id)).checked,
                 };
 
-                responsingData = {
+                query = {
                     name: (<HTMLInputElement>document.getElementById(config.html_name_id)).value ?? '',
                     seeding: (<HTMLTextAreaElement>document.getElementById(config.html_team_input_id)).value.split(','),
                     settings: singleEliminationSettings,
@@ -266,7 +266,7 @@ function createMaskFields(config: FormConfiguration, stage: StageType, parent: H
                 throw new DOMException('stage ' + stage + ' seems to be not implemented yet.');
         }
 
-        submitCallable(responsingData);
+        submitCallback(query);
     };
 
     parent.appendChild(submitBtnWrapper);
@@ -280,22 +280,21 @@ function createMaskFields(config: FormConfiguration, stage: StageType, parent: H
 function validateDoubleElimination(config: FormConfiguration): void {
     baseValidation(config);
 
-    const grandFinalType = (<HTMLSelectElement>document.getElementById(config.html_grand_final_type_id)).value;
+    const grandFinalType = (<HTMLSelectElement>document.getElementById(config.html_grand_final_type_id)).value as GrandFinalType;
     if (!grandFinalType || !grandFinalTypes.includes(grandFinalType))
         throw new DOMException('grand_final_type must be one of: ' + grandFinalTypes.toString());
 
-    const seedOrder = (<HTMLTextAreaElement>document.getElementById(config.html_double_elimination_seed_textarea_id)).value.split(',');
-    for (const i in seedOrder) {
-        if (seedOrder[i] === '') {
-            delete seedOrder[i];
+    const orderings = (<HTMLTextAreaElement>document.getElementById(config.html_double_elimination_seed_textarea_id)).value.split(',');
+    for (const i in orderings) {
+        if (orderings[i] === '') {
+            delete orderings[i];
             continue;
         }
 
-        const seed = seedOrder[i].trim();
+        const ordering = orderings[i].trim() as SeedOrdering;
 
-        if (!eliminationSeeds.includes(seed))
-            throw new DOMException('elimination seed_order wrong found: ' + seed + 'must be one of: ' + eliminationSeeds.toString());
-
+        if (!eliminationOrderings.includes(ordering))
+            throw new DOMException('elimination seed_ordering wrong found: ' + ordering + 'must be one of: ' + eliminationOrderings.toString());
     }
 }
 
@@ -307,9 +306,9 @@ function validateDoubleElimination(config: FormConfiguration): void {
 function validateSingleElimination(config: FormConfiguration): void {
     baseValidation(config);
 
-    const seedOrder = (<HTMLSelectElement>document.getElementById(config.html_seed_order_id)).value;
-    if (!seedOrder || !eliminationSeeds.includes(seedOrder))
-        throw new DOMException('seed_order must be one of: ' + eliminationSeeds.toString());
+    const ordering = (<HTMLSelectElement>document.getElementById(config.html_seed_order_id)).value as SeedOrdering;
+    if (!ordering || !eliminationOrderings.includes(ordering))
+        throw new DOMException('seed_ordering must be one of: ' + eliminationOrderings.toString());
 }
 
 /**
@@ -324,9 +323,9 @@ function validateRoundRobin(config: FormConfiguration): void {
     if (groupAmount <= 0)
         throw new DOMException('group_amount must be equal or bigger than 1');
 
-    const seedOrder = (<HTMLSelectElement>document.getElementById(config.html_seed_order_id)).value;
-    if (!roundRobinSeeds.includes(seedOrder))
-        throw new DOMException('seed_order must be one of ' + roundRobinSeeds.toString());
+    const ordering = (<HTMLSelectElement>document.getElementById(config.html_seed_order_id)).value as SeedOrdering;
+    if (!roundRobinSeeds.includes(ordering))
+        throw new DOMException('seed_ordering must be one of ' + roundRobinSeeds.toString());
 
     const roundRobinMode = (<HTMLSelectElement>document.getElementById(config.html_round_robin_mode_id)).value;
     if (!roundRobinMode.includes(roundRobinMode))
@@ -341,15 +340,15 @@ function validateRoundRobin(config: FormConfiguration): void {
 function baseValidation(config: FormConfiguration): void {
     const name = (<HTMLInputElement>document.getElementById(config.html_name_id)).value;
     if (!name || name === '')
-        throw new DOMException('no name provided');
+        throw new DOMException('No name provided.');
 
     const teams = (<HTMLInputElement>document.getElementById(config.html_team_input_id)).value.split(',');
     if (teams.length < 2 || !Number.isInteger(Math.log2(teams.length)))
-        throw new DOMException('invalid team amount provided');
+        throw new DOMException('Invalid team amount provided.');
 
-    const stage = (<HTMLInputElement>document.getElementById(config.html_stage_type_selector_id)).value;
-    if (!stage && stages.includes(stage))
-        throw new DOMException('invalid stage');
+    const stageType = (<HTMLInputElement>document.getElementById(config.html_stage_type_selector_id)).value as StageType;
+    if (!stageType && stageTypes.includes(stageType))
+        throw new DOMException('Invalid stage.');
 }
 
 /**
