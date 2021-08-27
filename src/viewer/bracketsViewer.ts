@@ -17,7 +17,7 @@ import {
     Side,
 } from './types';
 
-export default class BracketsViewer {
+export class BracketsViewer {
 
     readonly participantRefs: { [participantId: number]: HTMLElement[] } = {};
 
