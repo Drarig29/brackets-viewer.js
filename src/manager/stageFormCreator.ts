@@ -1,5 +1,5 @@
-import {GrandFinalType, InputStage, RoundRobinMode, SeedOrdering, StageSettings, StageType} from 'brackets-model';
-import {i18next} from '../viewer/lang';
+import { GrandFinalType, InputStage, RoundRobinMode, SeedOrdering, StageSettings, StageType } from 'brackets-model';
+import { t } from '../viewer/lang';
 
 const stages = ['round_robin', 'single_elimination', 'double_elimination'];
 
@@ -47,7 +47,6 @@ export default function stageFormCreator(configuration: FormConfiguration, submi
     if (null === stageSelector)
         throw new DOMException('somehow we could not create a select!');
 
-
     stageSelector.onchange = (): void => {
         removeMaskFields(parent);
 
@@ -67,7 +66,6 @@ export default function stageFormCreator(configuration: FormConfiguration, submi
                 throw new DOMException('stage ' + (<HTMLInputElement>stageSelector).value + ' seems to be not implemented yet.');
         }
 
-        //createBaseMask(parent, configuration);
         createMaskFields(configuration, stage, parent, submitCallable);
     };
 
@@ -105,8 +103,8 @@ function createBaseMask(parent: HTMLElement, configuration: FormConfiguration): 
         parent,
         'text',
         configuration.html_name_id,
-        i18next.t('form-creator.stage-name-label'),
-        i18next.t('form-creator.stage-name-placeholder'),
+        t('form-creator.stage-name-label'),
+        t('form-creator.stage-name-placeholder'),
         undefined,
         undefined,
         1,
@@ -116,12 +114,12 @@ function createBaseMask(parent: HTMLElement, configuration: FormConfiguration): 
     createTextarea(
         parent,
         configuration.html_team_input_id,
-        i18next.t('form-creator.team-label'),
-        i18next.t('form-creator.team-placeholder'),
+        t('form-creator.team-label'),
+        t('form-creator.team-placeholder'),
     );
 
     // Stage selector
-    createSelect(parent, configuration.html_stage_type_selector_id, i18next.t('form-creator.stage-selector-label'), stages);
+    createSelect(parent, configuration.html_stage_type_selector_id, t('form-creator.stage-selector-label'), stages);
 }
 
 /**
@@ -140,44 +138,44 @@ function createMaskFields(config: FormConfiguration, stage: StageType, parent: H
                 parent,
                 'number',
                 config.html_group_id,
-                i18next.t('form-creator.group-label'),
-                i18next.t('form-creator.group-placeholder'),
+                t('form-creator.group-label'),
+                t('form-creator.group-placeholder'),
                 config.group_default_size.toString(),
                 '1',
             );
 
             // Seed ordering
-            createSelect(parent, config.html_seed_order_id, i18next.t('form-creator.seed-order-label'), roundRobinSeeds);
+            createSelect(parent, config.html_seed_order_id, t('form-creator.seed-order-label'), roundRobinSeeds);
 
             // Round robin mode
-            createSelect(parent, config.html_round_robin_mode_id, i18next.t('form-creator.round-robin-mode-label'), roundRobinMode);
+            createSelect(parent, config.html_round_robin_mode_id, t('form-creator.round-robin-mode-label'), roundRobinMode);
 
             break;
         case 'double_elimination':
             // Consolation Final
-            createInput(parent, 'checkbox', config.html_consolation_final_checkbox_id, i18next.t('form-creator.consolation-final-label'));
+            createInput(parent, 'checkbox', config.html_consolation_final_checkbox_id, t('form-creator.consolation-final-label'));
 
             // Skip first round
-            createInput(parent, 'checkbox', config.html_skip_first_round_checkbox_id, i18next.t('form-creator.skip-first-round-label'));
+            createInput(parent, 'checkbox', config.html_skip_first_round_checkbox_id, t('form-creator.skip-first-round-label'));
 
             // Grand final types
-            createSelect(parent, config.html_grand_final_type_id, i18next.t('form-creator.grand-final-type-label'), grandFinalTypes);
+            createSelect(parent, config.html_grand_final_type_id, t('form-creator.grand-final-type-label'), grandFinalTypes);
 
             // Seed orders
             createTextarea(
                 parent,
                 config.html_double_elimination_seed_textarea_id,
-                i18next.t('form-creator.seed-order-label'),
-                i18next.t('form-creator.double-elimination-seed-order-placeholder'),
+                t('form-creator.seed-order-label'),
+                t('form-creator.double-elimination-seed-order-placeholder'),
             );
 
             break;
         case 'single_elimination':
             // Seed ordering
-            createSelect(parent, config.html_seed_order_id, i18next.t('form-creator.seed-order-label'), eliminationSeeds);
+            createSelect(parent, config.html_seed_order_id, t('form-creator.seed-order-label'), eliminationSeeds);
 
             // Consolation Final
-            createInput(parent, 'checkbox', config.html_consolation_final_checkbox_id, i18next.t('form-creator.consolation-final-label'));
+            createInput(parent, 'checkbox', config.html_consolation_final_checkbox_id, t('form-creator.consolation-final-label'));
 
             break;
         default:
@@ -186,7 +184,7 @@ function createMaskFields(config: FormConfiguration, stage: StageType, parent: H
 
     const submitBtnWrapper = document.createElement('div');
     const submitBtn = document.createElement('button');
-    submitBtn.innerText = i18next.t('form-creator.submit');
+    submitBtn.innerText = t('form-creator.submit');
     submitBtn.type = 'submit';
 
     submitBtnWrapper.appendChild(submitBtn);
@@ -342,15 +340,15 @@ function validateRoundRobin(config: FormConfiguration): void {
  */
 function baseValidation(config: FormConfiguration): void {
     const name = (<HTMLInputElement>document.getElementById(config.html_name_id)).value;
-    if (!name || name === '') 
+    if (!name || name === '')
         throw new DOMException('no name provided');
 
     const teams = (<HTMLInputElement>document.getElementById(config.html_team_input_id)).value.split(',');
-    if (teams.length < 2 || !Number.isInteger(Math.log2(teams.length))) 
+    if (teams.length < 2 || !Number.isInteger(Math.log2(teams.length)))
         throw new DOMException('invalid team amount provided');
 
     const stage = (<HTMLInputElement>document.getElementById(config.html_stage_type_selector_id)).value;
-    if(!stage && stages.includes(stage)) 
+    if (!stage && stages.includes(stage))
         throw new DOMException('invalid stage');
 }
 
@@ -372,9 +370,8 @@ function createTextarea(parent: HTMLElement, textareaId: string, labelText: stri
     textarea.placeholder = textareaPlaceholder;
     textarea.id = textareaId;
 
-    if (null !== textareaDefaultValue && undefined !== textareaDefaultValue) 
+    if (null !== textareaDefaultValue && undefined !== textareaDefaultValue)
         textarea.value = textareaDefaultValue;
-    
 
     wrapper.appendChild(label);
     wrapper.appendChild(textarea);
@@ -406,17 +403,14 @@ function createInput(parent: HTMLElement, inputType: string, inputId: string, la
     if (null !== inputPlaceholder && undefined !== inputPlaceholder)
         input.placeholder = inputPlaceholder;
 
-    if (null !== inputDefaultValue && undefined !== inputDefaultValue) 
+    if (null !== inputDefaultValue && undefined !== inputDefaultValue)
         input.value = inputDefaultValue;
-    
 
-    if (null !== inputMinValue && undefined !== inputMinValue) 
+    if (null !== inputMinValue && undefined !== inputMinValue)
         input.min = inputMinValue;
-    
 
-    if (null !== inputMinLengthValue && undefined !== inputMinLengthValue) 
+    if (null !== inputMinLengthValue && undefined !== inputMinLengthValue)
         input.minLength = inputMinLengthValue;
-    
 
     wrapper.appendChild(label);
     wrapper.appendChild(input);
