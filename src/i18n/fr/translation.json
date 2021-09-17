@@ -64,15 +64,15 @@
             "text": "$t(abbreviations.forfeit)",
             "tooltip": "Forfaits"
         },
-        "score-for": {
+        "scoreFor": {
             "text": "SF",
             "tooltip": "Score pour"
         },
-        "score-against": {
+        "scoreAgainst": {
             "text": "SA",
             "tooltip": "Score contre"
         },
-        "score-difference": {
+        "scoreDifference": {
             "text": "+/-",
             "tooltip": "Différence de score"
         },

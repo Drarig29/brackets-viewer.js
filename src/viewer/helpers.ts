@@ -1,6 +1,6 @@
 import { Match, ParticipantResult } from 'brackets-model';
-import { headers, abbreviations } from './lang';
 import { RankingHeader, Ranking, RankingFormula, RankingItem, RankingMap, BracketType, Side } from './types';
+import { t } from './lang';
 
 /**
  * Splits an array based on values of a given key of the objects of the array.
@@ -87,13 +87,13 @@ export function getOriginAbbreviation(matchLocation: BracketType, skipFirstRound
     roundNumber = roundNumber || -1;
 
     if (skipFirstRound && matchLocation === 'loser-bracket' && roundNumber === 1)
-        return abbreviations.seed;
+        return t('abbreviations.seed');
 
     if (matchLocation === 'single-bracket' || matchLocation === 'winner-bracket' && roundNumber === 1)
-        return abbreviations.seed;
+        return t('abbreviations.seed');
 
     if (matchLocation === 'loser-bracket' && roundNumber % 2 === 0 && side === 'opponent1')
-        return abbreviations.position;
+        return t('abbreviations.position');
 
     return null;
 }
@@ -113,7 +113,7 @@ export function isMajorRound(roundNumber: number): boolean {
  * @param itemName Name of the ranking property.
  */
 export function rankingHeader(itemName: keyof RankingItem): RankingHeader {
-    return headers[itemName];
+    return t(`ranking.${itemName}`, { returnObjects: true }) as RankingHeader;
 }
 
 /**

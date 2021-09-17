@@ -3,7 +3,7 @@ import LanguageDetector from 'i18next-browser-languagedetector';
 
 import { Status } from 'brackets-model';
 import { isMajorRound } from './helpers';
-import { FinalType, BracketType, OriginHint, RankingHeaders, RankingHeader } from './types';
+import { FinalType, BracketType, OriginHint } from './types';
 
 import en from '../i18n/en/translation.json';
 import fr from '../i18n/fr/translation.json';
@@ -210,43 +210,3 @@ export function getWinnerBracketRoundName(roundNumber: number, roundCount: numbe
 export function getLoserBracketRoundName(roundNumber: number, roundCount: number): string {
     return roundNumber === roundCount ? t('common.round-name-loser-bracket-final') : t('common.round-name-loser-bracket', { roundNumber });
 }
-
-/**
- * Abbreviations used in the viewer.
- */
-export const abbreviations = {
-    win: t('abbreviations.win'),
-    loss: t('abbreviations.loss'),
-    forfeit: t('abbreviations.forfeit'),
-    position: t('abbreviations.position'),
-    seed: t('abbreviations.seed'),
-};
-
-/**
- * The Best of X literal.
- * 
- * @param x Child count.
- */
-export const bestOfX = (x: number): string => t('common.best-of-x', { x });
-
-/**
- * The BYE literal.
- */
-export const BYE = t('common.bye');
-
-/**
- * Headers of the ranking.
- */
-export const headers: RankingHeaders = {
-    rank: t('ranking.rank', { returnObjects: true }) as RankingHeader,
-    id: t('ranking.id', { returnObjects: true }) as RankingHeader,
-    played: t('ranking.played', { returnObjects: true }) as RankingHeader,
-    wins: t('ranking.wins', { returnObjects: true }) as RankingHeader,
-    draws: t('ranking.draws', { returnObjects: true }) as RankingHeader,
-    losses: t('ranking.losses', { returnObjects: true }) as RankingHeader,
-    forfeits: t('ranking.forfeits', { returnObjects: true }) as RankingHeader,
-    scoreFor: t('ranking.score-for', { returnObjects: true }) as RankingHeader,
-    scoreAgainst: t('ranking.score-against', { returnObjects: true }) as RankingHeader,
-    scoreDifference: t('ranking.score-difference', { returnObjects: true }) as RankingHeader,
-    points: t('ranking.points', { returnObjects: true }) as RankingHeader,
-};

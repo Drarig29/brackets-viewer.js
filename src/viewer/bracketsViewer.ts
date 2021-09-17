@@ -369,7 +369,7 @@ export class BracketsViewer {
             opponents.append(dom.createMatchLabel(label, lang.getMatchStatus(match.status)));
 
         if (match.child_count > 0 && this.config.separatedChildCountLabel)
-            opponents.append(dom.createChildCountLabel(lang.bestOfX(match.child_count)));
+            opponents.append(dom.createChildCountLabel(lang.t('common.best-of-x', { x: match.child_count })));
 
         opponents.append(participant1, participant2);
         matchContainer.append(opponents);
@@ -399,7 +399,7 @@ export class BracketsViewer {
         };
 
         if (participant === null || participant === undefined) 
-            containers.name.innerText = lang.BYE;
+            containers.name.innerText = lang.t('common.bye');
          else 
             this.renderParticipant(containers, participant, side, originHint, matchLocation, roundNumber);
         
