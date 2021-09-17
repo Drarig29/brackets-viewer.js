@@ -18,12 +18,15 @@ export class InMemoryDatabase implements CrudInterface {
         this.data = data;
     }
 
+    /**
+     * @param partial Filter
+     */
     makeFilter(partial: any): (entry: any) => boolean {
         return (entry: any): boolean => {
             let result = true;
-            for (const [key, value] of Object.entries(partial)) {
+            for (const [key, value] of Object.entries(partial))
                 result = result && entry[key] === value;
-            }
+
             return result;
         };
     }
@@ -31,7 +34,7 @@ export class InMemoryDatabase implements CrudInterface {
     /**
      * Clearing all of the data
      */
-    reset() {
+    reset(): void {
         this.data = {
             participant: [],
             stage: [],
@@ -116,7 +119,7 @@ export class InMemoryDatabase implements CrudInterface {
 
     /**
      * @param table Where to get from.
-     * @param arg
+     * @param arg Arg.
      */
     select<T>(table: Table, arg?: number | Partial<T>): Promise<T[] | null> {
         try {
@@ -157,6 +160,7 @@ export class InMemoryDatabase implements CrudInterface {
      */
 
     update<T>(table: Table, id: number, value: T): Promise<boolean>;
+
     /**
      * Updates data in a table.
      *
@@ -239,6 +243,14 @@ export class InMemoryDatabase implements CrudInterface {
             return new Promise<boolean>((resolve) => {
                 resolve(false);
             });
+        }
+
+        if (!filter) {
+            this.data[table] = [];
+
+            return new Promise<boolean>((resolve) => {
+                resolve(true);
+            });    
         }
 
         const predicate = this.makeFilter(filter);

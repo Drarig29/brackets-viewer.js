@@ -94,12 +94,12 @@
         const id = urlParams.get('id');
 
         function listBrackets() {
-            const storageData = JSON.parse(localStorage.getItem(BRACKETS));
-            let bracketsList = document.createElement('ul');
+            const storageData = JSON.parse(localStorage.getItem(BRACKETS)) || {};
+            const bracketsList = document.createElement('ul');
 
             for (const [key, value] of Object.entries(storageData)) {
-                let bracketItem = document.createElement('li');
-                let bracketLink = document.createElement('a');
+                const bracketItem = document.createElement('li');
+                const bracketLink = document.createElement('a');
                 bracketLink.href = '?id=' + key;
                 bracketLink.innerText = 'Go to ID: ' + key;
 
@@ -146,8 +146,10 @@
             window.bracketsViewer.onMatchClicked = match => {
                 (async function () {
                     console.log(match);
+
                     let inputMask = document.getElementById(INPUT_MASK);
                     inputMask.style.display = 'flex';
+
                     let inputButton = document.getElementById(INPUT_SUBMIT);
                     inputButton.onclick = async () => {
                         const opponent1 = document.getElementById(OPPONENT1).value;
@@ -185,35 +187,32 @@
                             opponent2: opponent2Data,
                         });
 
+                        window.bracketsManager.storage.select('match', 0).then((match) => {
+                            window.bracketsViewer.updateMatch(match);
+                        });
+
                         window.bracketsManager.export().then((data) => {
                             let storeData = bracketsStore;
                             storeData[id] = data
                             localStorage.setItem(BRACKETS, JSON.stringify(storeData));
                         });
-
-                        location.reload();
                     }
                 })();
             }
 
             renderBracket(data);
-
         }
 
-        (() => {
-            if (null === id || '' === id) {
-                listBrackets();
-
-                return;
-            }
-
+        if (id === null || id === '') {
+            listBrackets();
+        } else {
             backLink = document.createElement('a');
             backLink.href = '?id';
             backLink.innerText = 'Go back';
             document.body.insertBefore(backLink, document.getElementById(ELEMENT_ID));
 
             createBracket(id);
-        })();
+        }
     </script>
 </body>
 
