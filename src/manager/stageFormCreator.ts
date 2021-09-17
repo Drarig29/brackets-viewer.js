@@ -74,21 +74,17 @@ export default function stageFormCreator(configuration: FormConfiguration, submi
 }
 
 /**
- * removing all fields of the mask which are not the name and the stage selector
+ * Removes all fields of the mask which are not the name and the stage selector.
  *
- * @param parent The HTML parent to hold the elements
+ * @param parent The HTML parent to hold the elements.
  */
 function removeMaskFields(parent: HTMLElement): void {
-    // while (parent.firstChild)
-    //     parent.removeChild(parent.firstChild);
-    for (let i = 0; i < parent.children.length; i++) {
-        // lets keep the first 3 "base" items
-        if (i > 2) {
-            parent.children[i].remove();
+    if (parent.children.length <= 3) return;
 
-            // reset i cause we removed one entry
-            i--;
-        }
+    // Keep the first 3 "base" items.
+    for (let i = 3; i < parent.children.length; i++) {
+        parent.children[i].remove();
+        i--;
     }
 }
 
