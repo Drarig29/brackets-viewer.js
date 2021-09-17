@@ -63,6 +63,24 @@ export class BracketsViewer {
     }
 
     /**
+     * Updates the results of an existing match.
+     * 
+     * @param match The match to update.
+     */
+    public updateMatch(match: Match): void {
+        const matchContainer = document.querySelector(`[data-match-id='${match.id}']`);
+        if (!matchContainer) throw Error('Match not found.');
+
+        matchContainer.setAttribute('data-match-status', match.status.toString());
+
+        const result1 = matchContainer.querySelector('.participant:nth-of-type(1) .result');
+        if (result1 && match.opponent1?.score) result1.innerHTML = match.opponent1?.score?.toString();
+
+        const result2 = matchContainer.querySelector('.participant:nth-of-type(2) .result');
+        if (result2 && match.opponent2?.score) result2.innerHTML = match.opponent2?.score?.toString();
+    }
+
+    /**
      * Sets the images which will be rendered for every participant.
      *
      * @param images The participant images.
