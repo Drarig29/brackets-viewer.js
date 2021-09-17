@@ -398,11 +398,10 @@ export class BracketsViewer {
             result: dom.createResultContainer(),
         };
 
-        if (participant === null || participant === undefined) 
+        if (participant === null || participant === undefined)
             containers.name.innerText = lang.t('common.bye');
-         else 
+        else
             this.renderParticipant(containers, participant, side, originHint, matchLocation, roundNumber);
-        
 
         containers.participant.append(containers.name, containers.result);
 
