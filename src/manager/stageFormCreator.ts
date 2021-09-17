@@ -197,7 +197,7 @@ function createMaskFields(config: FormConfiguration, stage: StageType, parent: H
                 try {
                     validateRoundRobin(config);
                 } catch (e) {
-                    alert(e.message);
+                    alert((<DOMException>e).message);
                     return;
                 }
 
