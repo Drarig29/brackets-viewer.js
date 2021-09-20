@@ -32,8 +32,8 @@
   $match-border: var(--match-border-width) solid var(--border-color);
 
   font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
-    "Helvetica Neue", Arial, "Noto Sans", sans-serif, "Apple Color Emoji",
-    "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";
+  "Helvetica Neue", Arial, "Noto Sans", sans-serif, "Apple Color Emoji",
+  "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";
 
   &:empty {
     // Prevents a FOUC during loading.
@@ -243,7 +243,7 @@
 
       %straight {
         border-left: unset;
-        left: -var(--round-margin);
+        left: var(--round-margin);
         width: var(--round-margin);
       }
 
