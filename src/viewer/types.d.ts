@@ -146,12 +146,12 @@ export type RankingFormula = (ranking: RankingItem) => number;
 /**
  * An object mapping ranking properties to their header.
  */
-export type RankingHeaders = { [name in keyof RankingItem]: RankingHeader };
+export type RankingHeaders = Record<keyof RankingItem, RankingHeader>;
 
 /**
  * An object mapping a participant id to its row in the ranking.
  */
-export type RankingMap = { [id: number]: RankingItem };
+export type RankingMap = Record<number, RankingItem>;
 
 /**
  * Definition of a ranking.

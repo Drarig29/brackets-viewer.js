@@ -19,7 +19,7 @@ import {
 
 export class BracketsViewer {
 
-    readonly participantRefs: { [participantId: number]: HTMLElement[] } = {};
+    readonly participantRefs: Record<number, HTMLElement[]> = {};
 
     private participants: Participant[] = [];
     private participantImages: ParticipantImage[] = [];
