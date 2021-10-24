@@ -1,7 +1,7 @@
 import i18next, { StringMap, TOptions } from 'i18next';
 import LanguageDetector from 'i18next-browser-languagedetector';
 
-import { Status } from 'brackets-model';
+import { Stage, Status } from 'brackets-model';
 import { isMajorRound } from './helpers';
 import { FinalType, BracketType, OriginHint } from './types';
 
@@ -179,6 +179,23 @@ export function getMatchStatus(status: Status): string {
  */
 export function getGroupName(groupNumber: number): string {
     return t('common.group-name', { groupNumber });
+}
+
+
+/**
+ * Returns the name of the bracket.
+ * 
+ * @param stage The current stage.
+ * @param type Type of the bracket.
+ */
+export function getBracketName(stage: Stage, type: BracketType): string | undefined {
+    switch (type) {
+        case 'winner-bracket':
+        case 'loser-bracket':
+            return t(`common.group-name-${type}`, { stage });
+        default:
+            return undefined;
+    }
 }
 
 /**

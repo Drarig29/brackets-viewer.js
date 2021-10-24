@@ -32,8 +32,8 @@
   $match-border: var(--match-border-width) solid var(--border-color);
 
   font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
-  "Helvetica Neue", Arial, "Noto Sans", sans-serif, "Apple Color Emoji",
-  "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";
+    "Helvetica Neue", Arial, "Noto Sans", sans-serif, "Apple Color Emoji",
+    "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";
 
   &:empty {
     // Prevents a FOUC during loading.
@@ -145,18 +145,25 @@
   }
 
   .bracket {
-    display: flex;
-
-    &:not(:last-of-type) {
-      margin-bottom: 15px;
+    h2 {
+      font-size: 1.5em;
+      color: gray;
     }
 
-    .round {
+    .rounds {
       display: flex;
-      flex-direction: column;
 
       &:not(:last-of-type) {
-        margin-right: var(--round-margin);
+        margin-bottom: 15px;
+      }
+
+      .round {
+        display: flex;
+        flex-direction: column;
+
+        &:not(:last-of-type) {
+          margin-right: var(--round-margin);
+        }
       }
     }
   }

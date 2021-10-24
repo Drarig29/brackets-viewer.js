@@ -85,6 +85,8 @@
         "bye": "BYE",
         "best-of-x": "Bo{{x}}",
         "group-name": "Group {{groupNumber}}",
+        "group-name-winner-bracket": "Winner Bracket",
+        "group-name-loser-bracket": "Loser Bracket",
         "round-name": "Round {{roundNumber}}",
         "round-name-final": "Final Round",
         "round-name-winner-bracket": "WB Round {{roundNumber}}",

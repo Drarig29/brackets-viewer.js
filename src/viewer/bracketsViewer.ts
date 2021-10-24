@@ -24,6 +24,7 @@ export class BracketsViewer {
     private participants: Participant[] = [];
     private participantImages: ParticipantImage[] = [];
 
+    private stage!: Stage;
     private config!: Config;
     private skipFirstRound = false;
     private alwaysConnectFirstRound = false;
@@ -99,6 +100,7 @@ export class BracketsViewer {
         const stage = data.stages[0];
         const matchesByGroup = splitBy(data.matches, 'group_id');
 
+        this.stage = stage;
         this.skipFirstRound = stage.settings.skipFirstRound || false;
 
         switch (stage.type) {
@@ -215,7 +217,8 @@ export class BracketsViewer {
     private renderBracket(container: HTMLElement, matchesByRound: Match[][], roundName: RoundName, bracketType: BracketType, connectFinal?: boolean): void {
         const groupId = matchesByRound[0][0].group_id;
         const roundCount = matchesByRound.length;
-        const bracketContainer = dom.createBracketContainer(groupId);
+        const bracketContainer = dom.createBracketContainer(groupId, lang.getBracketName(this.stage, bracketType));
+        const roundsContainer = dom.createRoundsContainer();
 
         const { matches: completedMatches, fromToornament } = completeWithBlankMatches(matchesByRound[0], matchesByRound[1], bracketType);
 
@@ -231,9 +234,10 @@ export class BracketsViewer {
             for (const match of matches)
                 roundContainer.append(match && this.createBracketMatch(roundNumber, roundCount, match, bracketType, connectFinal) || this.skipBracketMatch());
 
-            bracketContainer.append(roundContainer);
+            roundsContainer.append(roundContainer);
         }
 
+        bracketContainer.append(roundsContainer);
         container.append(bracketContainer);
     }
 
