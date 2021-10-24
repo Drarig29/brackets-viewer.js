@@ -29,6 +29,17 @@ i18next.use(LanguageDetector).init({
 });
 
 /**
+ * Adds a locale to the available i18n bundles.
+ * 
+ * @param name Name of the locale.
+ * @param locale Contents of the locale.
+ */
+export function addLocale(name: string, locale: Locale): void {
+    i18next.addResourceBundle(name, 'translation', locale);
+    i18next.changeLanguage();
+}
+
+/**
  * Returns an internationalized version of a locale key.
  * 
  * @param key A locale key.

@@ -3,6 +3,7 @@ import { Participant, Match, ParticipantResult, Stage, Status } from 'brackets-m
 import { splitBy, getRanking, getOriginAbbreviation, findRoot, completeWithBlankMatches } from './helpers';
 import * as dom from './dom';
 import * as lang from './lang';
+import { Locale } from './lang';
 import {
     Config,
     Connection,
@@ -79,6 +80,16 @@ export class BracketsViewer {
 
         const result2 = matchContainer.querySelector('.participant:nth-of-type(2) .result');
         if (result2 && match.opponent2?.score) result2.innerHTML = match.opponent2?.score?.toString();
+    }
+
+    /**
+     * Adds a locale to the available i18n bundles.
+     * 
+     * @param name Name of the locale.
+     * @param locale Contents of the locale.
+     */
+    public addLocale(name: string, locale: Locale): void {
+        lang.addLocale(name, locale);
     }
 
     /**
