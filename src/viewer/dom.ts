@@ -39,19 +39,27 @@ export function createEliminationContainer(stageId: number): HTMLElement {
 }
 
 /**
- * Creates a container which contains one bracket of a single or double elimination.
+ * Creates a container which contains one bracket of a single or double elimination stage.
  *
  * @param groupId ID of the group.
+ * @param title Title of the group.
  */
-export function createBracketContainer(groupId: number): HTMLElement {
+export function createBracketContainer(groupId: number, title?: string): HTMLElement {
     const bracket = document.createElement('section');
     bracket.classList.add('bracket');
     bracket.setAttribute('data-group-id', groupId.toString());
+
+    if (title) {
+        const h2 = document.createElement('h2');
+        h2.innerText = title;
+        bracket.append(h2);
+    }
+
     return bracket;
 }
 
 /**
- * Creates a container which contains a group.
+ * Creates a container which contains a group for round-robin stages.
  *
  * @param groupId ID of the group.
  * @param title Title of the group.
@@ -65,6 +73,15 @@ export function createGroupContainer(groupId: number, title: string): HTMLElemen
     group.setAttribute('data-group-id', groupId.toString());
     group.append(h2);
     return group;
+}
+
+/**
+ * Creates a container which contains a list of rounds.
+ */
+export function createRoundsContainer(): HTMLElement {
+    const round = document.createElement('div');
+    round.classList.add('rounds');
+    return round;
 }
 
 /**
