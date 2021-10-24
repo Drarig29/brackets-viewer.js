@@ -1,0 +1,79 @@
+<html>
+
+<head>
+    <meta charset="utf-8">
+
+    <link rel="stylesheet" href="../dist/brackets-viewer.min.css" />
+    <script type="text/javascript" src="../dist/brackets-viewer.min.js"></script>
+
+    <title>Demo with printing</title>
+
+    <!-- You can choose a default theme or make you own. -->
+    <link rel="stylesheet" href="themes/light.css" />
+
+    <style>
+        h1 {
+            display: none;
+        }
+
+        h2 {
+            margin-top: 30px !important;
+            margin-bottom: 20px !important;
+            font-size: 2em !important;
+            color: black !important;
+        }
+
+        h3 {
+            display: none;
+        }
+
+        @media print {
+            .brackets-viewer .bracket {
+                break-after: page;
+            }
+
+            .brackets-viewer .participant {
+                font-style: italic;
+            }
+        }
+    </style>
+
+</head>
+
+<body style="background: gray;">
+
+    <!-- This div will be used as the root for the library. It must be **perfectly** empty to prevent a FOUC. -->
+    <div id="example" class="brackets-viewer"></div>
+
+    <script>
+        (async function () {
+            const data = await fetch('http://localhost:3000/db')
+                .catch(() => alert('Failed to fetch localhost. Please do `npm run db` or use json-server your own way.'))
+                .then(res => res.json());
+
+
+            window.bracketsViewer.addLocale('en', {
+                "common": {
+                    "group-name-winner-bracket": "{{stage.name}}",
+                    "group-name-loser-bracket": "{{stage.name}} - Repechage",
+                }
+            });
+
+            window.bracketsViewer.render({
+                stages: data.stage,
+                matches: data.match,
+                matchGames: data.match_game,
+                participants: data.participant,
+            }, {
+                selector: '#example',
+                participantOriginPlacement: 'before',
+                separatedChildCountLabel: true,
+                showSlotsOrigin: true,
+                showLowerBracketSlotsOrigin: true,
+                highlightParticipantOnHover: true,
+            });
+        })();
+    </script>
+</body>
+
+</html>
