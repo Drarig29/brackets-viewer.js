@@ -32,7 +32,7 @@ Or from GitHub with (you can replace `@master` by any branch name, tag name or c
 <script type="text/javascript" src="https://cdn.jsdelivr.net/gh/Drarig29/brackets-viewer.js@master/dist/brackets-viewer.min.js"></script>
 ```
 
-Now, you can use it with data generated using [brackets-manager](https://github.com/Drarig29/brackets-manager.js) just like in the `/demo` folder.
+Now, you can use it with data generated using [brackets-manager](https://github.com/Drarig29/brackets-manager.js).
 
 To quickly test, you can use `json-server`:
 
@@ -47,6 +47,8 @@ To quickly test, you can use `json-server`:
   ```bash
   npx json-server --watch path/to/brackets-manager/db.json
   ```
+
+Once this is done, visit `/demo/index.html` to play with the demos.
 
 ## How to build?
 
