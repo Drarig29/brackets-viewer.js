@@ -29,6 +29,10 @@
     "bugs": {
         "url": "https://github.com/Drarig29/brackets-viewer.js/issues"
     },
+    "browserslist": [
+        "defaults",
+        "not IE 11"
+    ],
     "homepage": "https://github.com/Drarig29/brackets-viewer.js#readme",
     "dependencies": {
         "brackets-manager": "github:Drarig29/brackets-manager.js",
@@ -43,12 +47,14 @@
         "@babel/core": "^7.15.5",
         "@typescript-eslint/eslint-plugin": "^4.31.2",
         "@typescript-eslint/parser": "^4.31.2",
+        "autoprefixer": "^10.3.7",
         "babel-loader": "^8.2.2",
         "css-loader": "^6.3.0",
         "eslint": "^7.32.0",
         "eslint-plugin-jsdoc": "^35.5.1",
         "json-server": "^0.16.3",
         "mini-css-extract-plugin": "^2.3.0",
+        "postcss-loader": "^6.2.0",
         "sass": "^1.41.1",
         "sass-loader": "^12.1.0",
         "ts-loader": "^9.2.5",

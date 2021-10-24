@@ -39,13 +39,24 @@ var bracketsViewerConfig = Object.assign({}, config, {
                 use: [
                     MiniCssExtractPlugin.loader,
                     'css-loader',
+                    {
+                        loader: "postcss-loader",
+                        options: {
+                            postcssOptions: {
+                                plugins: [
+                                    "autoprefixer",
+                                ]
+                            }
+                        }
+                    },
                     'sass-loader',
                 ],
             },
         ],
     },
 });
-var stageFormCreatorConfig = Object.assign({}, config,{
+
+var stageFormCreatorConfig = Object.assign({}, config, {
     plugins: [
         new webpack.ProvidePlugin({
             process: 'process/browser',
