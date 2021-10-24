@@ -260,7 +260,7 @@ export class BracketsViewer {
      * @param matches Matches of the final.
      */
     private renderFinal(container: HTMLElement, finalType: FinalType, matches: Match[]): void {
-        const upperBracket = container.querySelector('.bracket');
+        const upperBracket = container.querySelector('.bracket .rounds');
         if (!upperBracket) throw Error('Upper bracket not found.');
 
         const winnerWb = matches[0].opponent1;
