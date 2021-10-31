@@ -432,7 +432,7 @@ export class BracketsViewer {
         };
 
         if (participant === null || participant === undefined)
-            containers.name.innerText = lang.t('common.bye');
+            dom.setupBye(containers.name);
         else
             this.renderParticipant(containers, participant, side, originHint, matchLocation, roundNumber);
 

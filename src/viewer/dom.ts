@@ -242,6 +242,17 @@ export function setupHint(nameContainer: HTMLElement, hint: string): void {
 }
 
 /**
+ * Sets a BYE on a name container.
+ *
+ * @param nameContainer The name container.
+ */
+export function setupBye(nameContainer: HTMLElement): void {
+    nameContainer.innerText = t('common.bye');
+    nameContainer.classList.add('bye');
+}
+
+
+/**
  * Sets a win for a participant.
  *
  * @param participantContainer The participant container.
