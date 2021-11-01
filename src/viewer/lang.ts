@@ -35,7 +35,7 @@ i18next.use(LanguageDetector).init({
  * @param locale Contents of the locale.
  */
 export function addLocale(name: string, locale: Locale): void {
-    i18next.addResourceBundle(name, 'translation', locale);
+    i18next.addResourceBundle(name, 'translation', locale, true, true);
     i18next.changeLanguage();
 }
 
