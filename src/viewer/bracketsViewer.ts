@@ -231,7 +231,7 @@ export class BracketsViewer {
         const bracketContainer = dom.createBracketContainer(groupId, lang.getBracketName(this.stage, bracketType));
         const roundsContainer = dom.createRoundsContainer();
 
-        const { matches: completedMatches, fromToornament } = completeWithBlankMatches(matchesByRound[0], matchesByRound[1], bracketType);
+        const { matches: completedMatches, fromToornament } = completeWithBlankMatches(bracketType, matchesByRound[0], matchesByRound[1]);
 
         this.alwaysConnectFirstRound = !fromToornament;
 
@@ -240,9 +240,9 @@ export class BracketsViewer {
             const roundNumber = roundIndex + 1;
             const roundContainer = dom.createRoundContainer(roundId, roundName(roundNumber, roundCount));
 
-            const matches = fromToornament && roundNumber === 1 ? completedMatches : matchesByRound[roundIndex];
+            const roundMatches = fromToornament && roundNumber === 1 ? completedMatches : matchesByRound[roundIndex];
 
-            for (const match of matches)
+            for (const match of roundMatches)
                 roundContainer.append(match && this.createBracketMatch(roundNumber, roundCount, match, bracketType, connectFinal) || this.skipBracketMatch());
 
             roundsContainer.append(roundContainer);

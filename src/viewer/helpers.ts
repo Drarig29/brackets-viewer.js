@@ -49,14 +49,17 @@ export function findRoot(selector?: string): HTMLElement {
  * Toornament can generate first rounds with an odd number of matches and the seeding is partially distributed in the second round.
  * This function adds a blank match in the first round as if it was the source match of a seeded match of the second round.
  * 
+ * @param bracketType Type of the bracket.
  * @param matches The list of first round matches.
  * @param nextMatches The list of second round matches.
- * @param bracketType Type of the bracket.
  */
-export function completeWithBlankMatches(matches: Match[], nextMatches: Match[], bracketType: BracketType): {
+export function completeWithBlankMatches(bracketType: BracketType, matches: Match[], nextMatches?: Match[]): {
     matches: (Match | null)[],
     fromToornament: boolean,
 } {
+    if (!nextMatches)
+        return { matches, fromToornament: false };
+
     let sources: (number | null)[] = [];
 
     if (bracketType === 'single-bracket' || bracketType === 'winner-bracket')
