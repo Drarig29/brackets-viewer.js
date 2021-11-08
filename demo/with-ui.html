@@ -150,8 +150,8 @@
 
                     let inputButton = document.getElementById(INPUT_SUBMIT);
                     inputButton.onclick = async () => {
-                        const opponent1 = document.getElementById(OPPONENT1).value;
-                        const opponent2 = document.getElementById(OPPONENT2).value;
+                        const opponent1 = parseInt(document.getElementById(OPPONENT1).value);
+                        const opponent2 = parseInt(document.getElementById(OPPONENT2).value);
 
                         let opponent1Data = {
                             score: opponent1
