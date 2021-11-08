@@ -70,6 +70,8 @@ export class BracketsViewer {
      * @param match The match to update.
      */
     public updateMatch(match: Match): void {
+        //  TODO: finish this function (update win/loss/forfeit, scoreboard in round-robin, etc.)
+
         const matchContainer = document.querySelector(`[data-match-id='${match.id}']`);
         if (!matchContainer) throw Error('Match not found.');
 
