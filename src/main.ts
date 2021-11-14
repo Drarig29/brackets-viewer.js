@@ -1,5 +1,5 @@
 import { BracketsViewer } from './viewer/bracketsViewer';
-import { InMemoryDatabase } from './manager/inMemoryDatabase';
+import { InMemoryDatabase } from 'brackets-memory-db';
 import { BracketsManager } from 'brackets-manager';
 
 window.bracketsViewer = new BracketsViewer();
