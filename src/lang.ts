@@ -5,8 +5,8 @@ import { Stage, Status } from 'brackets-model';
 import { isMajorRound } from './helpers';
 import { FinalType, BracketType, OriginHint } from './types';
 
-import en from '../i18n/en/translation.json';
-import fr from '../i18n/fr/translation.json';
+import en from './i18n/en/translation.json';
+import fr from './i18n/fr/translation.json';
 
 export const locales = {
     en,
