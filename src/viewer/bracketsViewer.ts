@@ -342,7 +342,7 @@ export class BracketsViewer {
      */
     private createBracketMatch(roundNumber: number, roundCount: number, match: Match, matchLocation: BracketType, connectFinal?: boolean): HTMLElement {
         const connection = dom.getBracketConnection(this.alwaysConnectFirstRound, roundNumber, roundCount, match, matchLocation, connectFinal);
-        const matchLabel = lang.getMatchLabel(match.number, roundNumber, roundCount, matchLocation) + (match.child_count > 0 ? `, Bo${match.child_count}` : '');
+        const matchLabel = lang.getMatchLabel(match.number, roundNumber, roundCount, matchLocation);
         const originHint = lang.getOriginHint(roundNumber, roundCount, this.skipFirstRound, matchLocation);
         return this.createMatch(match, matchLocation, connection, matchLabel, originHint, roundNumber);
     }
@@ -400,12 +400,7 @@ export class BracketsViewer {
         const participant1 = this.createParticipant(match.opponent1, 'opponent1', originHint, matchLocation, roundNumber);
         const participant2 = this.createParticipant(match.opponent2, 'opponent2', originHint, matchLocation, roundNumber);
 
-        if (label)
-            opponents.append(dom.createMatchLabel(label, lang.getMatchStatus(match.status)));
-
-        if (match.child_count > 0 && this.config.separatedChildCountLabel)
-            opponents.append(dom.createChildCountLabel(lang.t('common.best-of-x', { x: match.child_count })));
-
+        this.renderMatchLabel(opponents, match, label);
         opponents.append(participant1, participant2);
         matchContainer.append(opponents);
 
@@ -482,6 +477,33 @@ export class BracketsViewer {
     private renderParticipantImage(nameContainer: HTMLElement, participantId: number): void {
         const found = this.participantImages.find(item => item.participantId === participantId);
         if (found) dom.addParticipantImage(nameContainer, found.imageUrl);
+    }
+
+    /**
+     * Renders a match label.
+     * 
+     * @param opponents The opponents container.
+     * @param match Results of the match.
+     * @param label Label of the match.
+     */
+    private renderMatchLabel(opponents: HTMLElement, match: Match, label?: string): void {
+        const childCountLabel = `Bo${match.child_count}`;
+
+        label = label || '';
+
+        if (this.config.separatedChildCountLabel) {
+            opponents.append(dom.createMatchLabel(label, lang.getMatchStatus(match.status)));
+
+            if (match.child_count > 0)
+                opponents.append(dom.createChildCountLabel(lang.t('common.best-of-x', { x: match.child_count })));
+
+            return;
+        }
+
+        if (match.child_count > 0) {
+            const joined = label ? `${label}, ${childCountLabel}` : childCountLabel;
+            opponents.append(dom.createMatchLabel(joined, lang.getMatchStatus(match.status)));
+        }
     }
 
     /**
