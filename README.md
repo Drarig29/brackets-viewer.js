@@ -18,11 +18,11 @@ It contains all the logic needed to display tournaments.
 
 ## How to use?
 
-Import the library from npm using [jsDelivr](https://www.jsdelivr.com/):
+Import the library from npm using [jsDelivr](https://www.jsdelivr.com/) (you can replace `@latest` to lock a specific version):
 
 ```html
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/brackets-viewer/dist/brackets-viewer.min.css" />
-<script type="text/javascript" src="https://cdn.jsdelivr.net/npm/brackets-viewer/dist/brackets-viewer.min.js"></script>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/brackets-viewer@latest/dist/brackets-viewer.min.css" />
+<script type="text/javascript" src="https://cdn.jsdelivr.net/npm/brackets-viewer@latest/dist/brackets-viewer.min.js"></script>
 ```
 
 Or from GitHub with (you can replace `@master` by any branch name, tag name or commit id):
