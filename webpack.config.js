@@ -1,5 +1,4 @@
 const path = require('path');
-const webpack = require('webpack');
 const MiniCssExtractPlugin = require('mini-css-extract-plugin');
 
 var config = {
@@ -7,23 +6,15 @@ var config = {
 };
 
 var bracketsViewerConfig = Object.assign({}, config, {
+    entry: './src/index.ts',
     plugins: [
         new MiniCssExtractPlugin({
             filename: 'brackets-viewer.min.css',
         }),
-        new webpack.ProvidePlugin({
-            process: 'process/browser',
-        }),
     ],
     resolve: {
         extensions: ['.ts', '.js'],
-        fallback: {
-            path: require.resolve("path-browserify"),
-            util: require.resolve("util/"),
-            fs: false
-        }
     },
-    entry: './src/main.ts',
     output: {
         path: path.resolve(__dirname, 'dist'),
         filename: 'brackets-viewer.min.js',
@@ -57,20 +48,10 @@ var bracketsViewerConfig = Object.assign({}, config, {
 });
 
 var stageFormCreatorConfig = Object.assign({}, config, {
-    plugins: [
-        new webpack.ProvidePlugin({
-            process: 'process/browser',
-        }),
-    ],
+    entry: './src/form.ts',
     resolve: {
         extensions: ['.ts', '.js'],
-        fallback: {
-            path: require.resolve("path-browserify"),
-            util: require.resolve("util/"),
-            fs: false
-        }
     },
-    entry: './src/manager/stageFormCreator.ts',
     output: {
         path: path.resolve(__dirname, 'dist'),
         filename: 'stage-form-creator.min.js',

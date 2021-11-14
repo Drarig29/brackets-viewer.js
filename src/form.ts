@@ -1,5 +1,5 @@
 import { GrandFinalType, InputStage, RoundRobinMode, SeedOrdering, StageSettings, StageType } from 'brackets-model';
-import { t } from '../viewer/lang';
+import { t } from './lang';
 
 const stageTypes: StageType[] = ['round_robin', 'single_elimination', 'double_elimination'];
 
