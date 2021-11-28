@@ -558,9 +558,6 @@ export class BracketsViewer {
 
         refs.push(element);
 
-        // https://flaviocopes.com/how-to-add-event-listener-multiple-elements-javascript/
-        // Use bubbling to have only one callback
-
         element.addEventListener('mouseover', () => {
             refs.forEach(el => el.classList.add('hover'));
         });
