@@ -40,7 +40,7 @@ export class BracketsViewer {
      * @param data The data to display.
      * @param config An optional configuration for the viewer.
      */
-    public render(data: ViewerData, config?: Partial<Config>): void {
+    public async render(data: ViewerData, config?: Partial<Config>): Promise<void> {
         const root = document.createDocumentFragment();
 
         this.config = {

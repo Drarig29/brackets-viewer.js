@@ -61,7 +61,9 @@
                 showSlotsOrigin: true,
                 showLowerBracketSlotsOrigin: true,
                 highlightParticipantOnHover: true,
-            });
+            }).then(
+                () => console.log('Render finished')
+            );
         })()
     </script>
 </body>
