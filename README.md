@@ -6,8 +6,8 @@ It contains all the logic needed to display tournaments.
 
 - Supports translation ([i18next](https://www.i18next.com/))
 - Full vanilla JS (no framework)
-- A full working example of creating and displaying brackets (see [`/demo/with-ui.html`](demo/with-ui.html))
-- Themes supported, with CSS variables (see [`/demo/themes`](/demo/themes))
+- A full working example of creating and displaying brackets (see [`./demo/with-ui.html`](demo/with-ui.html))
+- Themes supported, with CSS variables (see [`./demo/themes`](/demo/themes))
 
 [![npm](https://img.shields.io/npm/v/brackets-viewer.svg)](https://www.npmjs.com/package/brackets-viewer)
 [![Downloads](https://img.shields.io/npm/dt/brackets-viewer.svg)](https://www.npmjs.com/package/brackets-viewer)
@@ -36,11 +36,11 @@ Now, you can use it with data generated using [brackets-manager](https://github.
 
 ## Demos
 
-To quickly test, you can also try the demos by visiting `/demo/index.html`.
+To quickly test, you can also try the demos by visiting `./demo/index.html`.
 
 To use `json-server`, you can:
 
-- Run the npm script named `db` to serve the static database file `/demo/db.json`
+- Run the npm script named `db` to serve the static database file `./demo/db.json`
 
   ```bash
   npm run db
