@@ -85,22 +85,22 @@ export class BracketsViewer {
     }
 
     /**
-     * Adds a locale to the available i18n bundles.
-     * 
-     * @param name Name of the locale.
-     * @param locale Contents of the locale.
-     */
-    public addLocale(name: string, locale: Locale): void {
-        lang.addLocale(name, locale);
-    }
-
-    /**
      * Sets the images which will be rendered for every participant.
      *
      * @param images The participant images.
      */
     public setParticipantImages(images: ParticipantImage[]): void {
         this.participantImages = images;
+    }
+
+    /**
+     * Adds a locale to the available i18n bundles.
+     * 
+     * @param name Name of the locale.
+     * @param locale Contents of the locale.
+     */
+     public addLocale(name: string, locale: Locale): void {
+        lang.addLocale(name, locale);
     }
 
     /**
