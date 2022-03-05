@@ -45,6 +45,11 @@ export type Side = 'opponent1' | 'opponent2';
  */
 export interface Config {
     /**
+     * A callback to be called when a match is clicked.
+     */
+    onMatchClick?: MatchClickCallback;
+
+    /**
      * An optional selector to select the root element.
      */
     selector?: string,
@@ -104,6 +109,11 @@ export type OriginHint = (position: number) => string;
  * A function returning a round name based on its number and the count of rounds.
  */
 export type RoundName = (roundNumber: number, roundCount: number) => string;
+
+/**
+ * A function called when a match is clicked.
+ */
+export type MatchClickCallback = (match: Match) => void;
 
 /**
  * Contains the information about the connections of a match.

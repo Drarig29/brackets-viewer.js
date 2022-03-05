@@ -16,6 +16,7 @@ import {
     ViewerData,
     ParticipantImage,
     Side,
+    MatchClickCallback,
 } from './types';
 
 export class BracketsViewer {
@@ -30,7 +31,16 @@ export class BracketsViewer {
     private skipFirstRound = false;
     private alwaysConnectFirstRound = false;
 
-    public onMatchClicked = (_: Match): void => { };
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    private _onMatchClick: MatchClickCallback = (match: Match): void => { };
+
+    /**
+     * @deprecated
+     * @param callback A callback to be called when a match is clicked.
+     */
+    public set onMatchClicked(callback: MatchClickCallback) {
+        this._onMatchClick = callback;
+    }
 
     /**
      * Renders data generated with `brackets-manager.js`. If multiple stages are given, they will all be displayed.
@@ -50,6 +60,9 @@ export class BracketsViewer {
             showLowerBracketSlotsOrigin: config?.showLowerBracketSlotsOrigin !== undefined ? config.showLowerBracketSlotsOrigin : true,
             highlightParticipantOnHover: config?.highlightParticipantOnHover !== undefined ? config.highlightParticipantOnHover : true,
         };
+
+        if (this.config.onMatchClick)
+            this._onMatchClick = this.config.onMatchClick;
 
         this.participants = data.participants;
 
@@ -99,7 +112,7 @@ export class BracketsViewer {
      * @param name Name of the locale.
      * @param locale Contents of the locale.
      */
-     public addLocale(name: string, locale: Locale): void {
+    public addLocale(name: string, locale: Locale): void {
         lang.addLocale(name, locale);
     }
 
@@ -392,7 +405,7 @@ export class BracketsViewer {
      */
     private createMatch(match: Match, matchLocation?: BracketType, connection?: Connection, label?: string, originHint?: OriginHint, roundNumber?: number): HTMLElement {
         const matchContainer = dom.createMatchContainer(match.id, match.status);
-        const opponents = dom.createOpponentsContainer(() => this.onMatchClicked(match));
+        const opponents = dom.createOpponentsContainer(() => this._onMatchClick(match));
 
         if (match.status >= Status.Completed)
             originHint = undefined;
