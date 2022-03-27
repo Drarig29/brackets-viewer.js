@@ -23,6 +23,7 @@
   --connector-border-width: 2px;
   --match-border-width: 1px;
   --match-border-radius: 0.3em;
+  --participant-image-size: 1em;
 }
 
 .brackets-viewer {
@@ -307,8 +308,8 @@
       }
 
       & > img {
-        width: 1em;
-        height: 1em;
+        width: var(--participant-image-size);
+        height: var(--participant-image-size);
         margin-right: 4px;
         object-fit: cover;
         border-radius: 4px;
