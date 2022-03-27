@@ -81,7 +81,11 @@
     text-align: center;
     background: var(--secondary-background);
     font-size: 1.1em;
-    padding: 10px;
+    padding: 10px 0px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    width: var(--match-width);
   }
 
   .round-robin {
