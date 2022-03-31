@@ -204,10 +204,21 @@
         if (id === null || id === '') {
             listBrackets();
         } else {
-            backLink = document.createElement('a');
+            const backLink = document.createElement('a');
             backLink.href = '?id';
             backLink.innerText = 'Go back';
             document.body.insertBefore(backLink, document.getElementById(ELEMENT_ID));
+
+            const deleteButton = document.createElement('a');
+            deleteButton.href = '?id';
+            deleteButton.innerText = 'Delete';
+            document.body.insertBefore(deleteButton, document.getElementById(ELEMENT_ID));
+
+            deleteButton.addEventListener('click', async (e) => {
+                const bracketsStore = JSON.parse(localStorage.getItem(BRACKETS));
+                delete bracketsStore[id];
+                localStorage.setItem(BRACKETS, JSON.stringify(bracketsStore));
+            });
 
             createBracket(id);
         }
