@@ -11,9 +11,17 @@
     <!-- You can choose a default theme or make you own. -->
     <link rel="stylesheet" href="themes/light.css" />
 
+    <style>
+        #input-mask div {
+            background: lightgrey;
+            padding: 10px 0;
+        }
+    </style>
+
 </head>
 
-<!-- TODO: Close the form after the result update -->
+<!-- TODO: rename "mask" to form -->
+<!-- TODO: autoselect the winner based on the input score -->
 <!-- TODO: Autofill the form with scores when opening it -->
 <!-- TODO: Use new FormData(document.querySelector('form')); -->
 
@@ -69,9 +77,9 @@
         });
     </script>
 
-
     <div id="input-mask">
         <div>
+            <h3></h3>
             <label id="opponent1-label" for="opponent1">Opponent 1: </label><input type="number" id="opponent1"><br>
             <label id="opponent2-label" for="opponent2">Opponent 2: </label><input type="number" id="opponent2"><br>
             <p>Who won?</p>
@@ -114,7 +122,20 @@
             document.body.insertBefore(bracketsList, document.getElementById(ELEMENT_ID));
         }
 
+        function loadData(id) {
+            const bracketsStore = JSON.parse(localStorage.getItem(BRACKETS));
+
+            if (null === bracketsStore || !(id in bracketsStore)) {
+                alert('Key is not found in data!');
+                return;
+            }
+
+            return bracketsStore[id];
+        }
+
         function renderBracket(data) {
+            document.getElementById(ELEMENT_ID).innerHTML = '';
+
             window.bracketsViewer.render({
                 stages: data.stage,
                 matches: data.match,
@@ -128,77 +149,6 @@
                 showLowerBracketSlotsOrigin: true,
                 highlightParticipantOnHover: true,
             });
-        }
-
-        function createBracket(id) {
-            const bracketsStore = JSON.parse(localStorage.getItem(BRACKETS));
-
-            if (null === bracketsStore || !(id in bracketsStore)) {
-                alert('Key is not found in data!');
-                return;
-            }
-
-            const data = bracketsStore[id];
-            console.log(data);
-
-            window.bracketsViewer.onMatchClicked = match => {
-                (async function () {
-                    console.log(match);
-
-                    let inputMask = document.getElementById(INPUT_MASK);
-                    inputMask.style.display = 'flex';
-
-                    let inputButton = document.getElementById(INPUT_SUBMIT);
-                    inputButton.onclick = async () => {
-                        const opponent1 = parseInt(document.getElementById(OPPONENT1).value);
-                        const opponent2 = parseInt(document.getElementById(OPPONENT2).value);
-
-                        let opponent1Data = {
-                            score: opponent1
-                        }
-
-                        let opponent2Data = {
-                            score: opponent2
-                        }
-
-                        if (document.getElementById(RADIO_OPPONENT1).checked) {
-                            opponent1Data['result'] = 'win';
-                        }
-
-                        if (document.getElementById(RADIO_OPPONENT2).checked) {
-                            opponent2Data['result'] = 'win';
-                        }
-
-                        if (document.getElementById(RADIO_DRAW).checked) {
-                            opponent1Data['result'] = 'draw';
-                            opponent2Data['result'] = 'draw';
-                        }
-
-                        console.log(document.getElementById(RADIO_OPPONENT1).checked);
-                        console.log(document.getElementById(RADIO_OPPONENT2).checked);
-
-                        await window.bracketsManager.import(data);
-
-                        await window.bracketsManager.update.match({
-                            id: match.id,
-                            opponent1: opponent1Data,
-                            opponent2: opponent2Data,
-                        });
-
-                        window.bracketsManager.storage.select('match', 0).then((match) => {
-                            window.bracketsViewer.updateMatch(match);
-                        });
-
-                        window.bracketsManager.export().then((data) => {
-                            let storeData = bracketsStore;
-                            storeData[id] = data
-                            localStorage.setItem(BRACKETS, JSON.stringify(storeData));
-                        });
-                    }
-                })();
-            }
-
-            renderBracket(data);
         }
 
         if (id === null || id === '') {
@@ -220,7 +170,55 @@
                 localStorage.setItem(BRACKETS, JSON.stringify(bracketsStore));
             });
 
-            createBracket(id);
+            window.bracketsViewer.onMatchClicked = async (match) => {
+                const inputMask = document.getElementById(INPUT_MASK);
+                inputMask.style.display = 'flex';
+
+                const matchTitle = document.querySelector(`[data-match-id="${match.id}"] .opponents > span`).textContent;
+                inputMask.querySelector('h3').innerText = matchTitle;
+
+                const inputButton = document.getElementById(INPUT_SUBMIT);
+                inputButton.onclick = async () => {
+                    const opponent1 = parseInt(document.getElementById(OPPONENT1).value);
+                    const opponent2 = parseInt(document.getElementById(OPPONENT2).value);
+
+                    const payload1 = { score: opponent1 }
+                    const payload2 = { score: opponent2 }
+
+                    if (document.getElementById(RADIO_OPPONENT1).checked) {
+                        payload1['result'] = 'win';
+                    }
+
+                    if (document.getElementById(RADIO_OPPONENT2).checked) {
+                        payload2['result'] = 'win';
+                    }
+
+                    if (document.getElementById(RADIO_DRAW).checked) {
+                        payload1['result'] = 'draw';
+                        payload2['result'] = 'draw';
+                    }
+
+                    const data = loadData(id);
+                    await window.bracketsManager.import(data);
+
+                    await window.bracketsManager.update.match({
+                        id: match.id,
+                        opponent1: payload1,
+                        opponent2: payload2,
+                    });
+
+                    const newData = await window.bracketsManager.export();
+                    renderBracket(newData);
+
+                    data[id] = newData;
+                    localStorage.setItem(BRACKETS, JSON.stringify(data));
+
+                    inputMask.style.display = 'none';
+                }
+            }
+
+            const data = loadData(id);
+            renderBracket(data);
         }
     </script>
 </body>
