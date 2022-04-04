@@ -211,8 +211,9 @@
                     const newData = await window.bracketsManager.export();
                     renderBracket(newData);
 
-                    data[id] = newData;
-                    localStorage.setItem(BRACKETS, JSON.stringify(data));
+                    const bracketsStore = JSON.parse(localStorage.getItem(BRACKETS));
+                    bracketsStore[id] = newData;
+                    localStorage.setItem(BRACKETS, JSON.stringify(bracketsStore));
 
                     inputMask.style.display = 'none';
                 }
