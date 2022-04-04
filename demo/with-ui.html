@@ -127,6 +127,7 @@
 
             if (null === bracketsStore || !(id in bracketsStore)) {
                 alert('Key is not found in data!');
+                window.location.search = '?id'
                 return;
             }
 
