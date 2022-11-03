@@ -1,5 +1,10 @@
 # brackets-viewer.js
 
+[![npm](https://img.shields.io/npm/v/brackets-viewer.svg)](https://www.npmjs.com/package/brackets-viewer)
+[![Downloads](https://img.shields.io/npm/dt/brackets-viewer.svg)](https://www.npmjs.com/package/brackets-viewer)
+[![jsDelivr](https://data.jsdelivr.com/v1/package/npm/brackets-viewer/badge?style=rounded)](https://www.jsdelivr.com/package/npm/brackets-viewer)
+[![Package Quality](https://packagequality.com/shield/brackets-viewer.svg)](https://packagequality.com/#?package=brackets-viewer)
+
 A simple library to display tournament brackets (round-robin, single elimination, double elimination)
 
 It contains all the logic needed to display tournaments.
@@ -8,11 +13,6 @@ It contains all the logic needed to display tournaments.
 - Full vanilla JS (no framework)
 - A full working example of creating and displaying brackets (see [`./demo/with-ui.html`](demo/with-ui.html))
 - Themes supported, with CSS variables (see [`./demo/themes`](/demo/themes))
-
-[![npm](https://img.shields.io/npm/v/brackets-viewer.svg)](https://www.npmjs.com/package/brackets-viewer)
-[![Downloads](https://img.shields.io/npm/dt/brackets-viewer.svg)](https://www.npmjs.com/package/brackets-viewer)
-[![jsDelivr](https://data.jsdelivr.com/v1/package/npm/brackets-viewer/badge?style=rounded)](https://www.jsdelivr.com/package/npm/brackets-viewer)
-[![Package Quality](https://packagequality.com/shield/brackets-viewer.svg)](https://packagequality.com/#?package=brackets-viewer)
 
 ![Screenshot](screenshot.png)
 
