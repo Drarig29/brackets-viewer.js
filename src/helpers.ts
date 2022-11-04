@@ -3,22 +3,24 @@ import { RankingHeader, Ranking, RankingFormula, RankingItem, RankingMap, Bracke
 import { t } from './lang';
 
 /**
- * Splits an array based on values of a given key of the objects of the array.
+ * Splits an array of objects based on their values at a given key.
  *
- * @param array The array to split.
+ * @param objects The array to split.
  * @param key The key of T.
  */
-export function splitBy<T>(array: T[], key: keyof T): T[][] {
-    const obj = Object();
+export function splitBy<T>(objects: T[], key: keyof T): T[][] {
+    const map = {} as Record<string | number, T[]>;
 
-    for (const value of array) {
-        if (!obj[value[key]])
-            obj[value[key]] = [];
+    for (const obj of objects) {
+        const commonValue = obj[key] as string | number;
 
-        obj[value[key]].push(value);
+        if (!map[commonValue])
+            map[commonValue] = [];
+
+        map[commonValue].push(obj);
     }
 
-    return Object.values(obj);
+    return Object.values(map);
 }
 
 /**

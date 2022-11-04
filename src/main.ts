@@ -50,6 +50,7 @@ export class BracketsViewer {
      * @param data The data to display.
      * @param config An optional configuration for the viewer.
      */
+    // eslint-disable-next-line @typescript-eslint/require-await -- Keep this async for backwards compatibility.
     public async render(data: ViewerData, config?: Partial<Config>): Promise<void> {
         const root = document.createDocumentFragment();
 
@@ -112,8 +113,8 @@ export class BracketsViewer {
      * @param name Name of the locale.
      * @param locale Contents of the locale.
      */
-    public addLocale(name: string, locale: Locale): void {
-        lang.addLocale(name, locale);
+    public async addLocale(name: string, locale: Locale): Promise<void> {
+        await lang.addLocale(name, locale);
     }
 
     /**
@@ -138,7 +139,7 @@ export class BracketsViewer {
                 this.renderElimination(root, stage, matchesByGroup);
                 break;
             default:
-                throw Error(`Unknown bracket type: ${stage.type}`);
+                throw Error(`Unknown bracket type: ${stage.type as string}`);
         }
     }
 
@@ -553,7 +554,7 @@ export class BracketsViewer {
         const abbreviation = getOriginAbbreviation(matchLocation, this.skipFirstRound, roundNumber, side);
         if (!abbreviation) return;
 
-        const origin = abbreviation + participant.position;
+        const origin = `${abbreviation}${participant.position}`;
         dom.addParticipantOrigin(nameContainer, origin, this.config.participantOriginPlacement);
     }
 

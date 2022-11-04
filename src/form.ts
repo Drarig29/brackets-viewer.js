@@ -175,7 +175,7 @@ function createMaskFields(config: FormConfiguration, stage: StageType, parent: H
 
             break;
         default:
-            throw new DOMException('stage ' + stage + ' seems to be not implemented yet.');
+            throw new DOMException(`stage ${stage as string} seems to be not implemented yet.`);
     }
 
     const submitBtnWrapper = document.createElement('div');
@@ -218,10 +218,7 @@ function createMaskFields(config: FormConfiguration, stage: StageType, parent: H
                 validateDoubleElimination(config);
 
                 const rawSeedOrder = (<HTMLTextAreaElement>document.getElementById(config.html_double_elimination_seed_textarea_id)).value.split(',');
-                const seedOrder: SeedOrdering[] = [];
-
-                for (const i in rawSeedOrder)
-                    seedOrder.push(<SeedOrdering>rawSeedOrder[i].trim());
+                const seedOrder = rawSeedOrder.map(order => order.trim() as SeedOrdering);
 
                 const doubleEliminationSettings: StageSettings = {
                     seedOrdering: seedOrder,
@@ -259,7 +256,7 @@ function createMaskFields(config: FormConfiguration, stage: StageType, parent: H
 
                 break;
             default:
-                throw new DOMException('stage ' + stage + ' seems to be not implemented yet.');
+                throw new DOMException(`stage ${stage as string} seems to be not implemented yet.`);
         }
 
         submitCallback(query);
@@ -281,17 +278,13 @@ function validateDoubleElimination(config: FormConfiguration): void {
         throw new DOMException('grand_final_type must be one of: ' + grandFinalTypes.toString());
 
     const orderings = (<HTMLTextAreaElement>document.getElementById(config.html_double_elimination_seed_textarea_id)).value.split(',');
-    for (const i in orderings) {
-        if (orderings[i] === '') {
-            delete orderings[i];
-            continue;
-        }
 
-        const ordering = orderings[i].trim() as SeedOrdering;
+    orderings.forEach(value => {
+        const ordering = value.trim() as SeedOrdering;
 
         if (!eliminationOrderings.includes(ordering))
             throw new DOMException('elimination seed_ordering wrong found: ' + ordering + 'must be one of: ' + eliminationOrderings.toString());
-    }
+    });
 }
 
 /**
@@ -438,15 +431,15 @@ function createSelect(parent: HTMLElement, selectId: string, labelText: string, 
 }
 
 /**
- * @param optionSwitch HTMLELement to add the options to
+ * @param optionSwitch HTMLElement to add the options to
  * @param options string list of possible options
  */
 function createOptions(optionSwitch: HTMLElement, options: string[]): void {
-    for (const i in options) {
-        const option = document.createElement('option');
-        option.innerText = options[i];
-        optionSwitch.appendChild(option);
-    }
+    options.forEach(option => {
+        const optionElement = document.createElement('option');
+        optionElement.innerText = option;
+        optionSwitch.appendChild(optionElement);
+    });
 }
 
 window.stageFormCreator = stageFormCreator;
