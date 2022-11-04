@@ -1,9 +1,20 @@
 module.exports = {
-    parser: '@typescript-eslint/parser', // Specifies the ESLint parser
+    parser: '@typescript-eslint/parser',
     parserOptions: {
-        ecmaVersion: 2020, // Allows for the parsing of modern ECMAScript features
-        sourceType: 'module', // Allows for the use of imports
+        ecmaVersion: 2020,
+        sourceType: 'module',
     },
+    overrides: [
+        {
+            files: ['*.ts'],
+            extends: [
+                'plugin:@typescript-eslint/recommended-requiring-type-checking',
+            ],
+            parserOptions: {
+                project: './tsconfig.json',
+            },
+        },
+    ],
     ignorePatterns: ['dist/', 'webpack.config.js'],
     extends: [
         'plugin:@typescript-eslint/recommended',
@@ -31,7 +42,6 @@ module.exports = {
         'jsdoc/require-param-type': 0,
         'jsdoc/require-returns': 0,
         'jsdoc/require-returns-type': 0,
-        'jsdoc/no-multi-asterisks': 0, // https://github.com/gajus/eslint-plugin-jsdoc/issues/773
 
         '@typescript-eslint/explicit-function-return-type': ['error'],
         '@typescript-eslint/no-empty-function': 0,
