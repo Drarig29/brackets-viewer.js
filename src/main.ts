@@ -60,6 +60,7 @@ export class BracketsViewer {
             showSlotsOrigin: config?.showSlotsOrigin !== undefined ? config.showSlotsOrigin : true,
             showLowerBracketSlotsOrigin: config?.showLowerBracketSlotsOrigin !== undefined ? config.showLowerBracketSlotsOrigin : true,
             highlightParticipantOnHover: config?.highlightParticipantOnHover !== undefined ? config.highlightParticipantOnHover : true,
+            showRankingTable: config?.showRankingTable !== undefined ? config.showRankingTable : true,
         };
 
         if (this.config.onMatchClick)
@@ -173,7 +174,9 @@ export class BracketsViewer {
                 groupContainer.append(roundContainer);
             }
 
-            groupContainer.append(this.createRanking(groupMatches));
+            if (this.config.showRankingTable)
+                groupContainer.append(this.createRanking(groupMatches));
+
             container.append(groupContainer);
         }
 

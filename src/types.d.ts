@@ -83,6 +83,11 @@ export interface Config {
      * Whether to highlight every instance of a participant on hover.
      */
     highlightParticipantOnHover?: boolean,
+
+    /**
+     * Whether to show a ranking table on round-robin stages.
+     */
+    showRankingTable?: boolean,
 }
 
 /**
