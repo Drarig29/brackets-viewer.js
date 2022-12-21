@@ -85,7 +85,7 @@ export interface Config {
     highlightParticipantOnHover?: boolean,
 
     /**
-     * Whether to show ranking table on round-robin stages.
+     * Whether to show a ranking table on round-robin stages.
      */
     showRankingTable?: boolean,
 }
