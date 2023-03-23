@@ -28,6 +28,20 @@ export function splitBy<
 }
 
 /**
+ * Sorts the objects in the given array by a given key.
+ *
+ * @param array The array to sort.
+ * @param key The key of T.
+ */
+export function sortBy<
+    T extends Record<string, unknown>,
+    K extends keyof T,
+    U extends Record<K, number>
+>(array: U[], key: K): U[] {
+    return [...array].sort((a, b) => a[key] - b[key]);
+}
+
+/**
  * Finds the root element
  *
  * @param selector An optional selector to select the root element.

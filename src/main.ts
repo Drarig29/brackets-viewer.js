@@ -1,6 +1,6 @@
 import './style.scss';
 import { Participant, Match, ParticipantResult, Stage, Status } from 'brackets-model';
-import { splitBy, getRanking, getOriginAbbreviation, findRoot, completeWithBlankMatches } from './helpers';
+import { splitBy, getRanking, getOriginAbbreviation, findRoot, completeWithBlankMatches, sortBy } from './helpers';
 import * as dom from './dom';
 import * as lang from './lang';
 import { Locale } from './lang';
@@ -160,7 +160,7 @@ export class BracketsViewer {
         for (const groupMatches of matchesByGroup) {
             const groupId = groupMatches[0].group_id;
             const groupContainer = dom.createGroupContainer(groupId, lang.getGroupName(groupNumber++));
-            const matchesByRound = splitBy(groupMatches, 'round_id');
+            const matchesByRound = splitBy(groupMatches, 'round_id').map(matches => sortBy(matches, 'number'));
 
             let roundNumber = 1;
 
@@ -210,10 +210,14 @@ export class BracketsViewer {
      */
     private renderSingleElimination(container: HTMLElement, matchesByGroup: Match[][]): void {
         const hasFinal = matchesByGroup[1] !== undefined;
-        this.renderBracket(container, splitBy(matchesByGroup[0], 'round_id'), lang.getRoundName, 'single-bracket');
+        const bracketMatches = splitBy(matchesByGroup[0], 'round_id').map(matches => sortBy(matches, 'number'));
 
-        if (hasFinal)
-            this.renderFinal(container, 'consolation_final', matchesByGroup[1]);
+        this.renderBracket(container, bracketMatches, lang.getRoundName, 'single-bracket');
+
+        if (hasFinal) {
+            const finalMatches = sortBy(matchesByGroup[1], 'number');
+            this.renderFinal(container, 'consolation_final', finalMatches);
+        }
     }
 
     /**
@@ -225,14 +229,19 @@ export class BracketsViewer {
     private renderDoubleElimination(container: HTMLElement, matchesByGroup: Match[][]): void {
         const hasLoserBracket = matchesByGroup[1] !== undefined;
         const hasFinal = matchesByGroup[2] !== undefined;
+        const winnerBracketMatches = splitBy(matchesByGroup[0], 'round_id').map(matches => sortBy(matches, 'number'));
 
-        this.renderBracket(container, splitBy(matchesByGroup[0], 'round_id'), lang.getWinnerBracketRoundName, 'winner-bracket', hasFinal);
+        this.renderBracket(container, winnerBracketMatches, lang.getWinnerBracketRoundName, 'winner-bracket', hasFinal);
 
-        if (hasLoserBracket)
-            this.renderBracket(container, splitBy(matchesByGroup[1], 'round_id'), lang.getLoserBracketRoundName, 'loser-bracket');
+        if (hasLoserBracket) {
+            const loserBracketMatches = splitBy(matchesByGroup[1], 'round_id').map(matches => sortBy(matches, 'number'));
+            this.renderBracket(container, loserBracketMatches, lang.getLoserBracketRoundName, 'loser-bracket');
+        }
 
-        if (hasFinal)
-            this.renderFinal(container, 'grand_final', matchesByGroup[2]);
+        if (hasFinal) {
+            const finalMatches = sortBy(matchesByGroup[2], 'number');
+            this.renderFinal(container, 'grand_final', finalMatches);
+        }
     }
 
     /**
