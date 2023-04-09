@@ -1,8 +1,9 @@
-import { Stage, Match, MatchGame, Participant } from 'brackets-model';
+import { Stage, Match, MatchGame, Participant, GroupType } from 'brackets-model';
 import { CallbackFunction, FormConfiguration } from './form';
 import { InMemoryDatabase } from 'brackets-memory-db';
 import { BracketsViewer } from './main';
 import { BracketsManager } from 'brackets-manager';
+import { ToI18nKey, Translator } from './lang';
 
 declare global {
     interface Window {
@@ -48,6 +49,12 @@ export interface Config {
      * A callback to be called when a match is clicked.
      */
     onMatchClick?: MatchClickCallback;
+
+    /**
+     * A function to deeply customize the names of the rounds.
+     * If you just want to **translate some words**, please use `addLocale()` instead.
+     */
+    customRoundName?: (...args: Parameters<RoundNameGetter>) => ReturnType<RoundNameGetter> | undefined,
 
     /**
      * An optional selector to select the root element.
@@ -101,9 +108,23 @@ export type ConnectionType = 'square' | 'straight' | false;
 export type OriginHint = (position: number) => string;
 
 /**
+ * Info associated to a round in order to name its header.
+ */
+export interface RoundNameInfo {
+    group: ToI18nKey<GroupType | 'round_robin'>,
+    roundNumber: number,
+    roundCount: number,
+    /**
+     * - For elimination stages: `1` = final, `1/2` = semi finals, `1/4` = quarter finals, etc.
+     * - For round-robin: `0` because there is no final. 
+     */
+    fractionOfFinal: number,
+}
+
+/**
  * A function returning a round name based on its number and the count of rounds.
  */
-export type RoundName = (roundNumber: number, roundCount: number) => string;
+export type RoundNameGetter = (info: RoundNameInfo, t: Translator) => string;
 
 /**
  * A function called when a match is clicked.

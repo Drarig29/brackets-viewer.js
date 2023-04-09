@@ -4,17 +4,19 @@ import { splitBy, getRanking, getOriginAbbreviation, findRoot, completeWithBlank
 import * as dom from './dom';
 import * as lang from './lang';
 import { Locale } from './lang';
+import { helpers } from 'brackets-manager';
 import {
     Config,
     Connection,
     OriginHint,
     ParticipantContainers,
     RankingItem,
-    RoundName,
+    RoundNameGetter,
     ViewerData,
     ParticipantImage,
     Side,
     MatchClickCallback,
+    RoundNameInfo,
 } from './types';
 
 export class BracketsViewer {
@@ -29,11 +31,16 @@ export class BracketsViewer {
     private skipFirstRound = false;
     private alwaysConnectFirstRound = false;
 
+    // eslint-disable-next-line jsdoc/require-jsdoc
+    private getRoundName(info: RoundNameInfo, fallbackGetter: RoundNameGetter): string {
+        return this.config.customRoundName?.(info, lang.t) || fallbackGetter(info, lang.t);
+    }
+
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
     private _onMatchClick: MatchClickCallback = (match: Match): void => { };
 
     /**
-     * @deprecated
+     * @deprecated Use `onMatchClick` in the `config` parameter of `viewer.render()`.
      * @param callback A callback to be called when a match is clicked.
      */
     public set onMatchClicked(callback: MatchClickCallback) {
@@ -53,6 +60,7 @@ export class BracketsViewer {
         const root = document.createDocumentFragment();
 
         this.config = {
+            customRoundName: config?.customRoundName,
             participantOriginPlacement: config?.participantOriginPlacement || 'before',
             separatedChildCountLabel: config?.separatedChildCountLabel !== undefined ? config.separatedChildCountLabel : false,
             showSlotsOrigin: config?.showSlotsOrigin !== undefined ? config.showSlotsOrigin : true,
@@ -164,12 +172,19 @@ export class BracketsViewer {
 
             for (const roundMatches of matchesByRound) {
                 const roundId = roundMatches[0].round_id;
-                const roundContainer = dom.createRoundContainer(roundId, lang.getRoundName(roundNumber++, 0));
+                const roundName = this.getRoundName({
+                    roundNumber,
+                    roundCount: 0,
+                    fractionOfFinal: 0,
+                    group: lang.toI18nKey('round_robin'),
+                }, lang.getRoundName);
 
+                const roundContainer = dom.createRoundContainer(roundId, roundName);
                 for (const match of roundMatches)
                     roundContainer.append(this.createMatch(match));
 
                 groupContainer.append(roundContainer);
+                roundNumber++;
             }
 
             if (this.config.showRankingTable)
@@ -247,11 +262,11 @@ export class BracketsViewer {
      *
      * @param container The container to render into.
      * @param matchesByRound A list of matches for each round.
-     * @param roundName A function giving a round's name based on its number.
+     * @param getRoundName A function giving a round's name based on its number.
      * @param bracketType Type of the bracket.
      * @param connectFinal Whether to connect the last match of the bracket to the final.
      */
-    private renderBracket(container: HTMLElement, matchesByRound: Match[][], roundName: RoundName, bracketType: GroupType, connectFinal?: boolean): void {
+    private renderBracket(container: HTMLElement, matchesByRound: Match[][], getRoundName: RoundNameGetter, bracketType: GroupType, connectFinal?: boolean): void {
         const groupId = matchesByRound[0][0].group_id;
         const roundCount = matchesByRound.length;
         const bracketContainer = dom.createBracketContainer(groupId, lang.getBracketName(this.stage, bracketType));
@@ -264,10 +279,16 @@ export class BracketsViewer {
         for (let roundIndex = 0; roundIndex < matchesByRound.length; roundIndex++) {
             const roundId = matchesByRound[roundIndex][0].round_id;
             const roundNumber = roundIndex + 1;
-            const roundContainer = dom.createRoundContainer(roundId, roundName(roundNumber, roundCount));
+            const roundName = this.getRoundName({
+                roundNumber,
+                roundCount,
+                fractionOfFinal: helpers.getFractionOfFinal(roundNumber, roundCount),
+                group: lang.toI18nKey(bracketType),
+            }, getRoundName);
+
+            const roundContainer = dom.createRoundContainer(roundId, roundName);
 
             const roundMatches = fromToornament && roundNumber === 1 ? completedMatches : matchesByRound[roundIndex];
-
             for (const match of roundMatches)
                 roundContainer.append(match && this.createBracketMatch(roundNumber, roundCount, match, bracketType, connectFinal) || this.skipBracketMatch());
 

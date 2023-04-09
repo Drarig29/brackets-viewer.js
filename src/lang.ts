@@ -3,7 +3,7 @@ import LanguageDetector from 'i18next-browser-languagedetector';
 
 import { Stage, Status, FinalType, GroupType } from 'brackets-model';
 import { isMajorRound } from './helpers';
-import { OriginHint } from './types';
+import { OriginHint, RoundNameInfo } from './types';
 
 import en from './i18n/en/translation.json';
 import fr from './i18n/fr/translation.json';
@@ -49,6 +49,21 @@ export function t<Scope extends keyof Locale, SubKey extends string & keyof Loca
     key: `${Scope}.${SubKey}`, options?: T,
 ): T['returnObjects'] extends true ? StringMap : string {
     return i18next.t(key, options);
+}
+
+export type Translator = typeof t;
+
+export type ToI18nKey<S extends string> = S extends `${infer A}_${infer B}`
+    ? `${A}-${B}`
+    : never;
+
+/**
+ * Converts a type to a valid i18n key.
+ *
+ * @param key The key to convert.
+ */
+export function toI18nKey<S extends `${string}_${string}`>(key: S): ToI18nKey<S> {
+    return key.replace('_', '-') as ToI18nKey<S>;
 }
 
 /**
@@ -192,10 +207,6 @@ export function getGroupName(groupNumber: number): string {
     return t('common.group-name', { groupNumber });
 }
 
-type Replace<S extends string, Search extends string, Replace extends string> = S extends `${infer A}${Search}${infer B}`
-    ? `${A}${Replace}${B}`
-    : never;
-
 /**
  * Returns the name of the bracket.
  * 
@@ -206,39 +217,32 @@ export function getBracketName(stage: Stage, type: GroupType): string | undefine
     switch (type) {
         case 'winner_bracket':
         case 'loser_bracket':
-            const key = type.replace('_', '-') as Replace<typeof type, '_', '-'>;
-            return t(`common.group-name-${key}`, { stage });
+            return t(`common.group-name-${toI18nKey(type)}`, { stage });
         default:
             return undefined;
     }
 }
 
+// eslint-disable-next-line jsdoc/require-param
 /**
  * Returns the name of a round.
- *
- * @param roundNumber Number of the round.
- * @param roundCount Count of rounds.
  */
-export function getRoundName(roundNumber: number, roundCount: number): string {
+export function getRoundName({ roundNumber, roundCount }: RoundNameInfo, t: Translator): string {
     return roundNumber === roundCount ? t('common.round-name-final') : t('common.round-name', { roundNumber });
 }
 
+// eslint-disable-next-line jsdoc/require-param
 /**
  * Returns the name of a round in the winner bracket of a double elimination stage.
- *
- * @param roundNumber Number of the round.
- * @param roundCount Count of rounds.
  */
-export function getWinnerBracketRoundName(roundNumber: number, roundCount: number): string {
+export function getWinnerBracketRoundName({ roundNumber, roundCount }: RoundNameInfo, t: Translator): string {
     return roundNumber === roundCount ? t('common.round-name-winner-bracket-final') : t('common.round-name-winner-bracket', { roundNumber });
 }
 
+// eslint-disable-next-line jsdoc/require-param
 /**
  * Returns the name of a round in the loser bracket of a double elimination stage.
- *
- * @param roundNumber Number of the round.
- * @param roundCount Count of rounds.
  */
-export function getLoserBracketRoundName(roundNumber: number, roundCount: number): string {
+export function getLoserBracketRoundName({ roundNumber, roundCount }: RoundNameInfo, t: Translator): string {
     return roundNumber === roundCount ? t('common.round-name-loser-bracket-final') : t('common.round-name-loser-bracket', { roundNumber });
 }
