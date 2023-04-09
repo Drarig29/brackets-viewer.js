@@ -37,15 +37,12 @@
             imageUrl: 'https://github.githubassets.com/pinned-octocat.svg',
         })));
 
-        window.bracketsViewer.onMatchClicked = match => console.log(match)
-
         await window.bracketsViewer.render({
             stages: data.stage,
             matches: data.match,
             matchGames: data.match_game,
             participants: data.participant,
         }, {
-            // This is optional.
             customRoundName: (info, t) => {
                 // You have a reference to `t` in order to translate things.
                 // Returning `undefined` will fallback to the default round name in the current language.
@@ -53,6 +50,7 @@
                 if (info.fractionOfFinal === 1 / 2)
                     return `${t(`abbreviations.${info.group}`)} Semi Finals`
             },
+            onMatchClick: match => console.log('A match was clicked', match),
             selector: '#example',
             participantOriginPlacement: 'before',
             separatedChildCountLabel: true,
