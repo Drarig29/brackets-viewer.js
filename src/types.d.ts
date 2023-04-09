@@ -96,16 +96,6 @@ export interface Config {
 export type ConnectionType = 'square' | 'straight' | false;
 
 /**
- * The possible types of final.
- */
-export type FinalType = 'consolation_final' | 'grand_final';
-
-/**
- * The possible types of bracket.
- */
-export type BracketType = 'single-bracket' | 'winner-bracket' | 'loser-bracket' | 'final-group';
-
-/**
  * A function returning an origin hint based on a participant's position.
  */
 export type OriginHint = (position: number) => string;

@@ -1,9 +1,9 @@
 import i18next, { StringMap, TOptions } from 'i18next';
 import LanguageDetector from 'i18next-browser-languagedetector';
 
-import { Stage, Status } from 'brackets-model';
+import { Stage, Status, FinalType, GroupType } from 'brackets-model';
 import { isMajorRound } from './helpers';
-import { FinalType, BracketType, OriginHint } from './types';
+import { OriginHint } from './types';
 
 import en from './i18n/en/translation.json';
 import fr from './i18n/fr/translation.json';
@@ -59,19 +59,19 @@ export function t<Scope extends keyof Locale, SubKey extends string & keyof Loca
  * @param skipFirstRound Whether to skip the first round.
  * @param matchLocation Location of the match.
  */
-export function getOriginHint(roundNumber: number, roundCount: number, skipFirstRound: boolean, matchLocation: BracketType): OriginHint | undefined {
+export function getOriginHint(roundNumber: number, roundCount: number, skipFirstRound: boolean, matchLocation: GroupType): OriginHint | undefined {
     if (roundNumber === 1) {
-        if (matchLocation === 'single-bracket')
+        if (matchLocation === 'single_bracket')
             return (position: number): string => t('origin-hint.seed', { position });
 
-        if (matchLocation === 'winner-bracket')
+        if (matchLocation === 'winner_bracket')
             return (position: number): string => t('origin-hint.seed', { position });
 
-        if (matchLocation === 'loser-bracket' && skipFirstRound)
+        if (matchLocation === 'loser_bracket' && skipFirstRound)
             return (position: number): string => t('origin-hint.seed', { position });
     }
 
-    if (isMajorRound(roundNumber) && matchLocation === 'loser-bracket') {
+    if (isMajorRound(roundNumber) && matchLocation === 'loser_bracket') {
         if (roundNumber === roundCount - 2)
             return (position: number): string => t('origin-hint.winner-bracket-semi-final', { position });
 
@@ -116,14 +116,14 @@ export function getFinalOriginHint(finalType: FinalType, roundNumber: number): O
  * @param roundCount Count of rounds.
  * @param matchLocation Location of the match.
  */
-export function getMatchLabel(matchNumber: number, roundNumber: number, roundCount: number, matchLocation: BracketType): string {
-    const matchPrefix = matchLocation === 'winner-bracket' ? t('match-label.winner-bracket') :
-        matchLocation === 'loser-bracket' ? t('match-label.loser-bracket') : t('match-label.standard-bracket');
+export function getMatchLabel(matchNumber: number, roundNumber: number, roundCount: number, matchLocation: GroupType): string {
+    const matchPrefix = matchLocation === 'winner_bracket' ? t('match-label.winner-bracket') :
+        matchLocation === 'loser_bracket' ? t('match-label.loser-bracket') : t('match-label.standard-bracket');
 
     const inSemiFinalRound = roundNumber === roundCount - 1;
     const inFinalRound = roundNumber === roundCount;
 
-    if (matchLocation === 'single-bracket') {
+    if (matchLocation === 'single_bracket') {
         if (inSemiFinalRound)
             return t('match-label.standard-bracket-semi-final', { matchNumber });
 
@@ -192,6 +192,9 @@ export function getGroupName(groupNumber: number): string {
     return t('common.group-name', { groupNumber });
 }
 
+type Replace<S extends string, Search extends string, Replace extends string> = S extends `${infer A}${Search}${infer B}`
+    ? `${A}${Replace}${B}`
+    : never;
 
 /**
  * Returns the name of the bracket.
@@ -199,11 +202,12 @@ export function getGroupName(groupNumber: number): string {
  * @param stage The current stage.
  * @param type Type of the bracket.
  */
-export function getBracketName(stage: Stage, type: BracketType): string | undefined {
+export function getBracketName(stage: Stage, type: GroupType): string | undefined {
     switch (type) {
-        case 'winner-bracket':
-        case 'loser-bracket':
-            return t(`common.group-name-${type}`, { stage });
+        case 'winner_bracket':
+        case 'loser_bracket':
+            const key = type.replace('_', '-') as Replace<typeof type, '_', '-'>;
+            return t(`common.group-name-${key}`, { stage });
         default:
             return undefined;
     }

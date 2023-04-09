@@ -1,5 +1,5 @@
-import { Match, ParticipantResult } from 'brackets-model';
-import { Connection, FinalType, BracketType, Placement, Ranking, RankingItem } from './types';
+import { Match, ParticipantResult, FinalType, GroupType } from 'brackets-model';
+import { Connection, Placement, Ranking, RankingItem } from './types';
 import { rankingHeader } from './helpers';
 import { t } from './lang';
 
@@ -327,13 +327,13 @@ export function addParticipantImage(nameContainer: HTMLElement, src: string): vo
  * @param matchLocation Location of the match.
  * @param connectFinal Whether to connect to the final.
  */
-export function getBracketConnection(alwaysConnectFirstRound: boolean, roundNumber: number, roundCount: number, match: Match, matchLocation?: BracketType, connectFinal?: boolean): Connection {
+export function getBracketConnection(alwaysConnectFirstRound: boolean, roundNumber: number, roundCount: number, match: Match, matchLocation?: GroupType, connectFinal?: boolean): Connection {
     const connection: Connection = {
         connectPrevious: false,
         connectNext: false,
     };
 
-    if (matchLocation === 'loser-bracket') {
+    if (matchLocation === 'loser_bracket') {
         connection.connectPrevious = roundNumber > 1 && (roundNumber % 2 === 1 ? 'square' : 'straight');
         connection.connectNext = roundNumber < roundCount && (roundNumber % 2 === 0 ? 'square' : 'straight');
     } else {
@@ -344,12 +344,12 @@ export function getBracketConnection(alwaysConnectFirstRound: boolean, roundNumb
     if (alwaysConnectFirstRound || roundNumber !== 2)
         return connection;
 
-    const upperBracket = matchLocation === 'single-bracket' || matchLocation === 'winner-bracket';
+    const upperBracket = matchLocation === 'single_bracket' || matchLocation === 'winner_bracket';
 
     if (upperBracket && match.opponent1?.position === undefined && match.opponent2?.position === undefined)
         connection.connectPrevious = false;
 
-    if (matchLocation === 'loser-bracket' && match.opponent2?.position === undefined)
+    if (matchLocation === 'loser_bracket' && match.opponent2?.position === undefined)
         connection.connectPrevious = false;
 
     return connection;

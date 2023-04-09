@@ -1,5 +1,5 @@
-import { Match, ParticipantResult } from 'brackets-model';
-import { RankingHeader, Ranking, RankingFormula, RankingItem, RankingMap, BracketType, Side } from './types';
+import { Match, ParticipantResult, GroupType } from 'brackets-model';
+import { RankingHeader, Ranking, RankingFormula, RankingItem, RankingMap, Side } from './types';
 import { t } from './lang';
 
 /**
@@ -73,7 +73,7 @@ export function findRoot(selector?: string): HTMLElement {
  * @param matches The list of first round matches.
  * @param nextMatches The list of second round matches.
  */
-export function completeWithBlankMatches(bracketType: BracketType, matches: Match[], nextMatches?: Match[]): {
+export function completeWithBlankMatches(bracketType: GroupType, matches: Match[], nextMatches?: Match[]): {
     matches: (Match | null)[],
     fromToornament: boolean,
 } {
@@ -82,10 +82,10 @@ export function completeWithBlankMatches(bracketType: BracketType, matches: Matc
 
     let sources: (number | null)[] = [];
 
-    if (bracketType === 'single-bracket' || bracketType === 'winner-bracket')
+    if (bracketType === 'single_bracket' || bracketType === 'winner_bracket')
         sources = nextMatches.map(match => [match.opponent1?.position || null, match.opponent2?.position || null]).flat();
 
-    if (bracketType === 'loser-bracket')
+    if (bracketType === 'loser_bracket')
         sources = nextMatches.map(match => match.opponent2?.position || null);
 
     // The manager does not set positions where the Toornament layer does.
@@ -106,16 +106,16 @@ export function completeWithBlankMatches(bracketType: BracketType, matches: Matc
  * @param roundNumber Number of the round.
  * @param side Side of the participant.
  */
-export function getOriginAbbreviation(matchLocation: BracketType, skipFirstRound: boolean, roundNumber?: number, side?: Side): string | null {
+export function getOriginAbbreviation(matchLocation: GroupType, skipFirstRound: boolean, roundNumber?: number, side?: Side): string | null {
     roundNumber = roundNumber || -1;
 
-    if (skipFirstRound && matchLocation === 'loser-bracket' && roundNumber === 1)
+    if (skipFirstRound && matchLocation === 'loser_bracket' && roundNumber === 1)
         return t('abbreviations.seed');
 
-    if (matchLocation === 'single-bracket' || matchLocation === 'winner-bracket' && roundNumber === 1)
+    if (matchLocation === 'single_bracket' || matchLocation === 'winner_bracket' && roundNumber === 1)
         return t('abbreviations.seed');
 
-    if (matchLocation === 'loser-bracket' && roundNumber % 2 === 0 && side === 'opponent1')
+    if (matchLocation === 'loser_bracket' && roundNumber % 2 === 0 && side === 'opponent1')
         return t('abbreviations.position');
 
     return null;
