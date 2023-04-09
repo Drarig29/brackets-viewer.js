@@ -512,11 +512,7 @@ export class BracketsViewer {
      * @param match Results of the match.
      * @param label Label of the match.
      */
-    private renderMatchLabel(opponents: HTMLElement, match: Match, label?: string): void {
-        const childCountLabel = `Bo${match.child_count}`;
-
-        label = label || '';
-
+    private renderMatchLabel(opponents: HTMLElement, match: Match, label = ''): void {
         if (this.config.separatedChildCountLabel) {
             opponents.append(dom.createMatchLabel(label, lang.getMatchStatus(match.status)));
 
@@ -527,6 +523,7 @@ export class BracketsViewer {
         }
 
         if (match.child_count > 0) {
+            const childCountLabel = lang.t('common.best-of-x', { x: match.child_count });
             const joined = label ? `${label}, ${childCountLabel}` : childCountLabel;
             opponents.append(dom.createMatchLabel(joined, lang.getMatchStatus(match.status)));
         }
