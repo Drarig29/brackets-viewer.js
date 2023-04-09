@@ -34,7 +34,7 @@
             console.log(data);
 
             // You can manually add locales. English will be used as a fallback if keys are missing.
-            // You can force browser language detection by setting the `i18nextLng` property to a locale key (ex: 'ru') in the localStorage.
+            // You can force browser language detection with: `window.localStorage['i18nextLng'] = 'ru'` and reloading the page.
             window.bracketsViewer.addLocale('ru', {
                 "common": {
                     "round-name": "раунд {{roundNumber}}",
