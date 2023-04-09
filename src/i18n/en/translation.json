@@ -1,16 +1,16 @@
 {
     "origin-hint": {
         "seed": "Seed {{position}}",
-        "winner-bracket": "Loser of WB {{round}}.{{position}}",
-        "winner-bracket-semi-final": "Loser of WB Semi {{position}}",
-        "winner-bracket-final": "Loser of WB Final",
+        "winner-bracket": "Loser of $t(abbreviations.winner-bracket) {{round}}.{{position}}",
+        "winner-bracket-semi-final": "Loser of $t(abbreviations.winner-bracket) Semi {{position}}",
+        "winner-bracket-final": "Loser of $t(abbreviations.winner-bracket) Final",
         "consolation-final": "Loser of Semi {{position}}",
-        "grand-final": "Winner of LB Final"
+        "grand-final": "Winner of $t(abbreviations.loser-bracket) Final"
     },
     "match-label": {
-        "winner-bracket": "WB",
-        "loser-bracket": "LB",
-        "standard-bracket": "M",
+        "winner-bracket": "$t(abbreviations.winner-bracket)",
+        "loser-bracket": "$t(abbreviations.loser-bracket)",
+        "standard-bracket": "$t(abbreviations.match)",
         "standard-bracket-semi-final": "Semi {{matchNumber}}",
         "standard-bracket-final": "Final",
         "double-elimination": "{{matchPrefix}} {{roundNumber}}.{{matchNumber}}",
@@ -18,7 +18,7 @@
         "double-elimination-final": "{{matchPrefix}} Final",
         "consolation-final": "Consolation Final",
         "grand-final-single": "Grand Final",
-        "grand-final": "GF Round {{roundNumber}}"
+        "grand-final": "$t(abbreviations.grand-final) Round {{roundNumber}}"
     },
     "match-status": {
         "locked": "Locked",
@@ -33,7 +33,11 @@
         "loss": "L",
         "forfeit": "F",
         "position": "P",
-        "seed": "#"
+        "seed": "#",
+        "winner-bracket": "WB",
+        "loser-bracket": "LB",
+        "match": "M",
+        "grand-final": "GF"
     },
     "ranking": {
         "rank": {
@@ -89,10 +93,10 @@
         "group-name-loser-bracket": "Loser Bracket",
         "round-name": "Round {{roundNumber}}",
         "round-name-final": "Final Round",
-        "round-name-winner-bracket": "WB Round {{roundNumber}}",
-        "round-name-winner-bracket-final": "WB Final Round",
-        "round-name-loser-bracket": "LB Round {{roundNumber}}",
-        "round-name-loser-bracket-final": "LB Final Round"
+        "round-name-winner-bracket": "$t(abbreviations.winner-bracket) Round {{roundNumber}}",
+        "round-name-winner-bracket-final": "$t(abbreviations.winner-bracket) Final Round",
+        "round-name-loser-bracket": "$t(abbreviations.loser-bracket) Round {{roundNumber}}",
+        "round-name-loser-bracket-final": "$t(abbreviations.loser-bracket) Final Round"
     },
     "form-creator": {
         "stage-name-label": "Name your stage",
