@@ -45,36 +45,33 @@
     <!-- This div will be used as the root for the library. It must be **perfectly** empty to prevent a FOUC. -->
     <div id="example" class="brackets-viewer"></div>
 
-    <script>
-        (async function () {
-            const data = await fetch('http://localhost:3000/db')
-                .catch(() => alert('Failed to fetch localhost. Please do `npm run db` or use json-server your own way.'))
-                .then(res => res.json());
+    <script type="module">
+        const data = await fetch('http://localhost:3000/db')
+            .catch(() => alert('Failed to fetch localhost. Please do `npm run db` or use json-server your own way.'))
+            .then(res => res.json());
 
+        window.bracketsViewer.addLocale('en', {
+            "common": {
+                "group-name-winner-bracket": "{{stage.name}}",
+                "group-name-loser-bracket": "{{stage.name}} - Repechage",
+            }
+        });
 
-            window.bracketsViewer.addLocale('en', {
-                "common": {
-                    "group-name-winner-bracket": "{{stage.name}}",
-                    "group-name-loser-bracket": "{{stage.name}} - Repechage",
-                }
-            });
+        await window.bracketsViewer.render({
+            stages: data.stage,
+            matches: data.match,
+            matchGames: data.match_game,
+            participants: data.participant,
+        }, {
+            selector: '#example',
+            participantOriginPlacement: 'before',
+            separatedChildCountLabel: true,
+            showSlotsOrigin: true,
+            showLowerBracketSlotsOrigin: true,
+            highlightParticipantOnHover: true,
+        })
 
-            window.bracketsViewer.render({
-                stages: data.stage,
-                matches: data.match,
-                matchGames: data.match_game,
-                participants: data.participant,
-            }, {
-                selector: '#example',
-                participantOriginPlacement: 'before',
-                separatedChildCountLabel: true,
-                showSlotsOrigin: true,
-                showLowerBracketSlotsOrigin: true,
-                highlightParticipantOnHover: true,
-            }).then(
-                () => console.log('Render finished')
-            );
-        })();
+        console.log('Render finished')
     </script>
 </body>
 

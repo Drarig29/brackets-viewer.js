@@ -18,53 +18,51 @@
     <!-- This div will be used as the root for the library. It must be **perfectly** empty to prevent a FOUC. -->
     <div id="example" class="brackets-viewer"></div>
 
-    <script>
-        (() => {
-            const urlParams = new URLSearchParams(window.location.search);
-            const id = urlParams.get('id');
+    <script type="module">
+        const urlParams = new URLSearchParams(window.location.search);
+        const id = urlParams.get('id');
 
-            const bracketsStore = JSON.parse(localStorage.getItem('brackets'));
+        const bracketsStore = JSON.parse(localStorage.getItem('brackets'));
 
-            if (null === bracketsStore || !(id in bracketsStore)) {
-                alert('Key is not found in data!');
-                return;
+        if (null === bracketsStore || !(id in bracketsStore)) {
+            alert('Key is not found in data!');
+            return;
+        }
+
+        const data = bracketsStore[id];
+        console.log(data);
+
+        // You can manually add locales. English will be used as a fallback if keys are missing.
+        // You can force browser language detection with: `window.localStorage['i18nextLng'] = 'ru'` and reloading the page.
+        window.bracketsViewer.addLocale('ru', {
+            "common": {
+                "round-name": "раунд {{roundNumber}}",
             }
+        });
 
-            const data = bracketsStore[id];
-            console.log(data);
+        // This is optional. You must do it before render().
+        window.bracketsViewer.setParticipantImages(data.participant.map(participant => ({
+            participantId: participant.id,
+            imageUrl: 'https://github.githubassets.com/pinned-octocat.svg',
+        })));
 
-            // You can manually add locales. English will be used as a fallback if keys are missing.
-            // You can force browser language detection with: `window.localStorage['i18nextLng'] = 'ru'` and reloading the page.
-            window.bracketsViewer.addLocale('ru', {
-                "common": {
-                    "round-name": "раунд {{roundNumber}}",
-                }
-            });
+        window.bracketsViewer.onMatchClicked = match => console.log(match)
 
-            // This is optional. You must do it before render().
-            window.bracketsViewer.setParticipantImages(data.participant.map(participant => ({
-                participantId: participant.id,
-                imageUrl: 'https://github.githubassets.com/pinned-octocat.svg',
-            })));
+        await window.bracketsViewer.render({
+            stages: data.stage,
+            matches: data.match,
+            matchGames: data.match_game,
+            participants: data.participant,
+        }, {
+            selector: '#example',
+            participantOriginPlacement: 'before',
+            separatedChildCountLabel: true,
+            showSlotsOrigin: true,
+            showLowerBracketSlotsOrigin: true,
+            highlightParticipantOnHover: true,
+        })
 
-            window.bracketsViewer.onMatchClicked = match => console.log(match)
-
-            window.bracketsViewer.render({
-                stages: data.stage,
-                matches: data.match,
-                matchGames: data.match_game,
-                participants: data.participant,
-            }, {
-                selector: '#example',
-                participantOriginPlacement: 'before',
-                separatedChildCountLabel: true,
-                showSlotsOrigin: true,
-                showLowerBracketSlotsOrigin: true,
-                highlightParticipantOnHover: true,
-            }).then(
-                () => console.log('Render finished')
-            );
-        })()
+        console.log('Render finished')
     </script>
 </body>
 

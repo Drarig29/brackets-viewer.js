@@ -32,7 +32,7 @@
 
     <div id="createNewBracket"></div>
     <script type="text/javascript" src="../dist/stage-form-creator.min.js"></script>
-    <script type="text/javascript">
+    <script>
         const config = {
             parent_id: 'createNewBracket',
             html_name_id: 'name',
@@ -49,31 +49,28 @@
             group_default_size: 1
         }
 
-        window.stageFormCreator(config, function (config) {
-            (async function () {
-                await window.bracketsManager.create(config)
-                    .then(() => {
-                        const rawStoredBrackets = localStorage.getItem(BRACKETS);
+        window.stageFormCreator(config, async (config) => {
+            await window.bracketsManager.create(config)
 
-                        if (null === rawStoredBrackets || '' === rawStoredBrackets) {
-                            localStorage.setItem(BRACKETS, JSON.stringify({
-                                0: window.inMemoryDatabase.data,
-                            }));
+            const rawStoredBrackets = localStorage.getItem(BRACKETS);
 
-                            window.location.href = '?id=0';
-                        }
+            if (null === rawStoredBrackets || '' === rawStoredBrackets) {
+                localStorage.setItem(BRACKETS, JSON.stringify({
+                    0: window.inMemoryDatabase.data,
+                }));
 
-                        let storedBrackets = JSON.parse(rawStoredBrackets);
-                        console.log(storedBrackets);
+                window.location.href = '?id=0';
+            }
 
-                        let index = Object.keys(storedBrackets).length;
-                        storedBrackets[index] = window.inMemoryDatabase.data;
+            let storedBrackets = JSON.parse(rawStoredBrackets);
+            console.log(storedBrackets);
 
-                        localStorage.setItem(BRACKETS, JSON.stringify(storedBrackets));
+            let index = Object.keys(storedBrackets).length;
+            storedBrackets[index] = window.inMemoryDatabase.data;
 
-                        window.location.href = '?id=' + index;
-                    });
-            })();
+            localStorage.setItem(BRACKETS, JSON.stringify(storedBrackets));
+
+            window.location.href = '?id=' + index;
         });
     </script>
 
@@ -92,7 +89,7 @@
         </div>
     </div>
 
-    <script type="text/javascript">
+    <script>
         const BRACKETS = 'brackets';
         const INPUT_MASK = 'input-mask';
         const INPUT_SUBMIT = 'input-submit';
