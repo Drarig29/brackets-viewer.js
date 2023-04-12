@@ -1,6 +1,6 @@
 {
     "name": "brackets-viewer",
-    "version": "1.5.0",
+    "version": "1.5.1",
     "description": "A simple library to display tournament brackets (round-robin, single elimination, double elimination)",
     "files": [
         "dist/"
