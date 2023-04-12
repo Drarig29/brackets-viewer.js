@@ -1,4 +1,4 @@
-import { Stage, Match, MatchGame, Participant, GroupType } from 'brackets-model';
+import { Stage, Match, MatchGame, Participant, GroupType, FinalType } from 'brackets-model';
 import { CallbackFunction, FormConfiguration } from './form';
 import { InMemoryDatabase } from 'brackets-memory-db';
 import { BracketsViewer } from './main';
@@ -110,15 +110,23 @@ export type OriginHint = (position: number) => string;
 /**
  * Info associated to a round in order to name its header.
  */
-export interface RoundNameInfo {
-    group: ToI18nKey<GroupType | 'round_robin'>,
+export type RoundNameInfo = {
+    groupType: Exclude<ToI18nKey<GroupType>, 'final-group'>,
     roundNumber: number,
     roundCount: number,
     /**
-     * - For elimination stages: `1` = final, `1/2` = semi finals, `1/4` = quarter finals, etc.
-     * - For round-robin: `0` because there is no final. 
+     * `1` = final, `1/2` = semi finals, `1/4` = quarter finals, etc.
      */
     fractionOfFinal: number,
+} | {
+    groupType: 'round-robin',
+    roundNumber: number,
+    roundCount: number,
+} | {
+    groupType: 'final-group',
+    finalType: ToI18nKey<FinalType>,
+    roundNumber: number,
+    roundCount: number,
 }
 
 /**

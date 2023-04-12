@@ -175,8 +175,7 @@ export class BracketsViewer {
                 const roundName = this.getRoundName({
                     roundNumber,
                     roundCount: 0,
-                    fractionOfFinal: 0,
-                    group: lang.toI18nKey('round_robin'),
+                    groupType: lang.toI18nKey('round_robin'),
                 }, lang.getRoundName);
 
                 const roundContainer = dom.createRoundContainer(roundId, roundName);
@@ -283,7 +282,7 @@ export class BracketsViewer {
                 roundNumber,
                 roundCount,
                 fractionOfFinal: helpers.getFractionOfFinal(roundNumber, roundCount),
-                group: lang.toI18nKey(bracketType),
+                groupType: lang.toI18nKey(bracketType as Exclude<GroupType, 'final_group'>),
             }, getRoundName);
 
             const roundContainer = dom.createRoundContainer(roundId, roundName);
@@ -313,12 +312,18 @@ export class BracketsViewer {
         const winnerWb = matches[0].opponent1;
         const displayCount = winnerWb?.id === null || winnerWb?.result === 'win' ? 1 : 2;
         const finalMatches = matches.slice(0, displayCount);
-
-        const roundCount = matches.length;
+        const roundCount = finalMatches.length;
 
         for (let roundIndex = 0; roundIndex < finalMatches.length; roundIndex++) {
             const roundNumber = roundIndex + 1;
-            const roundContainer = dom.createRoundContainer(finalMatches[roundIndex].round_id, lang.getFinalMatchLabel(finalType, roundNumber, roundCount));
+            const roundName = this.getRoundName({
+                roundNumber,
+                roundCount,
+                groupType: lang.toI18nKey('final_group'),
+                finalType: lang.toI18nKey(finalType)
+            }, lang.getRoundName);
+
+            const roundContainer = dom.createRoundContainer(finalMatches[roundIndex].round_id, roundName);
             roundContainer.append(this.createFinalMatch(finalType, finalMatches, roundNumber, roundCount));
             upperBracket.append(roundContainer);
         }

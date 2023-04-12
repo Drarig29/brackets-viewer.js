@@ -57,7 +57,15 @@
                 // Returning `undefined` will fallback to the default round name in the current language.
 
                 if (info.fractionOfFinal === 1 / 2)
-                    return `${t(`abbreviations.${info.group}`)} Semi Finals`
+                    return `${t(`abbreviations.${info.groupType}`)} Semi Finals`
+
+                if (info.finalType === 'grand-final') {
+                    if (info.roundCount > 1) {
+                        return `${t(`abbreviations.${info.finalType}`)} Final Round ${info.roundNumber}`
+                    }
+
+                    return `Grand Final`
+                }
             },
             onMatchClick: match => console.log('A match was clicked', match),
             selector: '#example',
