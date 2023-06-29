@@ -47,8 +47,15 @@
                 // You have a reference to `t` in order to translate things.
                 // Returning `undefined` will fallback to the default round name in the current language.
 
-                if (info.fractionOfFinal === 1 / 2)
-                    return `${t(`abbreviations.${info.groupType}`)} Semi Finals`
+                if (info.fractionOfFinal === 1 / 2) {
+                    if (info.groupType === 'single-bracket') {
+                        // Single elimination
+                        return 'Semi Finals'
+                    } else {
+                        // Double elimination
+                        return `${t(`abbreviations.${info.groupType}`)} Semi Finals`
+                    }
+                }
 
                 if (info.finalType === 'grand-final') {
                     if (info.roundCount > 1) {
