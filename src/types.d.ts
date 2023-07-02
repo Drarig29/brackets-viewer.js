@@ -1,4 +1,4 @@
-import { Stage, Match, MatchGame, Participant, GroupType, FinalType } from 'brackets-model';
+import { Stage, Match, MatchGame, Participant, GroupType, FinalType, Id } from 'brackets-model';
 import { CallbackFunction, FormConfiguration } from './form';
 import { InMemoryDatabase } from 'brackets-memory-db';
 import { BracketsViewer } from './main';
@@ -152,7 +152,7 @@ export interface Connection {
  */
 export interface RankingItem {
     rank: number,
-    id: number,
+    id: Id,
     played: number,
     wins: number,
     draws: number,
@@ -185,7 +185,7 @@ export type RankingHeaders = Record<keyof RankingItem, RankingHeader>;
 /**
  * An object mapping a participant id to its row in the ranking.
  */
-export type RankingMap = Record<number, RankingItem>;
+export type RankingMap = Record<Id, RankingItem>;
 
 /**
  * Definition of a ranking.

@@ -1,5 +1,5 @@
 import './style.scss';
-import { Participant, Match, ParticipantResult, Stage, Status, GroupType, FinalType } from 'brackets-model';
+import { Participant, Match, ParticipantResult, Stage, Status, GroupType, FinalType, Id } from 'brackets-model';
 import { splitBy, getRanking, getOriginAbbreviation, findRoot, completeWithBlankMatches, sortBy } from './helpers';
 import * as dom from './dom';
 import * as lang from './lang';
@@ -21,7 +21,7 @@ import {
 
 export class BracketsViewer {
 
-    readonly participantRefs: Record<number, HTMLElement[]> = {};
+    readonly participantRefs: Record<Id, HTMLElement[]> = {};
 
     private participants: Participant[] = [];
     private participantImages: ParticipantImage[] = [];
@@ -524,7 +524,7 @@ export class BracketsViewer {
      * @param nameContainer The name container.
      * @param participantId ID of the participant.
      */
-    private renderParticipantImage(nameContainer: HTMLElement, participantId: number): void {
+    private renderParticipantImage(nameContainer: HTMLElement, participantId: Id): void {
         const found = this.participantImages.find(item => item.participantId === participantId);
         if (found) dom.addParticipantImage(nameContainer, found.imageUrl);
     }
@@ -597,7 +597,7 @@ export class BracketsViewer {
      * @param participantId ID of the participant.
      * @param element The dom element to add events to.
      */
-    private setupMouseHover(participantId: number, element: HTMLElement): void {
+    private setupMouseHover(participantId: Id, element: HTMLElement): void {
         if (!this.config.highlightParticipantOnHover) return;
 
         const refs = this.participantRefs[participantId];

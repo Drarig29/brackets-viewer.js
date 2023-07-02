@@ -38,7 +38,7 @@
     "dependencies": {
         "brackets-manager": "^1.5.7",
         "brackets-memory-db": "^1.0.4",
-        "brackets-model": "^1.4.0",
+        "brackets-model": "^1.5.0",
         "i18next": "^21.6.14",
         "i18next-browser-languagedetector": "^6.1.4",
         "path-browserify": "^1.0.1",

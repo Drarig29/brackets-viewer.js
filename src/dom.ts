@@ -1,4 +1,4 @@
-import { Match, ParticipantResult, FinalType, GroupType } from 'brackets-model';
+import { Match, ParticipantResult, FinalType, GroupType, Id } from 'brackets-model';
 import { Connection, Placement, Ranking, RankingItem } from './types';
 import { rankingHeader } from './helpers';
 import { t } from './lang';
@@ -19,7 +19,7 @@ export function createTitle(title: string): HTMLElement {
  * 
  * @param stageId ID of the stage.
  */
-export function createRoundRobinContainer(stageId: number): HTMLElement {
+export function createRoundRobinContainer(stageId: Id): HTMLElement {
     const stage = document.createElement('div');
     stage.classList.add('round-robin');
     stage.setAttribute('data-stage-id', stageId.toString());
@@ -31,7 +31,7 @@ export function createRoundRobinContainer(stageId: number): HTMLElement {
  * 
  * @param stageId ID of the stage.
  */
-export function createEliminationContainer(stageId: number): HTMLElement {
+export function createEliminationContainer(stageId: Id): HTMLElement {
     const stage = document.createElement('div');
     stage.classList.add('elimination');
     stage.setAttribute('data-stage-id', stageId.toString());
@@ -44,7 +44,7 @@ export function createEliminationContainer(stageId: number): HTMLElement {
  * @param groupId ID of the group.
  * @param title Title of the group.
  */
-export function createBracketContainer(groupId: number, title?: string): HTMLElement {
+export function createBracketContainer(groupId: Id, title?: string): HTMLElement {
     const bracket = document.createElement('section');
     bracket.classList.add('bracket');
     bracket.setAttribute('data-group-id', groupId.toString());
@@ -64,7 +64,7 @@ export function createBracketContainer(groupId: number, title?: string): HTMLEle
  * @param groupId ID of the group.
  * @param title Title of the group.
  */
-export function createGroupContainer(groupId: number, title: string): HTMLElement {
+export function createGroupContainer(groupId: Id, title: string): HTMLElement {
     const h2 = document.createElement('h2');
     h2.innerText = title;
 
@@ -90,7 +90,7 @@ export function createRoundsContainer(): HTMLElement {
  * @param roundId ID of the round.
  * @param title Title of the round.
  */
-export function createRoundContainer(roundId: number, title: string): HTMLElement {
+export function createRoundContainer(roundId: Id, title: string): HTMLElement {
     const h3 = document.createElement('h3');
     h3.innerText = title;
 
@@ -107,7 +107,7 @@ export function createRoundContainer(roundId: number, title: string): HTMLElemen
  * @param matchId ID of the match.
  * @param status Status of the match.
  */
-export function createMatchContainer(matchId?: number, status?: number): HTMLElement {
+export function createMatchContainer(matchId?: Id, status?: number): HTMLElement {
     const match = document.createElement('div');
     match.classList.add('match');
     matchId !== undefined && match.setAttribute('data-match-id', matchId.toString());
@@ -156,7 +156,7 @@ export function createOpponentsContainer(onClick?: () => void): HTMLElement {
  *
  * @param participantId ID of the participant.
  */
-export function createParticipantContainer(participantId: number | null): HTMLElement {
+export function createParticipantContainer(participantId: Id | null): HTMLElement {
     const participant = document.createElement('div');
     participant.classList.add('participant');
 
