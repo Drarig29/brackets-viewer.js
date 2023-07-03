@@ -95,6 +95,11 @@ export interface Config {
      * Whether to show a ranking table on round-robin stages.
      */
     showRankingTable?: boolean,
+
+    /**
+     * Whether to clear any previously displayed data.
+     */
+    clear?: boolean
 }
 
 /**

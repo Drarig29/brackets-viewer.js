@@ -61,12 +61,12 @@ export class BracketsViewer {
 
         this.config = {
             customRoundName: config?.customRoundName,
-            participantOriginPlacement: config?.participantOriginPlacement || 'before',
-            separatedChildCountLabel: config?.separatedChildCountLabel !== undefined ? config.separatedChildCountLabel : false,
-            showSlotsOrigin: config?.showSlotsOrigin !== undefined ? config.showSlotsOrigin : true,
-            showLowerBracketSlotsOrigin: config?.showLowerBracketSlotsOrigin !== undefined ? config.showLowerBracketSlotsOrigin : true,
-            highlightParticipantOnHover: config?.highlightParticipantOnHover !== undefined ? config.highlightParticipantOnHover : true,
-            showRankingTable: config?.showRankingTable !== undefined ? config.showRankingTable : true,
+            participantOriginPlacement: config?.participantOriginPlacement ?? 'before',
+            separatedChildCountLabel: config?.separatedChildCountLabel ?? false,
+            showSlotsOrigin: config?.showSlotsOrigin ?? true,
+            showLowerBracketSlotsOrigin: config?.showLowerBracketSlotsOrigin ?? true,
+            highlightParticipantOnHover: config?.highlightParticipantOnHover ?? true,
+            showRankingTable: config?.showRankingTable ?? true,
         };
 
         if (config?.onMatchClick)
@@ -82,7 +82,12 @@ export class BracketsViewer {
             matches: data.matches.filter(match => match.stage_id === stage.id),
         }));
 
-        findRoot(config?.selector).append(root);
+        const target = findRoot(config?.selector)
+        if (config?.clear) {
+            target.innerHTML = ''
+        }
+
+        target.append(root);
     }
 
     /**
