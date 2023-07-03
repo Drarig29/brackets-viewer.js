@@ -69,8 +69,8 @@ export class BracketsViewer {
             showRankingTable: config?.showRankingTable !== undefined ? config.showRankingTable : true,
         };
 
-        if (this.config.onMatchClick)
-            this._onMatchClick = this.config.onMatchClick;
+        if (config?.onMatchClick)
+            this._onMatchClick = config.onMatchClick;
 
         this.participants = data.participants;
 
