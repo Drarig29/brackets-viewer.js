@@ -11,6 +11,7 @@ declare global {
         inMemoryDatabase: InMemoryDatabase,
         bracketsManager: BracketsManager,
         stageFormCreator: (configuration: FormConfiguration, submitCallable: CallbackFunction) => void,
+        updateFormCreator: (configuration: FormConfiguration, changeCallable: CallbackFunction) => void,
     }
 }
 
