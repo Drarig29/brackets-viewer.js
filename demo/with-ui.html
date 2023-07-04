@@ -50,7 +50,7 @@
         }
 
         window.stageFormCreator(config, async (config) => {
-            await window.bracketsManager.create(config)
+            await window.bracketsManager.create.stage(config)
 
             const rawStoredBrackets = localStorage.getItem(BRACKETS);
 
