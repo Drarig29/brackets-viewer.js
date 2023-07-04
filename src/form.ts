@@ -16,7 +16,8 @@ export type FormConfiguration = {
     parent_id: string,
     html_name_id: string,
     html_stage_type_selector_id: string
-    html_team_input_id: string
+    html_team_names_input_id: string
+    html_team_count_input_id: string
     html_group_id: string
     html_seed_order_id: string
     html_round_robin_mode_id: string
@@ -53,14 +54,14 @@ export default function stageFormCreator(configuration: FormConfiguration, submi
         let stage: StageType;
 
         switch ((<HTMLInputElement>stageSelector).value) {
-            case 'single_elimination':
-                stage = 'single_elimination';
+            case 'round_robin':
+                stage = 'round_robin';
                 break;
             case 'double_elimination':
                 stage = 'double_elimination';
                 break;
-            case 'round_robin':
-                stage = 'round_robin';
+            case 'single_elimination':
+                stage = 'single_elimination';
                 break;
             default:
                 throw new DOMException('stage ' + (<HTMLInputElement>stageSelector).value + ' seems to be not implemented yet.');
@@ -79,10 +80,10 @@ export default function stageFormCreator(configuration: FormConfiguration, submi
  * @param parent The HTML parent to hold the elements.
  */
 function removeMaskFields(parent: HTMLElement): void {
-    if (parent.children.length <= 3) return;
+    if (parent.children.length <= 4) return;
 
-    // Keep the first 3 "base" items.
-    for (let i = 3; i < parent.children.length; i++) {
+    // Keep the first 4 "base" items.
+    for (let i = 4; i < parent.children.length; i++) {
         parent.children[i].remove();
         i--;
     }
@@ -109,9 +110,20 @@ function createBaseMask(parent: HTMLElement, configuration: FormConfiguration): 
     // Teams
     createTextarea(
         parent,
-        configuration.html_team_input_id,
+        configuration.html_team_names_input_id,
         t('form-creator.team-label'),
-        t('form-creator.team-placeholder'),
+        t('form-creator.team-label-placeholder'),
+    );
+
+    // or Team count
+    createInput(
+        parent,
+        'number',
+        configuration.html_team_count_input_id,
+        t('form-creator.team-count'),
+        t('form-creator.team-count-placeholder'),
+        undefined,
+        '1',
     );
 
     // Stage selector
@@ -147,6 +159,16 @@ function createMaskFields(config: FormConfiguration, stage: StageType, parent: H
             createSelect(parent, config.html_round_robin_mode_id, t('form-creator.round-robin-mode-label'), roundRobinMode);
 
             break;
+
+        case 'single_elimination':
+            // Seed ordering
+            createSelect(parent, config.html_seed_order_id, t('form-creator.seed-order-label'), eliminationOrderings);
+
+            // Consolation Final
+            createInput(parent, 'checkbox', config.html_consolation_final_checkbox_id, t('form-creator.consolation-final-label'));
+
+            break;
+
         case 'double_elimination':
             // Consolation Final
             createInput(parent, 'checkbox', config.html_consolation_final_checkbox_id, t('form-creator.consolation-final-label'));
@@ -166,14 +188,7 @@ function createMaskFields(config: FormConfiguration, stage: StageType, parent: H
             );
 
             break;
-        case 'single_elimination':
-            // Seed ordering
-            createSelect(parent, config.html_seed_order_id, t('form-creator.seed-order-label'), eliminationOrderings);
 
-            // Consolation Final
-            createInput(parent, 'checkbox', config.html_consolation_final_checkbox_id, t('form-creator.consolation-final-label'));
-
-            break;
         default:
             throw new DOMException(`stage ${stage as string} seems to be not implemented yet.`);
     }
@@ -186,7 +201,8 @@ function createMaskFields(config: FormConfiguration, stage: StageType, parent: H
     submitBtnWrapper.appendChild(submitBtn);
 
     submitBtn.onclick = (): void => {
-        let query: InputStage;
+        let payload: InputStage;
+        let teamNamesValue: string
 
         switch (stage) {
             case 'round_robin':
@@ -205,15 +221,50 @@ function createMaskFields(config: FormConfiguration, stage: StageType, parent: H
                     groupCount: parseInt((<HTMLInputElement>document.getElementById(config.html_group_id)).value ?? '0'),
                 };
 
-                query = {
+                payload = {
                     name: (<HTMLInputElement>document.getElementById(config.html_name_id)).value ?? '',
-                    seeding: (<HTMLTextAreaElement>document.getElementById(config.html_team_input_id)).value.split(','),
                     settings: roundRobinSettings,
                     tournamentId: 0,
                     type: stage,
                 };
 
+                teamNamesValue = (<HTMLTextAreaElement>document.getElementById(config.html_team_names_input_id)).value
+
+                if (teamNamesValue) {
+                    payload.seeding = teamNamesValue.split(',')
+                } else {
+                    roundRobinSettings.size = parseInt((<HTMLTextAreaElement>document.getElementById(config.html_team_count_input_id)).value)
+                }
+
                 break;
+
+            case 'single_elimination':
+                validateSingleElimination(config);
+
+                const singleEliminationSettings: StageSettings = {
+                    seedOrdering: [
+                        (<SeedOrdering>(<HTMLInputElement>document.getElementById(config.html_seed_order_id)).value ?? 'natural'),
+                    ],
+                    consolationFinal: (<HTMLInputElement>document.getElementById(config.html_consolation_final_checkbox_id)).checked,
+                };
+
+                payload = {
+                    name: (<HTMLInputElement>document.getElementById(config.html_name_id)).value ?? '',
+                    settings: singleEliminationSettings,
+                    tournamentId: 0,
+                    type: stage,
+                };
+
+                teamNamesValue = (<HTMLTextAreaElement>document.getElementById(config.html_team_names_input_id)).value
+
+                if (teamNamesValue) {
+                    payload.seeding = teamNamesValue.split(',')
+                } else {
+                    singleEliminationSettings.size = parseInt((<HTMLTextAreaElement>document.getElementById(config.html_team_count_input_id)).value)
+                }
+
+                break;
+
             case 'double_elimination':
                 validateDoubleElimination(config);
 
@@ -227,39 +278,28 @@ function createMaskFields(config: FormConfiguration, stage: StageType, parent: H
                     grandFinal: <GrandFinalType>(<HTMLSelectElement>document.getElementById(config.html_grand_final_type_id)).value,
                 };
 
-                query = {
+                payload = {
                     name: (<HTMLInputElement>document.getElementById(config.html_name_id)).value ?? '',
-                    seeding: (<HTMLTextAreaElement>document.getElementById(config.html_team_input_id)).value.split(','),
                     settings: doubleEliminationSettings,
                     tournamentId: 0,
                     type: stage,
                 };
 
-                break;
-            case 'single_elimination':
-                validateSingleElimination(config);
+                teamNamesValue = (<HTMLTextAreaElement>document.getElementById(config.html_team_names_input_id)).value
 
-                const singleEliminationSettings: StageSettings = {
-                    seedOrdering: [
-                        (<SeedOrdering>(<HTMLInputElement>document.getElementById(config.html_seed_order_id)).value ?? 'natural'),
-                    ],
-                    consolationFinal: (<HTMLInputElement>document.getElementById(config.html_consolation_final_checkbox_id)).checked,
-                };
-
-                query = {
-                    name: (<HTMLInputElement>document.getElementById(config.html_name_id)).value ?? '',
-                    seeding: (<HTMLTextAreaElement>document.getElementById(config.html_team_input_id)).value.split(','),
-                    settings: singleEliminationSettings,
-                    tournamentId: 0,
-                    type: stage,
-                };
+                if (teamNamesValue) {
+                    payload.seeding = teamNamesValue.split(',')
+                } else {
+                    doubleEliminationSettings.size = parseInt((<HTMLTextAreaElement>document.getElementById(config.html_team_count_input_id)).value)
+                }
 
                 break;
+
             default:
                 throw new DOMException(`stage ${stage as string} seems to be not implemented yet.`);
         }
 
-        submitCallback(query);
+        submitCallback(payload);
     };
 
     parent.appendChild(submitBtnWrapper);
@@ -331,8 +371,11 @@ function baseValidation(config: FormConfiguration): void {
     if (!name || name === '')
         throw new DOMException('No name provided.');
 
-    const teams = (<HTMLInputElement>document.getElementById(config.html_team_input_id)).value.split(',');
-    if (teams.length < 2 || !Number.isInteger(Math.log2(teams.length)))
+    const teamNamesValue = (<HTMLInputElement>document.getElementById(config.html_team_names_input_id)).value
+    const teams = teamNamesValue ? teamNamesValue.split(',') : [];
+    const teamCount = teams.length || parseInt((<HTMLInputElement>document.getElementById(config.html_team_count_input_id)).value)
+
+    if (teamCount < 2 || !Number.isInteger(Math.log2(teamCount)))
         throw new DOMException('Invalid team amount provided.');
 
     const stageType = (<HTMLInputElement>document.getElementById(config.html_stage_type_selector_id)).value as StageType;
