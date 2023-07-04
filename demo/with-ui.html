@@ -12,16 +12,44 @@
     <link rel="stylesheet" href="themes/light.css" />
 
     <style>
+        #input-mask {
+            position: absolute;
+            left: 50%;
+            margin-left: -150px;
+            height: 190px;
+            top: 50%;
+            margin-top: -95px;
+            background: #9e9e9e;
+            box-shadow: #14191f;
+            border-radius: 5px;
+            z-index: 1;
+            display: none;
+            justify-content: center;
+            align-items: center;
+        }
+
         #input-mask div {
+            text-align: center;
             background: lightgrey;
-            padding: 10px 0;
+            padding: 10px 20px;
+        }
+
+        #createNewBracket>div {
+            display: grid;
+            grid-template-columns: 1fr 2fr;
+            margin: 5px;
+            align-items: center;
+            justify-content: center;
+        }
+
+        #createNewBracket>div:last-child {
+            grid-template-columns: 1fr;
         }
     </style>
 
 </head>
 
 <!-- TODO: rename "mask" to form -->
-<!-- TODO: autoselect the winner based on the input score -->
 <!-- TODO: Autofill the form with scores when opening it -->
 <!-- TODO: Use new FormData(document.querySelector('form')); -->
 
@@ -40,12 +68,6 @@
             <h3></h3>
             <label id="opponent1-label" for="opponent1">Opponent 1: </label><input type="number" id="opponent1"><br>
             <label id="opponent2-label" for="opponent2">Opponent 2: </label><input type="number" id="opponent2"><br>
-            <p>Who won?</p>
-            <input type="radio" id="won-opponent1" value="opponent1" name="won" checked><label
-                for="won-opponent1">Opponent1</label><br>
-            <input type="radio" id="won-opponent2" value="opponent2" name="won"><label
-                for="won-opponent2">Opponent2</label><br>
-            <input type="radio" id="won-draw" value="draw" name="won"><label for="won-draw">Draw</label><br><br>
             <button id="input-submit">Submit</button>
         </div>
     </div>
@@ -56,9 +78,6 @@
         const INPUT_SUBMIT = 'input-submit';
         const OPPONENT1 = 'opponent1';
         const OPPONENT2 = 'opponent2';
-        const RADIO_OPPONENT1 = 'won-opponent1';
-        const RADIO_OPPONENT2 = 'won-opponent2';
-        const RADIO_DRAW = 'won-draw';
         const ELEMENT_ID = 'bracketsViewerExample';
         const urlParams = new URLSearchParams(window.location.search);
         const id = urlParams.get('id');
@@ -193,34 +212,26 @@
                 const matchTitle = document.querySelector(`[data-match-id="${match.id}"] .opponents > span`).textContent;
                 inputMask.querySelector('h3').innerText = matchTitle;
 
-                const inputButton = document.getElementById(INPUT_SUBMIT);
-                inputButton.onclick = async () => {
+                const enterKeyListener = (event) => {
+                    if (event.key === 'Enter') {
+                        updateMatch()
+                    }
+                }
+
+                document.addEventListener('keypress', enterKeyListener)
+
+                const updateMatch = async () => {
                     const opponent1 = parseInt(document.getElementById(OPPONENT1).value);
                     const opponent2 = parseInt(document.getElementById(OPPONENT2).value);
-
-                    const payload1 = { score: opponent1 }
-                    const payload2 = { score: opponent2 }
-
-                    if (document.getElementById(RADIO_OPPONENT1).checked) {
-                        payload1['result'] = 'win';
-                    }
-
-                    if (document.getElementById(RADIO_OPPONENT2).checked) {
-                        payload2['result'] = 'win';
-                    }
-
-                    if (document.getElementById(RADIO_DRAW).checked) {
-                        payload1['result'] = 'draw';
-                        payload2['result'] = 'draw';
-                    }
 
                     const data = loadData(id);
                     await window.bracketsManager.import(data);
 
                     await window.bracketsManager.update.match({
                         id: match.id,
-                        opponent1: payload1,
-                        opponent2: payload2,
+                        status: 4,
+                        opponent1: { score: opponent1 },
+                        opponent2: { score: opponent2 },
                     });
 
                     const newData = await window.bracketsManager.export();
@@ -231,7 +242,12 @@
                     localStorage.setItem(BRACKETS, JSON.stringify(bracketsStore));
 
                     inputMask.style.display = 'none';
+
+                    document.removeEventListener('keypress', enterKeyListener)
                 }
+
+                const inputButton = document.getElementById(INPUT_SUBMIT);
+                inputButton.onclick = updateMatch
             }
 
             const data = loadData(id);
