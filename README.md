@@ -39,6 +39,45 @@ Or from GitHub with (you can replace `@master` by any branch name, tag name or c
 
 Now, you can use it with data generated using [brackets-manager](https://github.com/Drarig29/brackets-manager.js) or with crafted data following the [brackets-model](https://github.com/Drarig29/brackets-model).
 
+**Usage:**
+
+This will find a **unique** element with a `.brackets-viewer` class, and **append** to it:
+
+```js
+window.bracketsViewer.render({
+  stages: data.stage,
+  matches: data.match,
+  matchGames: data.match_game,
+  participants: data.participant,
+});
+```
+
+If you want to clear the container's content before rendering again, use this:
+
+```js
+window.bracketsViewer.render({
+  stages: data.stage,
+  matches: data.match,
+  matchGames: data.match_game,
+  participants: data.participant,
+}, {
+  clear: true,
+});
+```
+
+If you have multiple elements with a `.brackets-viewer` class, you must provide a `selector`:
+
+```js
+window.bracketsViewer.render({
+  stages: data.stage,
+  matches: data.match,
+  matchGames: data.match_game,
+  participants: data.participant,
+}, {
+  selector: '#example',
+});
+```
+
 ## Demos
 
 To quickly test, you can also try the demos by visiting `./demo/index.html`.
