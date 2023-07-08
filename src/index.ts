@@ -5,3 +5,14 @@ import { BracketsViewer } from './main';
 window.bracketsViewer = new BracketsViewer();
 window.inMemoryDatabase = new InMemoryDatabase();
 window.bracketsManager = new BracketsManager(window.inMemoryDatabase);
+
+export { BracketsViewer };
+export { ToI18nKey } from './lang';
+export {
+    Config,
+    MatchClickCallback,
+    Placement,
+    ViewerData,
+    ParticipantImage,
+    RoundNameInfo,
+} from './types';
