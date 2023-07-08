@@ -57,6 +57,9 @@ export class BracketsViewer {
      */
     // eslint-disable-next-line @typescript-eslint/require-await -- Keep this async for backwards compatibility.
     public async render(data: ViewerData, config?: Partial<Config>): Promise<void> {
+        if (typeof data === 'string')
+            throw Error('Using a CSS selector as the first argument is deprecated. Please look here: https://github.com/Drarig29/brackets-viewer.js');
+
         const root = document.createDocumentFragment();
 
         this.config = {
@@ -71,6 +74,15 @@ export class BracketsViewer {
 
         if (config?.onMatchClick)
             this._onMatchClick = config.onMatchClick;
+
+        if (!data.stages?.length)
+            throw Error('The `data.stages` array is either empty or undefined');
+
+        if (!data.participants?.length)
+            throw Error('The `data.participants` array is either empty or undefined');
+
+        if (!data.matches?.length)
+            throw Error('The `data.matches` array is either empty or undefined');
 
         this.participants = data.participants;
         data.participants.forEach(participant => this.participantRefs[participant.id] = []);
@@ -135,6 +147,9 @@ export class BracketsViewer {
      */
     private renderStage(root: DocumentFragment, data: ViewerData): void {
         const stage = data.stages[0];
+        if (!data.matches?.length)
+            throw Error(`No matches found for stage ${stage.id}`);
+
         const matchesByGroup = splitBy(data.matches, 'group_id');
 
         this.stage = stage;
