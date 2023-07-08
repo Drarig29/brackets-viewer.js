@@ -73,7 +73,6 @@ export class BracketsViewer {
             this._onMatchClick = config.onMatchClick;
 
         this.participants = data.participants;
-
         data.participants.forEach(participant => this.participantRefs[participant.id] = []);
 
         data.stages.forEach(stage => this.renderStage(root, {
@@ -82,10 +81,9 @@ export class BracketsViewer {
             matches: data.matches.filter(match => match.stage_id === stage.id),
         }));
 
-        const target = findRoot(config?.selector)
-        if (config?.clear) {
-            target.innerHTML = ''
-        }
+        const target = findRoot(config?.selector);
+        if (config?.clear)
+            target.innerHTML = '';
 
         target.append(root);
     }
@@ -325,7 +323,7 @@ export class BracketsViewer {
                 roundNumber,
                 roundCount,
                 groupType: lang.toI18nKey('final_group'),
-                finalType: lang.toI18nKey(finalType)
+                finalType: lang.toI18nKey(finalType),
             }, lang.getRoundName);
 
             const roundContainer = dom.createRoundContainer(finalMatches[roundIndex].round_id, roundName);

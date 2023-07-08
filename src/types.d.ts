@@ -133,7 +133,7 @@ export type RoundNameInfo = {
     finalType: ToI18nKey<FinalType>,
     roundNumber: number,
     roundCount: number,
-}
+};
 
 /**
  * A function returning a round name based on its number and the count of rounds.

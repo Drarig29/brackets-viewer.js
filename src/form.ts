@@ -74,12 +74,20 @@ export function stageFormCreator(configuration: FormConfiguration, submitCallabl
     createMaskFields(configuration, 'single_elimination', parent, submitCallable);
 }
 
-export function updateFormCreator(configuration: FormConfiguration, changeCallable: CallbackFunction) {
+/**
+ * Creates a DOM form to update the current stage.
+ *
+ * @param configuration HTML element IDs to render this form to
+ * @param changeCallable Callback function - what should happen onClick on the forms submit button?
+ */
+export function updateFormCreator(configuration: FormConfiguration, changeCallable: CallbackFunction): void {
     const urlParams = new URLSearchParams(window.location.search);
     const id = urlParams.get('id') ?? 0;
 
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
     const storedBrackets = JSON.parse(localStorage.getItem('brackets') ?? '');
-    const currentBracket = storedBrackets[id] as Database
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
+    const currentBracket = storedBrackets[id] as Database;
 
     const parent = document.getElementById(configuration.parent_id);
 
@@ -96,15 +104,15 @@ export function updateFormCreator(configuration: FormConfiguration, changeCallab
     stageSelector.onchange = (): void => {
         removeMaskFields(parent);
 
-        const stage = ((<HTMLInputElement>stageSelector).value || 'single_elimination') as StageType
+        const stage = ((<HTMLInputElement>stageSelector).value || 'single_elimination') as StageType;
         createMaskFields(configuration, stage, parent, changeCallable, 'Edit');
     };
 
     const teamCountInput = document.getElementById(configuration.html_team_count_input_id)!;
-    teamCountInput.oninput = () => {
-        const stage = ((<HTMLInputElement>stageSelector).value || 'single_elimination') as StageType
-        applyForm(configuration, stage, changeCallable)
-    }
+    teamCountInput.oninput = (): void => {
+        const stage = ((<HTMLInputElement>stageSelector).value || 'single_elimination') as StageType;
+        applyForm(configuration, stage, changeCallable);
+    };
 
     createMaskFields(configuration, currentBracket.stage[0].type, parent, changeCallable, 'Edit');
 }
@@ -117,20 +125,24 @@ export function updateFormCreator(configuration: FormConfiguration, changeCallab
 function removeMaskFields(parent: HTMLElement): void {
     [...parent.children]
         .filter(c => !c.classList.contains('base-input'))
-        .forEach(c => c.remove())
+        .forEach(c => c.remove());
 }
 
 
 /**
  * @param parent HTMLElement
  * @param configuration FormConfiguration
+ * @param setDefaultValues Whether to set default values for the form
+ * @param showTeamNamesInput Whether to show the input for team names
  */
 function createBaseMask(parent: HTMLElement, configuration: FormConfiguration, setDefaultValues = false, showTeamNamesInput = true): void {
     const urlParams = new URLSearchParams(window.location.search);
     const id = urlParams.get('id') ?? 0;
 
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
     const storedBrackets = JSON.parse(localStorage.getItem('brackets') ?? '');
-    const currentBracket = storedBrackets[id] as Database
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
+    const currentBracket = storedBrackets[id] as Database;
 
     // Name
     createInput(
@@ -142,7 +154,7 @@ function createBaseMask(parent: HTMLElement, configuration: FormConfiguration, s
         setDefaultValues ? currentBracket.stage[0].name : undefined,
         undefined,
         1,
-        'base-input'
+        'base-input',
     );
 
     // Team names
@@ -153,7 +165,7 @@ function createBaseMask(parent: HTMLElement, configuration: FormConfiguration, s
             t('form-creator.team-label'),
             t('form-creator.team-label-placeholder'),
             undefined,
-            'base-input'
+            'base-input',
         );
     }
 
@@ -167,7 +179,7 @@ function createBaseMask(parent: HTMLElement, configuration: FormConfiguration, s
         setDefaultValues ? currentBracket.participant.length.toString() : '',
         '1',
         undefined,
-        'base-input'
+        'base-input',
     );
 
     // Stage selector
@@ -177,7 +189,7 @@ function createBaseMask(parent: HTMLElement, configuration: FormConfiguration, s
         t('form-creator.stage-selector-label'),
         stageTypes,
         setDefaultValues ? currentBracket.stage[0].type : undefined,
-        'base-input'
+        'base-input',
     );
 }
 
@@ -188,6 +200,7 @@ function createBaseMask(parent: HTMLElement, configuration: FormConfiguration, s
  * @param stage Which type of stage are we building?
  * @param parent The parent DOM
  * @param submitCallback the callable to call when the data got created
+ * @param submitBtnText Text of the submit button
  */
 function createMaskFields(config: FormConfiguration, stage: StageType, parent: HTMLElement, submitCallback: CallbackFunction, submitBtnText?: string): void {
     switch (stage) {
@@ -236,7 +249,7 @@ function createMaskFields(config: FormConfiguration, stage: StageType, parent: H
                 config.html_double_elimination_seed_textarea_id,
                 t('form-creator.seed-order-label'),
                 t('form-creator.double-elimination-seed-order-placeholder'),
-                'natural'
+                'natural',
             );
 
             break;
@@ -253,15 +266,22 @@ function createMaskFields(config: FormConfiguration, stage: StageType, parent: H
     submitBtnWrapper.appendChild(submitBtn);
 
     submitBtn.onclick = (): void => {
-        applyForm(config, stage, submitCallback)
+        applyForm(config, stage, submitCallback);
     };
 
     parent.appendChild(submitBtnWrapper);
 }
 
-function applyForm(config: FormConfiguration, stage: StageType, submitCallback: CallbackFunction) {
+/**
+ * Apply a form when click on submit
+ * 
+ * @param config HTML element IDs to render this form to
+ * @param stage Which type of stage are we building?
+ * @param submitCallback the callable to call when the data got created
+ */
+function applyForm(config: FormConfiguration, stage: StageType, submitCallback: CallbackFunction): void {
     let payload: InputStage;
-    let teamNamesValue: string
+    let teamNamesValue: string;
 
     switch (stage) {
         case 'round_robin':
@@ -287,14 +307,14 @@ function applyForm(config: FormConfiguration, stage: StageType, submitCallback: 
                 type: stage,
             };
 
-            teamNamesValue = (<HTMLTextAreaElement>document.getElementById(config.html_team_names_input_id))?.value
+            teamNamesValue = (<HTMLTextAreaElement>document.getElementById(config.html_team_names_input_id))?.value;
 
-            if (teamNamesValue) {
-                payload.seeding = teamNamesValue.split(',')
-            } else {
-                const teamCount = parseInt((<HTMLTextAreaElement>document.getElementById(config.html_team_count_input_id)).value)
-                payload.seeding = Array.from({ length: teamCount }).map((_, i) => `Team ${i + 1}`)
-                roundRobinSettings.size = helpers.getNearestPowerOfTwo(teamCount)
+            if (teamNamesValue)
+                payload.seeding = teamNamesValue.split(',');
+            else {
+                const teamCount = parseInt((<HTMLTextAreaElement>document.getElementById(config.html_team_count_input_id)).value);
+                payload.seeding = Array.from({ length: teamCount }).map((_, i) => `Team ${i + 1}`);
+                roundRobinSettings.size = helpers.getNearestPowerOfTwo(teamCount);
             }
 
             break;
@@ -316,14 +336,14 @@ function applyForm(config: FormConfiguration, stage: StageType, submitCallback: 
                 type: stage,
             };
 
-            teamNamesValue = (<HTMLTextAreaElement>document.getElementById(config.html_team_names_input_id))?.value
+            teamNamesValue = (<HTMLTextAreaElement>document.getElementById(config.html_team_names_input_id))?.value;
 
-            if (teamNamesValue) {
-                payload.seeding = teamNamesValue.split(',')
-            } else {
-                const teamCount = parseInt((<HTMLTextAreaElement>document.getElementById(config.html_team_count_input_id)).value)
-                payload.seeding = Array.from({ length: teamCount }).map((_, i) => `Team ${i + 1}`)
-                singleEliminationSettings.size = helpers.getNearestPowerOfTwo(teamCount)
+            if (teamNamesValue)
+                payload.seeding = teamNamesValue.split(',');
+            else {
+                const teamCount = parseInt((<HTMLTextAreaElement>document.getElementById(config.html_team_count_input_id)).value);
+                payload.seeding = Array.from({ length: teamCount }).map((_, i) => `Team ${i + 1}`);
+                singleEliminationSettings.size = helpers.getNearestPowerOfTwo(teamCount);
             }
 
             break;
@@ -348,14 +368,14 @@ function applyForm(config: FormConfiguration, stage: StageType, submitCallback: 
                 type: stage,
             };
 
-            teamNamesValue = (<HTMLTextAreaElement>document.getElementById(config.html_team_names_input_id))?.value
+            teamNamesValue = (<HTMLTextAreaElement>document.getElementById(config.html_team_names_input_id))?.value;
 
-            if (teamNamesValue) {
-                payload.seeding = teamNamesValue.split(',')
-            } else {
-                const teamCount = parseInt((<HTMLTextAreaElement>document.getElementById(config.html_team_count_input_id)).value)
-                payload.seeding = Array.from({ length: teamCount }).map((_, i) => `Team ${i + 1}`)
-                doubleEliminationSettings.size = helpers.getNearestPowerOfTwo(teamCount)
+            if (teamNamesValue)
+                payload.seeding = teamNamesValue.split(',');
+            else {
+                const teamCount = parseInt((<HTMLTextAreaElement>document.getElementById(config.html_team_count_input_id)).value);
+                payload.seeding = Array.from({ length: teamCount }).map((_, i) => `Team ${i + 1}`);
+                doubleEliminationSettings.size = helpers.getNearestPowerOfTwo(teamCount);
             }
 
             break;
@@ -433,9 +453,9 @@ function baseValidation(config: FormConfiguration): void {
     if (!name || name === '')
         throw new DOMException('No name provided.');
 
-    const teamNamesValue = (<HTMLInputElement>document.getElementById(config.html_team_names_input_id))?.value
+    const teamNamesValue = (<HTMLInputElement>document.getElementById(config.html_team_names_input_id))?.value;
     const teams = teamNamesValue ? teamNamesValue.split(',') : [];
-    const teamCount = teams.length || parseInt((<HTMLInputElement>document.getElementById(config.html_team_count_input_id)).value)
+    const teamCount = teams.length || parseInt((<HTMLInputElement>document.getElementById(config.html_team_count_input_id)).value);
 
     if (teamCount < 2)
         throw new DOMException('Invalid team amount provided.');
@@ -451,6 +471,7 @@ function baseValidation(config: FormConfiguration): void {
  * @param labelText the text for the label of the textarea
  * @param textareaPlaceholder the placeholder for the textarea
  * @param textareaDefaultValue the default value for the textarea - if NULL or UNDEFINED this is not set
+ * @param className Class name to give to the wrapper
  */
 function createTextarea(parent: HTMLElement, textareaId: string, labelText: string, textareaPlaceholder: string, textareaDefaultValue?: string, className?: string): void {
     const wrapper = document.createElement('div');
@@ -466,9 +487,8 @@ function createTextarea(parent: HTMLElement, textareaId: string, labelText: stri
     if (null !== textareaDefaultValue && undefined !== textareaDefaultValue)
         textarea.value = textareaDefaultValue;
 
-    if (className) {
-        wrapper.classList.add(className)
-    }
+    if (className)
+        wrapper.classList.add(className);
 
     wrapper.appendChild(label);
     wrapper.appendChild(textarea);
@@ -485,6 +505,7 @@ function createTextarea(parent: HTMLElement, textareaId: string, labelText: stri
  * @param inputDefaultValue the default value for the input - if NULL or UNDEFINED this is not set
  * @param inputMinValue the min value for the input - if NULL or UNDEFINED this is not set
  * @param inputMinLengthValue the minLength value for the input - if NULL or UNDEFINED this is not set
+ * @param className Class name to give to the wrapper
  */
 function createInput(parent: HTMLElement, inputType: string, inputId: string, labelText: string, inputPlaceholder?: string, inputDefaultValue?: string, inputMinValue?: string, inputMinLengthValue?: number, className?: string): void {
     const wrapper = document.createElement('div');
@@ -509,9 +530,8 @@ function createInput(parent: HTMLElement, inputType: string, inputId: string, la
     if (null !== inputMinLengthValue && undefined !== inputMinLengthValue)
         input.minLength = inputMinLengthValue;
 
-    if (className) {
-        wrapper.classList.add(className)
-    }
+    if (className)
+        wrapper.classList.add(className);
 
     wrapper.appendChild(label);
     wrapper.appendChild(input);
@@ -524,6 +544,8 @@ function createInput(parent: HTMLElement, inputType: string, inputId: string, la
  * @param selectId The ID of the generated select
  * @param labelText The text of the label for the generated select
  * @param options The options to display in select
+ * @param selectedOption Which option should be selected by default
+ * @param className Class name to give to the wrapper
  */
 function createSelect(parent: HTMLElement, selectId: string, labelText: string, options: string[], selectedOption?: string, className?: string): void {
     const wrapper = document.createElement('div');
@@ -537,9 +559,8 @@ function createSelect(parent: HTMLElement, selectId: string, labelText: string, 
 
     createOptions(select, options, selectedOption);
 
-    if (className) {
-        wrapper.classList.add(className)
-    }
+    if (className)
+        wrapper.classList.add(className);
 
     wrapper.appendChild(label);
     wrapper.appendChild(select);
@@ -550,14 +571,15 @@ function createSelect(parent: HTMLElement, selectId: string, labelText: string, 
 /**
  * @param optionSwitch HTMLElement to add the options to
  * @param options string list of possible options
+ * @param selectedOption Which option should be selected by default
  */
 function createOptions(optionSwitch: HTMLElement, options: string[], selectedOption?: string): void {
     options.forEach(option => {
         const optionElement = document.createElement('option');
         optionElement.innerText = option;
-        if (option === selectedOption) {
-            optionElement.selected = true
-        }
+        if (option === selectedOption)
+            optionElement.selected = true;
+
         optionSwitch.appendChild(optionElement);
     });
 }
