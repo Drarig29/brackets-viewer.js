@@ -15,4 +15,8 @@ export {
     ViewerData,
     ParticipantImage,
     RoundNameInfo,
+    MatchWithMetadata,
+    Connection,
+    ConnectionType,
+    OriginHint,
 } from './types';

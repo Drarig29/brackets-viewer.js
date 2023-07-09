@@ -13,6 +13,53 @@ declare global {
         stageFormCreator: (configuration: FormConfiguration, submitCallable: CallbackFunction) => void,
         updateFormCreator: (configuration: FormConfiguration, changeCallable: CallbackFunction) => void,
     }
+
+    interface HTMLElement {
+        togglePopover: () => void
+    }
+
+    // https://developer.mozilla.org/en-US/docs/Web/API/ToggleEvent
+    interface ToggleEvent extends Event {
+        oldState: 'open' | 'closed'
+        newState: 'open' | 'closed'
+    }
+}
+
+/**
+ * A match with metadata constructed by the viewer.
+ */
+export interface MatchWithMetadata extends Match {
+    metadata: {
+        /** The list of child games of this match. */
+        games: MatchGame[]
+
+        // Positional information
+
+        /** Label as shown in the UI */
+        label?: string,
+        /** Number of the round this match is in. */
+        roundNumber?: number,
+        /** Count of rounds in the group this match is in. */
+        roundCount?: number,
+        /** Group type this match is in. */
+        matchLocation?: GroupType
+
+        // Other information
+
+        /** Whether to connect this match to the final if it happens to be the last one of the bracket. */
+        connectFinal?: boolean
+        /** Whether to connect this match with previous or next matches. */
+        connection?: Connection
+        /** Function returning an origin hint based on a participant's position for this match. */
+        originHint?: OriginHint
+    }
+}
+
+export interface MatchGameWithMetadata extends MatchGame {
+    metadata: {
+        /** Label as shown in the UI */
+        label?: string
+    }
 }
 
 /**
@@ -27,6 +74,20 @@ export interface ViewerData {
 
     /** The games of the matches to display. */
     matchGames: MatchGame[],
+
+    /** The participants who play in the stage to display. */
+    participants: Participant[],
+}
+
+/**
+ * The data to display with `brackets-viewer.js`
+ */
+export interface InternalViewerData {
+    /** The stages to display. */
+    stages: Stage[],
+
+    /** The matches of the stage to display. */
+    matches: MatchWithMetadata[],
 
     /** The participants who play in the stage to display. */
     participants: Participant[],
@@ -50,6 +111,11 @@ export interface Config {
      * A callback to be called when a match is clicked.
      */
     onMatchClick?: MatchClickCallback;
+
+    /**
+     * A callback to be called when a match's label is clicked.
+     */
+    onMatchLabelClick?: MatchClickCallback;
 
     /**
      * A function to deeply customize the names of the rounds.
@@ -86,6 +152,11 @@ export interface Config {
      * Whether to show the origin of a slot (in the lower bracket of an elimination stage).
      */
     showLowerBracketSlotsOrigin?: boolean,
+
+    /** 
+     * Display a popover when the label of a match with child games is clicked.
+     */
+    showPopoverOnMatchLabelClick?: boolean,
 
     /**
      * Whether to highlight every instance of a participant on hover.
@@ -143,7 +214,7 @@ export type RoundNameGetter = (info: RoundNameInfo, t: Translator) => string;
 /**
  * A function called when a match is clicked.
  */
-export type MatchClickCallback = (match: Match) => void;
+export type MatchClickCallback = (match: MatchWithMetadata) => void;
 
 /**
  * Contains the information about the connections of a match.

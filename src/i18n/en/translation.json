@@ -8,6 +8,7 @@
         "grand-final": "Winner of $t(abbreviations.loser-bracket) Final"
     },
     "match-label": {
+        "default": "Match {{matchNumber}}",
         "winner-bracket": "$t(abbreviations.winner-bracket)",
         "loser-bracket": "$t(abbreviations.loser-bracket)",
         "standard-bracket": "$t(abbreviations.match)",
@@ -18,7 +19,8 @@
         "double-elimination-final": "{{matchPrefix}} Final",
         "consolation-final": "Consolation Final",
         "grand-final-single": "Grand Final",
-        "grand-final": "$t(abbreviations.grand-final) Round {{roundNumber}}"
+        "grand-final": "$t(abbreviations.grand-final) Round {{roundNumber}}",
+        "match-game": "Game {{gameNumber}}"
     },
     "match-status": {
         "locked": "Locked",

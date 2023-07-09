@@ -8,6 +8,7 @@
         "grand-final": "Gagnant Finale $t(abbreviations.loser-bracket)"
     },
     "match-label": {
+        "default": "Match {{matchNumber}}",
         "winner-bracket": "$t(abbreviations.winner-bracket)",
         "loser-bracket": "$t(abbreviations.loser-bracket)",
         "standard-bracket": "$t(abbreviations.match)",
@@ -18,7 +19,8 @@
         "double-elimination-final": "Finale {{matchPrefix}}",
         "consolation-final": "Petite finale",
         "grand-final-single": "Grande finale",
-        "grand-final": "$t(abbreviations.grand-final) Round {{roundNumber}}"
+        "grand-final": "$t(abbreviations.grand-final) Round {{roundNumber}}",
+        "match-game": "Game {{gameNumber}}"
     },
     "match-status": {
         "locked": "Verrouillé",
@@ -89,6 +91,8 @@
         "bye": "BYE",
         "best-of-x": "Bo{{x}}",
         "group-name": "Groupe {{groupNumber}}",
+        "group-name-winner-bracket": "Winner Bracket",
+        "group-name-loser-bracket": "Loser Bracket",
         "round-name": "Round {{roundNumber}}",
         "round-name-final": "Round final",
         "round-name-winner-bracket": "$t(abbreviations.winner-bracket) Round {{roundNumber}}",
@@ -102,6 +106,8 @@
         "stage-selector-label": "Select a stage",
         "team-label": "Name your teams",
         "team-placeholder": "Comma separated List of Team Names (must be 2^n)",
+        "team-count": "Or a team count",
+        "team-count-placeholder": "How many teams do you want?",
         "group-label": "How many groups?",
         "group-placeholder": "How many groups do you want?",
         "seed-order-label": "How would you like to order your seeds?",

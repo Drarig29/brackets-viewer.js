@@ -1,5 +1,5 @@
-import { Match, ParticipantResult, GroupType } from 'brackets-model';
-import { RankingHeader, Ranking, RankingFormula, RankingItem, RankingMap, Side } from './types';
+import { Match, ParticipantResult, GroupType, MatchGame } from 'brackets-model';
+import { RankingHeader, Ranking, RankingFormula, RankingItem, RankingMap, Side, MatchWithMetadata } from './types';
 import { t } from './lang';
 
 /**
@@ -73,8 +73,8 @@ export function findRoot(selector?: string): HTMLElement {
  * @param matches The list of first round matches.
  * @param nextMatches The list of second round matches.
  */
-export function completeWithBlankMatches(bracketType: GroupType, matches: Match[], nextMatches?: Match[]): {
-    matches: (Match | null)[],
+export function completeWithBlankMatches(bracketType: GroupType, matches: MatchWithMetadata[], nextMatches?: MatchWithMetadata[]): {
+    matches: (MatchWithMetadata | null)[],
     fromToornament: boolean,
 } {
     if (!nextMatches)
@@ -230,4 +230,23 @@ function createRanking(rankingMap: RankingMap): RankingItem[] {
     }
 
     return ranking;
+}
+
+/**
+ * Indicates whether the input is a match.
+ * 
+ * @param input A match or a match game.
+ */
+export function isMatch(input: Match | MatchGame): input is Match {
+    return 'child_count' in input;
+}
+
+
+/**
+ * Indicates whether the input is a match game.
+ * 
+ * @param input A match or a match game.
+ */
+export function isMatchGame(input: Match | MatchGame): input is MatchGame {
+    return !isMatch(input);
 }

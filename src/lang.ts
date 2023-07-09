@@ -131,7 +131,10 @@ export function getFinalOriginHint(finalType: FinalType, roundNumber: number): O
  * @param roundCount Count of rounds.
  * @param matchLocation Location of the match.
  */
-export function getMatchLabel(matchNumber: number, roundNumber: number, roundCount: number, matchLocation: GroupType): string {
+export function getMatchLabel(matchNumber: number, roundNumber?: number, roundCount?: number, matchLocation?: GroupType): string {
+    if (roundNumber === undefined || roundCount === undefined || matchLocation === undefined)
+        return t('match-label.default', { matchNumber });
+
     const matchPrefix = matchLocation === 'winner_bracket' ? t('match-label.winner-bracket') :
         matchLocation === 'loser_bracket' ? t('match-label.loser-bracket') : t('match-label.standard-bracket');
 
