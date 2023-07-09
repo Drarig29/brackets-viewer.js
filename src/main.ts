@@ -100,11 +100,8 @@ export class BracketsViewer {
         this.popover = document.createElement('div');
         this.popover.setAttribute('popover', 'auto');
         this.popover.addEventListener('toggle', (event) => {
-            if ((event as ToggleEvent).newState === 'closed') {
-                [...document.querySelectorAll('.opponents.popover-selected')].forEach(element => {
-                    element.classList.remove('popover-selected');
-                });
-            }
+            if ((event as ToggleEvent).newState === 'closed')
+                document.querySelector('.opponents.popover-selected')?.classList.remove('popover-selected');
         });
 
         root.append(this.popover);
@@ -638,13 +635,12 @@ export class BracketsViewer {
         const onClick = (event: MouseEvent): void => {
             // Prevent `this._onMatchClick()` from being called.
             event.stopPropagation();
+            this._onMatchLabelClick(match);
 
             if (this.config.showPopoverOnMatchLabelClick) {
                 opponents.classList.add('popover-selected');
                 this.showPopover(match);
             }
-
-            this._onMatchLabelClick(match);
         };
 
         if (this.config.separatedChildCountLabel) {
@@ -687,7 +683,11 @@ export class BracketsViewer {
             this.popover.append(match);
         }
 
-        this.popover.togglePopover();
+        try {
+            this.popover.togglePopover();
+        } catch {
+            // Keep this while Firefox doesn't support the Popover API.
+        }
     }
 
     /**
