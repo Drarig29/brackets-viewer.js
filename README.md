@@ -78,6 +78,8 @@ window.bracketsViewer.render({
 });
 ```
 
+See the [full documentation](https://drarig29.github.io/brackets-docs/reference/viewer/interfaces/Config.html) for the `render()` configuration.
+
 ## Demos
 
 To quickly test, you can also try the demos by visiting `./demo/index.html`.
