@@ -13,6 +13,7 @@
   --connector-color: #9e9e9e;
   --border-color: #d9d9d9;
   --border-hover-color: #b6b5b5;
+  --border-selected-color: rgb(60, 60, 60);
 
   /* Sizes */
   --text-size: 12px;
@@ -224,6 +225,10 @@
       border: 1px solid var(--border-hover-color);
     }
 
+    &.popover-selected {
+      border: 1px solid var(--border-selected-color);
+    }
+
     & > span {
       position: absolute;
       top: -10px;
@@ -353,7 +358,12 @@
   }
 
   [popover] {
-    padding: 10px 14px;
+    padding: 0 14px 10px 14px;
+
+    h4 {
+      font-size: 1.1em;
+      margin-bottom: 24px;
+    }
 
     .match:not(:last-of-type) {
       margin-bottom: 20px;

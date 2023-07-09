@@ -15,6 +15,17 @@ export function createTitle(title: string): HTMLElement {
 }
 
 /**
+ * Creates the title of a popover.
+ *
+ * @param title The title to set.
+ */
+export function createPopoverTitle(title: string): HTMLElement {
+    const h4 = document.createElement('h4');
+    h4.innerText = title;
+    return h4;
+}
+
+/**
  * Creates a container which contains a round-robin stage.
  * 
  * @param stageId ID of the stage.
@@ -129,9 +140,9 @@ export function createMatchContainer(match?: Match | MatchGame): HTMLElement {
  * @param status The status to set as tooltip.
  * @param onClick Called when the label is clicked.
  */
-export function createMatchLabel(label: string, status: string, onClick?: (event: MouseEvent) => void): HTMLElement {
+export function createMatchLabel(label: string | undefined, status: string, onClick?: (event: MouseEvent) => void): HTMLElement {
     const span = document.createElement('span');
-    span.innerText = label;
+    span.innerText = label || '';
     span.title = status;
     onClick && span.addEventListener('click', onClick);
     return span;

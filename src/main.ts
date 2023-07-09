@@ -1,13 +1,12 @@
 import './style.scss';
-import { Participant, Match, ParticipantResult, Stage, Status, GroupType, FinalType, Id, MatchGame } from 'brackets-model';
-import { splitBy, getRanking, getOriginAbbreviation, findRoot, completeWithBlankMatches, sortBy, isMatchGame } from './helpers';
+import { Participant, Match, ParticipantResult, Stage, Status, GroupType, FinalType, Id } from 'brackets-model';
+import { splitBy, getRanking, getOriginAbbreviation, findRoot, completeWithBlankMatches, sortBy, isMatchGame, isMatch } from './helpers';
 import * as dom from './dom';
 import * as lang from './lang';
 import { Locale } from './lang';
 import { helpers } from 'brackets-manager';
 import {
     Config,
-    Connection,
     OriginHint,
     ParticipantContainers,
     RankingItem,
@@ -17,8 +16,9 @@ import {
     Side,
     MatchClickCallback,
     RoundNameInfo,
-    MatchWithGames,
+    MatchWithMetadata,
     InternalViewerData,
+    MatchGameWithMetadata,
 } from './types';
 
 export class BracketsViewer {
@@ -40,19 +40,10 @@ export class BracketsViewer {
     }
 
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    private _onMatchClick: MatchClickCallback = (match: MatchWithGames): void => { };
+    private _onMatchClick: MatchClickCallback = (match: MatchWithMetadata): void => { };
 
-    private _onMatchLabelClick: MatchClickCallback = (match: MatchWithGames): void => {
-        this.popover.innerText = '';
-
-        // TODO: replace `MatchWithGames` with `MatchWithMetadata`
-        // const matchLabel = lang.getMatchLabel(match.number, roundNumber, roundCount, matchLocation);
-
-        for (const game of match.games!)
-            this.popover.append(this.createMatch(game, false, undefined, undefined, lang.t('match-label.match-game', { gameNumber: game.number })));
-
-        this.popover.togglePopover();
-    };
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    private _onMatchLabelClick: MatchClickCallback = (match: MatchWithMetadata): void => { };
 
     /**
      * @deprecated Use `onMatchClick` in the `config` parameter of `viewer.render()`.
@@ -83,12 +74,16 @@ export class BracketsViewer {
             separatedChildCountLabel: config?.separatedChildCountLabel ?? false,
             showSlotsOrigin: config?.showSlotsOrigin ?? true,
             showLowerBracketSlotsOrigin: config?.showLowerBracketSlotsOrigin ?? true,
+            showPopoverOnMatchLabelClick: config?.showPopoverOnMatchLabelClick ?? true,
             highlightParticipantOnHover: config?.highlightParticipantOnHover ?? true,
             showRankingTable: config?.showRankingTable ?? true,
         };
 
         if (config?.onMatchClick)
             this._onMatchClick = config.onMatchClick;
+
+        if (config?.onMatchLabelClick)
+            this._onMatchLabelClick = config.onMatchLabelClick;
 
         if (!data.stages?.length)
             throw Error('The `data.stages` array is either empty or undefined');
@@ -104,6 +99,14 @@ export class BracketsViewer {
 
         this.popover = document.createElement('div');
         this.popover.setAttribute('popover', 'auto');
+        this.popover.addEventListener('toggle', (event) => {
+            if ((event as ToggleEvent).newState === 'closed') {
+                [...document.querySelectorAll('.opponents.popover-selected')].forEach(element => {
+                    element.classList.remove('popover-selected');
+                });
+            }
+        });
+
         root.append(this.popover);
 
         data.stages.forEach(stage => this.renderStage(root, {
@@ -113,9 +116,9 @@ export class BracketsViewer {
                 .filter(match => match.stage_id === stage.id)
                 .map(match => ({
                     ...match,
-                    ...(match.child_count > 0 ? {
+                    metadata: {
                         games: data.matchGames.filter(game => game.parent_id === match.id),
-                    } : {}),
+                    },
                 })),
         }));
 
@@ -201,7 +204,7 @@ export class BracketsViewer {
      * @param stage The stage to render.
      * @param matchesByGroup A list of matches for each group.
      */
-    private renderRoundRobin(root: DocumentFragment, stage: Stage, matchesByGroup: Match[][]): void {
+    private renderRoundRobin(root: DocumentFragment, stage: Stage, matchesByGroup: MatchWithMetadata[][]): void {
         const container = dom.createRoundRobinContainer(stage.id);
         container.append(dom.createTitle(stage.name));
 
@@ -246,7 +249,7 @@ export class BracketsViewer {
      * @param stage The stage to render.
      * @param matchesByGroup A list of matches for each group.
      */
-    private renderElimination(root: DocumentFragment, stage: Stage, matchesByGroup: Match[][]): void {
+    private renderElimination(root: DocumentFragment, stage: Stage, matchesByGroup: MatchWithMetadata[][]): void {
         const container = dom.createEliminationContainer(stage.id);
         container.append(dom.createTitle(stage.name));
 
@@ -264,7 +267,7 @@ export class BracketsViewer {
      * @param container The container to render into.
      * @param matchesByGroup A list of matches for each group.
      */
-    private renderSingleElimination(container: HTMLElement, matchesByGroup: Match[][]): void {
+    private renderSingleElimination(container: HTMLElement, matchesByGroup: MatchWithMetadata[][]): void {
         const hasFinal = matchesByGroup[1] !== undefined;
         const bracketMatches = splitBy(matchesByGroup[0], 'round_id').map(matches => sortBy(matches, 'number'));
 
@@ -282,7 +285,7 @@ export class BracketsViewer {
      * @param container The container to render into.
      * @param matchesByGroup A list of matches for each group.
      */
-    private renderDoubleElimination(container: HTMLElement, matchesByGroup: Match[][]): void {
+    private renderDoubleElimination(container: HTMLElement, matchesByGroup: MatchWithMetadata[][]): void {
         const hasLoserBracket = matchesByGroup[1] !== undefined;
         const hasFinal = matchesByGroup[2] !== undefined;
         const winnerBracketMatches = splitBy(matchesByGroup[0], 'round_id').map(matches => sortBy(matches, 'number'));
@@ -309,7 +312,7 @@ export class BracketsViewer {
      * @param bracketType Type of the bracket.
      * @param connectFinal Whether to connect the last match of the bracket to the final.
      */
-    private renderBracket(container: HTMLElement, matchesByRound: Match[][], getRoundName: RoundNameGetter, bracketType: GroupType, connectFinal?: boolean): void {
+    private renderBracket(container: HTMLElement, matchesByRound: MatchWithMetadata[][], getRoundName: RoundNameGetter, bracketType: GroupType, connectFinal?: boolean): void {
         const groupId = matchesByRound[0][0].group_id;
         const roundCount = matchesByRound.length;
         const bracketContainer = dom.createBracketContainer(groupId, lang.getBracketName(this.stage, bracketType));
@@ -332,8 +335,18 @@ export class BracketsViewer {
             const roundContainer = dom.createRoundContainer(roundId, roundName);
 
             const roundMatches = fromToornament && roundNumber === 1 ? completedMatches : matchesByRound[roundIndex];
-            for (const match of roundMatches)
-                roundContainer.append(match && this.createBracketMatch(roundNumber, roundCount, match, bracketType, connectFinal) || this.skipBracketMatch());
+            for (const match of roundMatches) {
+                roundContainer.append(match && this.createBracketMatch({
+                    ...match,
+                    metadata: {
+                        ...match.metadata,
+                        roundNumber,
+                        roundCount,
+                        matchLocation: bracketType,
+                        connectFinal,
+                    },
+                }) || this.skipBracketMatch());
+            }
 
             roundsContainer.append(roundContainer);
         }
@@ -349,7 +362,7 @@ export class BracketsViewer {
      * @param finalType Type of the final.
      * @param matches Matches of the final.
      */
-    private renderFinal(container: HTMLElement, finalType: FinalType, matches: Match[]): void {
+    private renderFinal(container: HTMLElement, finalType: FinalType, matches: MatchWithMetadata[]): void {
         const upperBracket = container.querySelector('.bracket .rounds');
         if (!upperBracket) throw Error('Upper bracket not found.');
 
@@ -367,8 +380,18 @@ export class BracketsViewer {
                 finalType: lang.toI18nKey(finalType),
             }, lang.getRoundName);
 
-            const roundContainer = dom.createRoundContainer(finalMatches[roundIndex].round_id, roundName);
-            roundContainer.append(this.createFinalMatch(finalType, finalMatches, roundNumber, roundCount));
+            const finalMatch: MatchWithMetadata = {
+                ...finalMatches[roundIndex],
+                metadata: {
+                    ...finalMatches[roundIndex].metadata,
+                    roundNumber,
+                    roundCount,
+                    matchLocation: 'final_group',
+                },
+            };
+
+            const roundContainer = dom.createRoundContainer(finalMatch.round_id, roundName);
+            roundContainer.append(this.createFinalMatch(finalType, finalMatch));
             upperBracket.append(roundContainer);
         }
     }
@@ -428,33 +451,46 @@ export class BracketsViewer {
     /**
      * Creates a match in a bracket.
      *
-     * @param roundNumber Number of the round.
-     * @param roundCount Count of rounds.
      * @param match Information about the match.
-     * @param matchLocation Location of the match.
-     * @param connectFinal Whether to connect this match to the final if it happens to be the last one of the bracket.
      */
-    private createBracketMatch(roundNumber: number, roundCount: number, match: Match, matchLocation: GroupType, connectFinal?: boolean): HTMLElement {
+    private createBracketMatch(match: MatchWithMetadata): HTMLElement {
+        const { roundNumber, roundCount, matchLocation, connectFinal } = match.metadata;
+
+        if (roundNumber === undefined || roundCount === undefined || matchLocation === undefined)
+            throw Error(`The match's internal data is missing roundNumber, roundCount or matchLocation: ${JSON.stringify(match)}`);
+
         const connection = dom.getBracketConnection(this.alwaysConnectFirstRound, roundNumber, roundCount, match, matchLocation, connectFinal);
         const matchLabel = lang.getMatchLabel(match.number, roundNumber, roundCount, matchLocation);
         const originHint = lang.getOriginHint(roundNumber, roundCount, this.skipFirstRound, matchLocation);
-        return this.createMatch(match, true, matchLocation, connection, matchLabel, originHint, roundNumber);
+
+        match.metadata.connection = connection;
+        match.metadata.label = matchLabel;
+        match.metadata.originHint = originHint;
+
+        return this.createMatch(match, true);
     }
 
     /**
      * Creates a match in a final.
      *
      * @param type Type of the final.
-     * @param matches Matches of the final.
-     * @param roundNumber Number of the round.
-     * @param roundCount Count of rounds.
+     * @param match Information about the match.
      */
-    private createFinalMatch(type: FinalType, matches: Match[], roundNumber: number, roundCount: number): HTMLElement {
-        const roundIndex = roundNumber - 1;
-        const connection = dom.getFinalConnection(type, roundNumber, matches.length);
+    private createFinalMatch(type: FinalType, match: MatchWithMetadata): HTMLElement {
+        const { roundNumber, roundCount } = match.metadata;
+
+        if (roundNumber === undefined || roundCount === undefined)
+            throw Error(`The match's internal data is missing roundNumber or roundCount: ${JSON.stringify(match)}`);
+
+        const connection = dom.getFinalConnection(type, roundNumber, roundCount);
         const matchLabel = lang.getFinalMatchLabel(type, roundNumber, roundCount);
         const originHint = lang.getFinalOriginHint(type, roundNumber);
-        return this.createMatch(matches[roundIndex], true, 'final_group', connection, matchLabel, originHint);
+
+        match.metadata.connection = connection;
+        match.metadata.label = matchLabel;
+        match.metadata.originHint = originHint;
+
+        return this.createMatch(match, true);
     }
 
     /**
@@ -479,32 +515,40 @@ export class BracketsViewer {
      *
      * @param match Results of the match.
      * @param propagateHighlight Whether to highlight participants in other matches.
-     * @param matchLocation Location of the match.
-     * @param connection Connection of this match with the others.
-     * @param label Label of the match.
-     * @param originHint Origin hint for the match.
-     * @param roundNumber Number of the round.
      */
-    private createMatch(match: Match | MatchGame, propagateHighlight: boolean, matchLocation?: GroupType, connection?: Connection, label?: string, originHint?: OriginHint, roundNumber?: number): HTMLElement {
+    private createMatch(match: MatchWithMetadata | MatchGameWithMetadata, propagateHighlight: boolean): HTMLElement {
         const matchContainer = dom.createMatchContainer(match);
-        const opponents = isMatchGame(match)
-            ? dom.createOpponentsContainer()
-            : dom.createOpponentsContainer(() => this._onMatchClick(match));
+        const opponents = isMatch(match)
+            ? dom.createOpponentsContainer(() => this._onMatchClick(match))
+            : dom.createOpponentsContainer();
 
-        if (match.status >= Status.Completed)
-            originHint = undefined;
+        if (isMatch(match) && match.status >= Status.Completed)
+            match.metadata.originHint = undefined;
 
-        const participant1 = this.createParticipant(match.opponent1, propagateHighlight, 'opponent1', originHint, matchLocation, roundNumber);
-        const participant2 = this.createParticipant(match.opponent2, propagateHighlight, 'opponent2', originHint, matchLocation, roundNumber);
+        if (isMatch(match)) {
+            const { originHint, matchLocation, roundNumber } = match.metadata;
 
-        this.renderMatchLabel(opponents, match, label);
-        opponents.append(participant1, participant2);
+            const participant1 = this.createParticipant(match.opponent1, propagateHighlight, 'opponent1', originHint, matchLocation, roundNumber);
+            const participant2 = this.createParticipant(match.opponent2, propagateHighlight, 'opponent2', originHint, matchLocation, roundNumber);
+
+            this.renderMatchLabel(opponents, match);
+            opponents.append(participant1, participant2);
+        } else {
+            const participant1 = this.createParticipant(match.opponent1, propagateHighlight, 'opponent1');
+            const participant2 = this.createParticipant(match.opponent2, propagateHighlight, 'opponent2');
+
+            this.renderMatchLabel(opponents, match);
+            opponents.append(participant1, participant2);
+        }
+
         matchContainer.append(opponents);
 
-        if (!connection)
-            return matchContainer;
+        if (isMatch(match)) {
+            if (!match.metadata.connection)
+                return matchContainer;
 
-        dom.setupConnection(opponents, matchContainer, connection);
+            dom.setupConnection(opponents, matchContainer, match.metadata.connection);
+        }
 
         return matchContainer;
     }
@@ -582,9 +626,10 @@ export class BracketsViewer {
      * 
      * @param opponents The opponents container.
      * @param match Results of the match.
-     * @param label Label of the match.
      */
-    private renderMatchLabel(opponents: HTMLElement, match: Match | MatchGame, label = ''): void {
+    private renderMatchLabel(opponents: HTMLElement, match: MatchWithMetadata | MatchGameWithMetadata): void {
+        const { label } = match.metadata;
+
         if (isMatchGame(match)) {
             opponents.append(dom.createMatchLabel(label, lang.getMatchStatus(match.status)));
             return;
@@ -593,6 +638,12 @@ export class BracketsViewer {
         const onClick = (event: MouseEvent): void => {
             // Prevent `this._onMatchClick()` from being called.
             event.stopPropagation();
+
+            if (this.config.showPopoverOnMatchLabelClick) {
+                opponents.classList.add('popover-selected');
+                this.showPopover(match);
+            }
+
             this._onMatchLabelClick(match);
         };
 
@@ -610,6 +661,33 @@ export class BracketsViewer {
             const joined = label ? `${label}, ${childCountLabel}` : childCountLabel;
             opponents.append(dom.createMatchLabel(joined, lang.getMatchStatus(match.status), onClick));
         }
+    }
+
+    /**
+     * Show a popover to display the games of a match.
+     * 
+     * @param match The parent match.
+     */
+    private showPopover(match: MatchWithMetadata): void {
+        this.popover.innerText = '';
+
+        const { roundNumber, roundCount, matchLocation } = match.metadata;
+
+        const matchLabel = lang.getMatchLabel(match.number, roundNumber, roundCount, matchLocation);
+        const popoverTitle = dom.createPopoverTitle(matchLabel);
+        this.popover.append(popoverTitle);
+
+        for (const game of match.metadata.games) {
+            const matchGameLabel = lang.t('match-label.match-game', { gameNumber: game.number });
+            const match = this.createMatch({
+                ...game,
+                metadata: { label: matchGameLabel },
+            }, false);
+
+            this.popover.append(match);
+        }
+
+        this.popover.togglePopover();
     }
 
     /**

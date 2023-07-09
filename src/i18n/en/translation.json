@@ -8,6 +8,7 @@
         "grand-final": "Winner of $t(abbreviations.loser-bracket) Final"
     },
     "match-label": {
+        "default": "Match {{matchNumber}}",
         "winner-bracket": "$t(abbreviations.winner-bracket)",
         "loser-bracket": "$t(abbreviations.loser-bracket)",
         "standard-bracket": "$t(abbreviations.match)",
