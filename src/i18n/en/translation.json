@@ -18,7 +18,8 @@
         "double-elimination-final": "{{matchPrefix}} Final",
         "consolation-final": "Consolation Final",
         "grand-final-single": "Grand Final",
-        "grand-final": "$t(abbreviations.grand-final) Round {{roundNumber}}"
+        "grand-final": "$t(abbreviations.grand-final) Round {{roundNumber}}",
+        "match-game": "Game {{gameNumber}}"
     },
     "match-status": {
         "locked": "Locked",

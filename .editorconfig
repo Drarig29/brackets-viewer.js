@@ -11,5 +11,5 @@ charset = utf-8
 trim_trailing_whitespace = false
 insert_final_newline = true
 
-[*.yml]
+[*.{yml,scss}]
 indent_size = 2

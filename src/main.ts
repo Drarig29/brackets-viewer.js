@@ -1,6 +1,6 @@
 import './style.scss';
-import { Participant, Match, ParticipantResult, Stage, Status, GroupType, FinalType, Id } from 'brackets-model';
-import { splitBy, getRanking, getOriginAbbreviation, findRoot, completeWithBlankMatches, sortBy } from './helpers';
+import { Participant, Match, ParticipantResult, Stage, Status, GroupType, FinalType, Id, MatchGame } from 'brackets-model';
+import { splitBy, getRanking, getOriginAbbreviation, findRoot, completeWithBlankMatches, sortBy, isMatchGame } from './helpers';
 import * as dom from './dom';
 import * as lang from './lang';
 import { Locale } from './lang';
@@ -17,6 +17,8 @@ import {
     Side,
     MatchClickCallback,
     RoundNameInfo,
+    MatchWithGames,
+    InternalViewerData,
 } from './types';
 
 export class BracketsViewer {
@@ -30,6 +32,7 @@ export class BracketsViewer {
     private config!: Config;
     private skipFirstRound = false;
     private alwaysConnectFirstRound = false;
+    private popover!: HTMLElement;
 
     // eslint-disable-next-line jsdoc/require-jsdoc
     private getRoundName(info: RoundNameInfo, fallbackGetter: RoundNameGetter): string {
@@ -37,7 +40,19 @@ export class BracketsViewer {
     }
 
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    private _onMatchClick: MatchClickCallback = (match: Match): void => { };
+    private _onMatchClick: MatchClickCallback = (match: MatchWithGames): void => { };
+
+    private _onMatchLabelClick: MatchClickCallback = (match: MatchWithGames): void => {
+        this.popover.innerText = '';
+
+        // TODO: replace `MatchWithGames` with `MatchWithMetadata`
+        // const matchLabel = lang.getMatchLabel(match.number, roundNumber, roundCount, matchLocation);
+
+        for (const game of match.games!)
+            this.popover.append(this.createMatch(game, false, undefined, undefined, lang.t('match-label.match-game', { gameNumber: game.number })));
+
+        this.popover.togglePopover();
+    };
 
     /**
      * @deprecated Use `onMatchClick` in the `config` parameter of `viewer.render()`.
@@ -87,10 +102,21 @@ export class BracketsViewer {
         this.participants = data.participants;
         data.participants.forEach(participant => this.participantRefs[participant.id] = []);
 
+        this.popover = document.createElement('div');
+        this.popover.setAttribute('popover', 'auto');
+        root.append(this.popover);
+
         data.stages.forEach(stage => this.renderStage(root, {
             ...data,
             stages: [stage],
-            matches: data.matches.filter(match => match.stage_id === stage.id),
+            matches: data.matches
+                .filter(match => match.stage_id === stage.id)
+                .map(match => ({
+                    ...match,
+                    ...(match.child_count > 0 ? {
+                        games: data.matchGames.filter(game => game.parent_id === match.id),
+                    } : {}),
+                })),
         }));
 
         const target = findRoot(config?.selector);
@@ -145,7 +171,7 @@ export class BracketsViewer {
      * @param root The root element.
      * @param data The data to display.
      */
-    private renderStage(root: DocumentFragment, data: ViewerData): void {
+    private renderStage(root: DocumentFragment, data: InternalViewerData): void {
         const stage = data.stages[0];
         if (!data.matches?.length)
             throw Error(`No matches found for stage ${stage.id}`);
@@ -198,7 +224,7 @@ export class BracketsViewer {
 
                 const roundContainer = dom.createRoundContainer(roundId, roundName);
                 for (const match of roundMatches)
-                    roundContainer.append(this.createMatch(match));
+                    roundContainer.append(this.createMatch(match, true));
 
                 groupContainer.append(roundContainer);
                 roundNumber++;
@@ -382,7 +408,7 @@ export class BracketsViewer {
 
                 if (participant !== undefined) {
                     const cell = dom.createCell(participant.name);
-                    this.setupMouseHover(participant.id, cell);
+                    this.setupMouseHover(participant.id, cell, true);
                     row.append(cell);
                     continue;
                 }
@@ -412,7 +438,7 @@ export class BracketsViewer {
         const connection = dom.getBracketConnection(this.alwaysConnectFirstRound, roundNumber, roundCount, match, matchLocation, connectFinal);
         const matchLabel = lang.getMatchLabel(match.number, roundNumber, roundCount, matchLocation);
         const originHint = lang.getOriginHint(roundNumber, roundCount, this.skipFirstRound, matchLocation);
-        return this.createMatch(match, matchLocation, connection, matchLabel, originHint, roundNumber);
+        return this.createMatch(match, true, matchLocation, connection, matchLabel, originHint, roundNumber);
     }
 
     /**
@@ -428,7 +454,7 @@ export class BracketsViewer {
         const connection = dom.getFinalConnection(type, roundNumber, matches.length);
         const matchLabel = lang.getFinalMatchLabel(type, roundNumber, roundCount);
         const originHint = lang.getFinalOriginHint(type, roundNumber);
-        return this.createMatch(matches[roundIndex], 'final_group', connection, matchLabel, originHint);
+        return this.createMatch(matches[roundIndex], true, 'final_group', connection, matchLabel, originHint);
     }
 
     /**
@@ -438,8 +464,8 @@ export class BracketsViewer {
         const matchContainer = dom.createMatchContainer();
         const opponents = dom.createOpponentsContainer();
 
-        const participant1 = this.createParticipant(null);
-        const participant2 = this.createParticipant(null);
+        const participant1 = this.createParticipant(null, true);
+        const participant2 = this.createParticipant(null, true);
 
         opponents.append(participant1, participant2);
         matchContainer.append(opponents);
@@ -452,21 +478,24 @@ export class BracketsViewer {
      * Creates a match based on its results.
      *
      * @param match Results of the match.
+     * @param propagateHighlight Whether to highlight participants in other matches.
      * @param matchLocation Location of the match.
      * @param connection Connection of this match with the others.
      * @param label Label of the match.
      * @param originHint Origin hint for the match.
      * @param roundNumber Number of the round.
      */
-    private createMatch(match: Match, matchLocation?: GroupType, connection?: Connection, label?: string, originHint?: OriginHint, roundNumber?: number): HTMLElement {
-        const matchContainer = dom.createMatchContainer(match.id, match.status);
-        const opponents = dom.createOpponentsContainer(() => this._onMatchClick(match));
+    private createMatch(match: Match | MatchGame, propagateHighlight: boolean, matchLocation?: GroupType, connection?: Connection, label?: string, originHint?: OriginHint, roundNumber?: number): HTMLElement {
+        const matchContainer = dom.createMatchContainer(match);
+        const opponents = isMatchGame(match)
+            ? dom.createOpponentsContainer()
+            : dom.createOpponentsContainer(() => this._onMatchClick(match));
 
         if (match.status >= Status.Completed)
             originHint = undefined;
 
-        const participant1 = this.createParticipant(match.opponent1, 'opponent1', originHint, matchLocation, roundNumber);
-        const participant2 = this.createParticipant(match.opponent2, 'opponent2', originHint, matchLocation, roundNumber);
+        const participant1 = this.createParticipant(match.opponent1, propagateHighlight, 'opponent1', originHint, matchLocation, roundNumber);
+        const participant2 = this.createParticipant(match.opponent2, propagateHighlight, 'opponent2', originHint, matchLocation, roundNumber);
 
         this.renderMatchLabel(opponents, match, label);
         opponents.append(participant1, participant2);
@@ -484,12 +513,13 @@ export class BracketsViewer {
      * Creates a participant for a match.
      *
      * @param participant Information about the participant.
+     * @param propagateHighlight Whether to highlight the participant in other matches.
      * @param side Side of the participant.
      * @param originHint Origin hint for the match.
      * @param matchLocation Location of the match.
      * @param roundNumber Number of the round.
      */
-    private createParticipant(participant: ParticipantResult | null, side?: Side, originHint?: OriginHint, matchLocation?: GroupType, roundNumber?: number): HTMLElement {
+    private createParticipant(participant: ParticipantResult | null, propagateHighlight: boolean, side?: Side, originHint?: OriginHint, matchLocation?: GroupType, roundNumber?: number): HTMLElement {
         const containers: ParticipantContainers = {
             participant: dom.createParticipantContainer(participant && participant.id),
             name: dom.createNameContainer(),
@@ -504,7 +534,7 @@ export class BracketsViewer {
         containers.participant.append(containers.name, containers.result);
 
         if (participant && participant.id !== null)
-            this.setupMouseHover(participant.id, containers.participant);
+            this.setupMouseHover(participant.id, containers.participant, propagateHighlight);
 
         return containers.participant;
     }
@@ -554,12 +584,23 @@ export class BracketsViewer {
      * @param match Results of the match.
      * @param label Label of the match.
      */
-    private renderMatchLabel(opponents: HTMLElement, match: Match, label = ''): void {
-        if (this.config.separatedChildCountLabel) {
+    private renderMatchLabel(opponents: HTMLElement, match: Match | MatchGame, label = ''): void {
+        if (isMatchGame(match)) {
             opponents.append(dom.createMatchLabel(label, lang.getMatchStatus(match.status)));
+            return;
+        }
+
+        const onClick = (event: MouseEvent): void => {
+            // Prevent `this._onMatchClick()` from being called.
+            event.stopPropagation();
+            this._onMatchLabelClick(match);
+        };
+
+        if (this.config.separatedChildCountLabel) {
+            opponents.append(dom.createMatchLabel(label, lang.getMatchStatus(match.status), onClick));
 
             if (match.child_count > 0)
-                opponents.append(dom.createChildCountLabel(lang.t('common.best-of-x', { x: match.child_count })));
+                opponents.append(dom.createChildCountLabel(lang.t('common.best-of-x', { x: match.child_count }), onClick));
 
             return;
         }
@@ -567,7 +608,7 @@ export class BracketsViewer {
         if (match.child_count > 0) {
             const childCountLabel = lang.t('common.best-of-x', { x: match.child_count });
             const joined = label ? `${label}, ${childCountLabel}` : childCountLabel;
-            opponents.append(dom.createMatchLabel(joined, lang.getMatchStatus(match.status)));
+            opponents.append(dom.createMatchLabel(joined, lang.getMatchStatus(match.status), onClick));
         }
     }
 
@@ -614,21 +655,31 @@ export class BracketsViewer {
      *
      * @param participantId ID of the participant.
      * @param element The dom element to add events to.
+     * @param propagateHighlight Whether to highlight the participant in other matches.
      */
-    private setupMouseHover(participantId: Id, element: HTMLElement): void {
+    private setupMouseHover(participantId: Id, element: HTMLElement, propagateHighlight: boolean): void {
         if (!this.config.highlightParticipantOnHover) return;
+
+        const setupListeners = (elements: HTMLElement[]): void => {
+            element.addEventListener('mouseenter', () => {
+                elements.forEach(el => el.classList.add('hover'));
+            });
+
+            element.addEventListener('mouseleave', () => {
+                elements.forEach(el => el.classList.remove('hover'));
+            });
+        };
+
+        if (!propagateHighlight) {
+            setupListeners([element]);
+            return;
+        }
 
         const refs = this.participantRefs[participantId];
         if (!refs) throw Error(`The participant (id: ${participantId}) does not exist in the participants table.`);
 
         refs.push(element);
 
-        element.addEventListener('mouseover', () => {
-            refs.forEach(el => el.classList.add('hover'));
-        });
-
-        element.addEventListener('mouseleave', () => {
-            refs.forEach(el => el.classList.remove('hover'));
-        });
+        setupListeners(refs);
     }
 }

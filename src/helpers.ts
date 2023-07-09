@@ -1,4 +1,4 @@
-import { Match, ParticipantResult, GroupType } from 'brackets-model';
+import { Match, ParticipantResult, GroupType, MatchGame } from 'brackets-model';
 import { RankingHeader, Ranking, RankingFormula, RankingItem, RankingMap, Side } from './types';
 import { t } from './lang';
 
@@ -230,4 +230,13 @@ function createRanking(rankingMap: RankingMap): RankingItem[] {
     }
 
     return ranking;
+}
+
+/**
+ * Indicates whether the input is a match or a match game.
+ * 
+ * @param input A match or a match game.
+ */
+export function isMatchGame(input: Match | MatchGame): input is MatchGame {
+    return 'parent_id' in input;
 }

@@ -13,7 +13,19 @@ declare global {
         stageFormCreator: (configuration: FormConfiguration, submitCallable: CallbackFunction) => void,
         updateFormCreator: (configuration: FormConfiguration, changeCallable: CallbackFunction) => void,
     }
+
+    interface HTMLElement {
+        togglePopover: () => void
+    }
 }
+
+/**
+ * A match along with its match games (optional).
+ */
+export interface MatchWithGames extends Match {
+    games?: MatchGame[]
+}
+
 
 /**
  * The data to display with `brackets-viewer.js`
@@ -27,6 +39,20 @@ export interface ViewerData {
 
     /** The games of the matches to display. */
     matchGames: MatchGame[],
+
+    /** The participants who play in the stage to display. */
+    participants: Participant[],
+}
+
+/**
+ * The data to display with `brackets-viewer.js`
+ */
+export interface InternalViewerData {
+    /** The stages to display. */
+    stages: Stage[],
+
+    /** The matches of the stage to display. */
+    matches: MatchWithGames[],
 
     /** The participants who play in the stage to display. */
     participants: Participant[],

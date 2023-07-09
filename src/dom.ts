@@ -1,6 +1,6 @@
-import { Match, ParticipantResult, FinalType, GroupType, Id } from 'brackets-model';
+import { Match, ParticipantResult, FinalType, GroupType, Id, MatchGame } from 'brackets-model';
 import { Connection, Placement, Ranking, RankingItem } from './types';
-import { rankingHeader } from './helpers';
+import { isMatchGame, rankingHeader } from './helpers';
 import { t } from './lang';
 
 /**
@@ -104,15 +104,22 @@ export function createRoundContainer(roundId: Id, title: string): HTMLElement {
 /**
  * Creates a container which contains a match.
  *
- * @param matchId ID of the match.
- * @param status Status of the match.
+ * @param match A match or a match game.
  */
-export function createMatchContainer(matchId?: Id, status?: number): HTMLElement {
-    const match = document.createElement('div');
-    match.classList.add('match');
-    matchId !== undefined && match.setAttribute('data-match-id', matchId.toString());
-    status !== undefined && match.setAttribute('data-match-status', status.toString());
-    return match;
+export function createMatchContainer(match?: Match | MatchGame): HTMLElement {
+    const div = document.createElement('div');
+    div.classList.add('match');
+
+    if (match) {
+        if (isMatchGame(match))
+            div.setAttribute('data-match-game-id', match.id.toString());
+        else
+            div.setAttribute('data-match-id', match.id.toString());
+
+        div.setAttribute('data-match-status', match.status.toString());
+    }
+
+    return div;
 }
 
 /**
@@ -120,11 +127,13 @@ export function createMatchContainer(matchId?: Id, status?: number): HTMLElement
  *
  * @param label The label of the match.
  * @param status The status to set as tooltip.
+ * @param onClick Called when the label is clicked.
  */
-export function createMatchLabel(label: string, status: string): HTMLElement {
+export function createMatchLabel(label: string, status: string, onClick?: (event: MouseEvent) => void): HTMLElement {
     const span = document.createElement('span');
     span.innerText = label;
     span.title = status;
+    onClick && span.addEventListener('click', onClick);
     return span;
 }
 
@@ -132,10 +141,12 @@ export function createMatchLabel(label: string, status: string): HTMLElement {
  * Creates a container which contains the child count label of a match.
  *
  * @param label The child count label of the match.
+ * @param onClick Called when the label is clicked.
  */
-export function createChildCountLabel(label: string): HTMLElement {
+export function createChildCountLabel(label: string, onClick?: (event: MouseEvent) => void): HTMLElement {
     const span = document.createElement('span');
     span.innerText = label;
+    onClick && span.addEventListener('click', onClick);
     return span;
 }
 
