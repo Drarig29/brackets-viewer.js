@@ -15,4 +15,5 @@ export {
     ViewerData,
     ParticipantImage,
     RoundNameInfo,
+    MatchWithMetadata,
 } from './types';
