@@ -239,6 +239,7 @@ export function createRankingHeaders(ranking: Ranking): HTMLElement {
 export function setupHint(nameContainer: HTMLElement, hint: string): void {
     nameContainer.classList.add('hint');
     nameContainer.innerText = hint;
+    nameContainer.title = hint;
 }
 
 /**
