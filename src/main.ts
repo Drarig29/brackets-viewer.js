@@ -101,7 +101,7 @@ export class BracketsViewer {
         this.popover.setAttribute('popover', 'auto');
         this.popover.addEventListener('toggle', (event) => {
             if ((event as ToggleEvent).newState === 'closed')
-                document.querySelector('.opponents.popover-selected')?.classList.remove('popover-selected');
+                this.clearPreviousPopoverSelections();
         });
 
         root.append(this.popover);
@@ -638,6 +638,7 @@ export class BracketsViewer {
             this._onMatchLabelClick(match);
 
             if (this.config.showPopoverOnMatchLabelClick) {
+                this.clearPreviousPopoverSelections();
                 opponents.classList.add('popover-selected');
                 this.showPopover(match);
             }
@@ -759,5 +760,12 @@ export class BracketsViewer {
         refs.push(element);
 
         setupListeners(refs);
+    }
+
+    /**
+     * Clears any previous popover selections.
+     */
+    private clearPreviousPopoverSelections(): void {
+        document.querySelector('.opponents.popover-selected')?.classList.remove('popover-selected');
     }
 }
