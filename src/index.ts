@@ -16,4 +16,7 @@ export {
     ParticipantImage,
     RoundNameInfo,
     MatchWithMetadata,
+    Connection,
+    ConnectionType,
+    OriginHint,
 } from './types';
