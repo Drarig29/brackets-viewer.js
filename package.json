@@ -12,7 +12,8 @@
         "prepare": "npm run build",
         "prepublishOnly": "npm run build",
         "lint": "eslint '**/*.{js,ts}' --fix",
-        "test": "exit 0"
+        "test": "exit 0",
+        "watch-demo": "browser-sync demo . --watch dist"
     },
     "repository": {
         "type": "git",
@@ -51,6 +52,7 @@
         "@typescript-eslint/parser": "^5.16.0",
         "autoprefixer": "^10.4.4",
         "babel-loader": "^8.2.4",
+        "browser-sync": "^2.29.3",
         "css-loader": "^6.7.1",
         "eslint": "^8.12.0",
         "eslint-plugin-jsdoc": "^38.0.8",
