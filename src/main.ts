@@ -637,7 +637,7 @@ export class BracketsViewer {
             event.stopPropagation();
             this._onMatchLabelClick(match);
 
-            if (this.config.showPopoverOnMatchLabelClick) {
+            if (match.child_count > 0 && this.config.showPopoverOnMatchLabelClick) {
                 this.clearPreviousPopoverSelections();
                 opponents.classList.add('popover-selected');
                 this.showPopover(match);
