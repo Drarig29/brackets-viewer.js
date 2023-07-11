@@ -85,7 +85,7 @@ export function updateFormCreator(configuration: FormConfiguration, changeCallab
     const id = urlParams.get('id') ?? 0;
 
     // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
-    const storedBrackets = JSON.parse(localStorage.getItem('brackets') ?? '');
+    const storedBrackets = JSON.parse(localStorage.getItem('brackets') ?? '{}');
     // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
     const currentBracket = storedBrackets[id] as Database;
 
@@ -140,7 +140,7 @@ function createBaseMask(parent: HTMLElement, configuration: FormConfiguration, s
     const id = urlParams.get('id') ?? 0;
 
     // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
-    const storedBrackets = JSON.parse(localStorage.getItem('brackets') ?? '');
+    const storedBrackets = JSON.parse(localStorage.getItem('brackets') ?? '{}');
     // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
     const currentBracket = storedBrackets[id] as Database;
 
