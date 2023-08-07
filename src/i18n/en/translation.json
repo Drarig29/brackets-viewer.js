@@ -90,6 +90,7 @@
     "common": {
         "bye": "BYE",
         "best-of-x": "Bo{{x}}",
+        "consolation": "Consolation",
         "group-name": "Group {{groupNumber}}",
         "group-name-winner-bracket": "Winner Bracket",
         "group-name-loser-bracket": "Loser Bracket",

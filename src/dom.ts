@@ -55,10 +55,13 @@ export function createEliminationContainer(stageId: Id): HTMLElement {
  * @param groupId ID of the group.
  * @param title Title of the group.
  */
-export function createBracketContainer(groupId: Id, title?: string): HTMLElement {
+export function createBracketContainer(groupId?: Id, title?: string): HTMLElement {
     const bracket = document.createElement('section');
     bracket.classList.add('bracket');
-    bracket.setAttribute('data-group-id', groupId.toString());
+
+    // Consolation matches are not in a group.
+    if (groupId)
+        bracket.setAttribute('data-group-id', groupId.toString());
 
     if (title) {
         const h2 = document.createElement('h2');

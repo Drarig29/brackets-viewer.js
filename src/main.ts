@@ -1,6 +1,6 @@
 import './style.scss';
 import { Participant, Match, ParticipantResult, Stage, Status, GroupType, FinalType, Id } from 'brackets-model';
-import { splitBy, getRanking, getOriginAbbreviation, findRoot, completeWithBlankMatches, sortBy, isMatchGame, isMatch } from './helpers';
+import { splitBy, getRanking, getOriginAbbreviation, findRoot, completeWithBlankMatches, sortBy, isMatchGame, isMatch, splitByWithLeftovers } from './helpers';
 import * as dom from './dom';
 import * as lang from './lang';
 import { Locale } from './lang';
@@ -176,7 +176,8 @@ export class BracketsViewer {
         if (!data.matches?.length)
             throw Error(`No matches found for stage ${stage.id}`);
 
-        const matchesByGroup = splitBy(data.matches, 'group_id');
+        // Consolation matches are under `-1` in the array.
+        const matchesByGroup = splitByWithLeftovers(data.matches, 'group_id');
 
         this.stage = stage;
         this.skipFirstRound = stage.settings.skipFirstRound || false;
@@ -192,6 +193,8 @@ export class BracketsViewer {
             default:
                 throw Error(`Unknown bracket type: ${stage.type as string}`);
         }
+
+        this.renderConsolationMatches(root, matchesByGroup);
     }
 
     /**
@@ -256,6 +259,35 @@ export class BracketsViewer {
             this.renderDoubleElimination(container, matchesByGroup);
 
         root.append(container);
+    }
+
+    /**
+     * Renders a list of consolation matches.
+     *
+     * @param root The root element.
+     * @param matchesByGroup A list of matches for each group.
+     */
+    private renderConsolationMatches(root: DocumentFragment, matchesByGroup: MatchWithMetadata[][]): void {
+        const consolationMatches = matchesByGroup[-1];
+        if (!consolationMatches?.length)
+            return;
+
+        const consolation = dom.createBracketContainer(undefined, lang.t('common.consolation'));
+        const roundsContainer = dom.createRoundsContainer();
+
+        let matchNumber = 0;
+        for (const match of consolationMatches) {
+            roundsContainer.append(this.createMatch({
+                ...match,
+                metadata: {
+                    label: lang.t('match-label.default', { matchNumber: ++matchNumber }),
+                    games: [],
+                },
+            }, true));
+        }
+
+        consolation.append(roundsContainer);
+        root.append(consolation);
     }
 
     /**
