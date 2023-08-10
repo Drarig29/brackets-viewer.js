@@ -1,7 +1,7 @@
 import i18next, { StringMap, TOptions } from 'i18next';
 import LanguageDetector from 'i18next-browser-languagedetector';
 
-import { Stage, Status, FinalType, GroupType } from 'brackets-model';
+import { Stage, Status, FinalType, GroupType, StageType } from 'brackets-model';
 import { isMajorRound } from './helpers';
 import { OriginHint, RoundNameInfo } from './types';
 
@@ -107,20 +107,25 @@ export function getOriginHint(roundNumber: number, roundCount: number, skipFirst
 /**
  * Returns an origin hint function for a match in final.
  *
+ * @param stageType Type of the stage.
  * @param finalType Type of the final.
  * @param roundNumber Number of the round.
  */
-export function getFinalOriginHint(finalType: FinalType, roundNumber: number): OriginHint | undefined {
-    // Single elimination.
-    if (finalType === 'consolation_final')
+export function getFinalOriginHint(stageType: StageType, finalType: FinalType, roundNumber: number): OriginHint | undefined {
+    if (stageType === 'single_elimination')
         return (position: number): string => t('origin-hint.consolation-final', { position });
 
     // Double elimination.
-    if (roundNumber === 1) // Grand Final round 1
-        return (): string => t('origin-hint.grand-final');
+    if (finalType === 'grand_final') {
+        return roundNumber === 1
+            ? (): string => t('origin-hint.grand-final') // Grand Final round 1
+            : undefined; // Grand Final round 2 (no hint because it's obvious both participants come from the previous round)
+    }
 
-    // Grand Final round 2 (no hint because it's obvious both participants come from the previous round)
-    return undefined;
+    // Consolation final in double elimination.
+    return (position: number): string => position === 1
+        ? t('origin-hint.double-elimination-consolation-final-opponent-1')
+        : t('origin-hint.double-elimination-consolation-final-opponent-2');
 }
 
 /**

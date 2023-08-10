@@ -114,6 +114,7 @@ export class BracketsViewer {
                 .map(match => ({
                     ...match,
                     metadata: {
+                        stageType: stage.type,
                         games: data.matchGames.filter(game => game.parent_id === match.id),
                     },
                 })),
@@ -194,7 +195,7 @@ export class BracketsViewer {
                 throw Error(`Unknown bracket type: ${stage.type as string}`);
         }
 
-        this.renderConsolationMatches(root, matchesByGroup);
+        this.renderConsolationMatches(root, stage, matchesByGroup);
     }
 
     /**
@@ -265,9 +266,10 @@ export class BracketsViewer {
      * Renders a list of consolation matches.
      *
      * @param root The root element.
+     * @param stage The stage to render.
      * @param matchesByGroup A list of matches for each group.
      */
-    private renderConsolationMatches(root: DocumentFragment, matchesByGroup: MatchWithMetadata[][]): void {
+    private renderConsolationMatches(root: DocumentFragment, stage: Stage, matchesByGroup: MatchWithMetadata[][]): void {
         const consolationMatches = matchesByGroup[-1];
         if (!consolationMatches?.length)
             return;
@@ -281,6 +283,7 @@ export class BracketsViewer {
                 ...match,
                 metadata: {
                     label: lang.t('match-label.default', { matchNumber: ++matchNumber }),
+                    stageType: stage.type,
                     games: [],
                 },
             }, true));
@@ -297,15 +300,13 @@ export class BracketsViewer {
      * @param matchesByGroup A list of matches for each group.
      */
     private renderSingleElimination(container: HTMLElement, matchesByGroup: MatchWithMetadata[][]): void {
-        const hasFinal = matchesByGroup[1] !== undefined;
         const bracketMatches = splitBy(matchesByGroup[0], 'round_id').map(matches => sortBy(matches, 'number'));
+        const { hasFinal, connectFinal, finalMatches } = this.getFinalInfoSingleElimination(matchesByGroup);
 
-        this.renderBracket(container, bracketMatches, lang.getRoundName, 'single_bracket');
+        this.renderBracket(container, bracketMatches, lang.getRoundName, 'single_bracket', connectFinal);
 
-        if (hasFinal) {
-            const finalMatches = sortBy(matchesByGroup[1], 'number');
+        if (hasFinal)
             this.renderFinal(container, 'consolation_final', finalMatches);
-        }
     }
 
     /**
@@ -316,10 +317,10 @@ export class BracketsViewer {
      */
     private renderDoubleElimination(container: HTMLElement, matchesByGroup: MatchWithMetadata[][]): void {
         const hasLoserBracket = matchesByGroup[1] !== undefined;
-        const hasFinal = matchesByGroup[2] !== undefined;
         const winnerBracketMatches = splitBy(matchesByGroup[0], 'round_id').map(matches => sortBy(matches, 'number'));
+        const { hasFinal, connectFinal, grandFinalMatches, consolationFinalMatches } = this.getFinalInfoDoubleElimination(matchesByGroup);
 
-        this.renderBracket(container, winnerBracketMatches, lang.getWinnerBracketRoundName, 'winner_bracket', hasFinal);
+        this.renderBracket(container, winnerBracketMatches, lang.getWinnerBracketRoundName, 'winner_bracket', connectFinal);
 
         if (hasLoserBracket) {
             const loserBracketMatches = splitBy(matchesByGroup[1], 'round_id').map(matches => sortBy(matches, 'number'));
@@ -327,9 +328,56 @@ export class BracketsViewer {
         }
 
         if (hasFinal) {
-            const finalMatches = sortBy(matchesByGroup[2], 'number');
-            this.renderFinal(container, 'grand_final', finalMatches);
+            this.renderFinal(container, 'grand_final', grandFinalMatches);
+            this.renderFinal(container, 'consolation_final', consolationFinalMatches);
         }
+    }
+
+    /**
+     * Returns information about the final group in single elimination.
+     *
+     * @param matchesByGroup A list of matches for each group.
+     */
+    private getFinalInfoSingleElimination(matchesByGroup: MatchWithMetadata[][]): {
+        hasFinal: boolean,
+        connectFinal: boolean,
+        finalMatches: MatchWithMetadata[]
+    } {
+        const hasFinal = matchesByGroup[1] !== undefined;
+        const finalMatches = sortBy(matchesByGroup[1] ?? [], 'number');
+
+        // In single elimination, the only possible type of final is a consolation final,
+        // and it has to be disconnected from the bracket because it doesn't directly follows its last match.
+        const connectFinal = false;
+
+        return { hasFinal, connectFinal, finalMatches };
+    }
+
+    /**
+     * Returns information about the final group in double elimination.
+     * 
+     * @param matchesByGroup A list of matches for each group.
+     */
+    private getFinalInfoDoubleElimination(matchesByGroup: MatchWithMetadata[][]): {
+        hasFinal: boolean,
+        connectFinal: boolean,
+        grandFinalMatches: MatchWithMetadata[]
+        consolationFinalMatches: MatchWithMetadata[]
+    } {
+        const hasFinal = matchesByGroup[2] !== undefined;
+        const finalMatches = sortBy(matchesByGroup[2] ?? [], 'number');
+
+        // All grand final matches have a `number: 1` property. We can have 0, 1 or 2 of them.
+        const grandFinalMatches = finalMatches.filter(match => match.number === 1);
+        // All consolation matches have a `number: 2` property (set by the manager). We can only have 0 or 1 of them.
+        const consolationFinalMatches = finalMatches.filter(match => match.number === 2);
+
+        // In double elimination, we can have a grand final, a consolation final, or both.
+        // We only want to connect the upper bracket with the final group when we have at least one grand final match.
+        // The grand final will always be placed directly next to the bracket.
+        const connectFinal = grandFinalMatches.length > 0;
+
+        return { hasFinal, connectFinal, grandFinalMatches, consolationFinalMatches };
     }
 
     /**
@@ -339,7 +387,7 @@ export class BracketsViewer {
      * @param matchesByRound A list of matches for each round.
      * @param getRoundName A function giving a round's name based on its number.
      * @param bracketType Type of the bracket.
-     * @param connectFinal Whether to connect the last match of the bracket to the final.
+     * @param connectFinal Whether to connect the last match of the bracket to the first match of the final group.
      */
     private renderBracket(container: HTMLElement, matchesByRound: MatchWithMetadata[][], getRoundName: RoundNameGetter, bracketType: GroupType, connectFinal?: boolean): void {
         const groupId = matchesByRound[0][0].group_id;
@@ -392,6 +440,10 @@ export class BracketsViewer {
      * @param matches Matches of the final.
      */
     private renderFinal(container: HTMLElement, finalType: FinalType, matches: MatchWithMetadata[]): void {
+        // Double elimination stages can have a grand final, or a consolation final, or both.
+        if (matches.length === 0)
+            return;
+
         const upperBracket = container.querySelector('.bracket .rounds');
         if (!upperBracket) throw Error('Upper bracket not found.');
 
@@ -400,6 +452,8 @@ export class BracketsViewer {
         const finalMatches = matches.slice(0, displayCount);
         const roundCount = finalMatches.length;
 
+        const defaultFinalRoundNameGetter: RoundNameGetter = ({ roundNumber, roundCount }) => lang.getFinalMatchLabel(finalType, roundNumber, roundCount);
+
         for (let roundIndex = 0; roundIndex < finalMatches.length; roundIndex++) {
             const roundNumber = roundIndex + 1;
             const roundName = this.getRoundName({
@@ -407,7 +461,7 @@ export class BracketsViewer {
                 roundCount,
                 groupType: lang.toI18nKey('final_group'),
                 finalType: lang.toI18nKey(finalType),
-            }, lang.getRoundName);
+            }, defaultFinalRoundNameGetter);
 
             const finalMatch: MatchWithMetadata = {
                 ...finalMatches[roundIndex],
@@ -502,18 +556,18 @@ export class BracketsViewer {
     /**
      * Creates a match in a final.
      *
-     * @param type Type of the final.
+     * @param finalType Type of the final.
      * @param match Information about the match.
      */
-    private createFinalMatch(type: FinalType, match: MatchWithMetadata): HTMLElement {
+    private createFinalMatch(finalType: FinalType, match: MatchWithMetadata): HTMLElement {
         const { roundNumber, roundCount } = match.metadata;
 
         if (roundNumber === undefined || roundCount === undefined)
             throw Error(`The match's internal data is missing roundNumber or roundCount: ${JSON.stringify(match)}`);
 
-        const connection = dom.getFinalConnection(type, roundNumber, roundCount);
-        const matchLabel = lang.getFinalMatchLabel(type, roundNumber, roundCount);
-        const originHint = lang.getFinalOriginHint(type, roundNumber);
+        const connection = dom.getFinalConnection(finalType, roundNumber, roundCount);
+        const matchLabel = lang.getFinalMatchLabel(finalType, roundNumber, roundCount);
+        const originHint = lang.getFinalOriginHint(match.metadata.stageType, finalType, roundNumber);
 
         match.metadata.connection = connection;
         match.metadata.label = matchLabel;

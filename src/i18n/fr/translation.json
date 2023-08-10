@@ -5,7 +5,9 @@
         "winner-bracket-semi-final": "Perdant $t(abbreviations.winner-bracket) Semi {{position}}",
         "winner-bracket-final": "Perdant Finale $t(abbreviations.winner-bracket)",
         "consolation-final": "Perdant Semi {{position}}",
-        "grand-final": "Gagnant Finale $t(abbreviations.loser-bracket)"
+        "grand-final": "Gagnant Finale $t(abbreviations.loser-bracket)",
+        "double-elimination-consolation-final-opponent-1": "Perdant $t(abbreviations.loser-bracket) Semi 1",
+        "double-elimination-consolation-final-opponent-2": "Perdant $t(abbreviations.loser-bracket) Final"
     },
     "match-label": {
         "default": "Match {{matchNumber}}",

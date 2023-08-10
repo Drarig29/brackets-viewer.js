@@ -1,4 +1,4 @@
-import { Stage, Match, MatchGame, Participant, GroupType, FinalType, Id } from 'brackets-model';
+import { Stage, Match, MatchGame, Participant, GroupType, FinalType, Id, StageType } from 'brackets-model';
 import { CallbackFunction, FormConfiguration } from './form';
 import { InMemoryDatabase } from 'brackets-memory-db';
 import { BracketsViewer } from './main';
@@ -30,6 +30,10 @@ declare global {
  */
 export interface MatchWithMetadata extends Match {
     metadata: {
+        // Information known since the beginning
+
+        /** Type of the stage this match is in. */
+        stageType: StageType
         /** The list of child games of this match. */
         games: MatchGame[]
 
