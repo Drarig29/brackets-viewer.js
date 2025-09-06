@@ -2,18 +2,21 @@
     "name": "brackets-viewer",
     "version": "1.6.2",
     "description": "A simple library to display tournament brackets (round-robin, single elimination, double elimination)",
+    "main": "./dist/index.js",
+    "types": "./dist/index.d.ts",
     "files": [
         "dist/"
     ],
     "scripts": {
         "db": "npx json-server --watch demo/db.json",
-        "build": "npx webpack --mode production",
+        "build": "npx webpack --mode production && npm run tsc",
         "start": "npx webpack --watch --mode development",
         "prepare": "npm run build",
         "prepublishOnly": "npm run build",
         "lint": "eslint '**/*.{js,ts}' --fix",
         "test": "exit 0",
-        "watch-demo": "browser-sync demo . --watch dist"
+        "watch-demo": "browser-sync demo . --watch dist",
+        "tsc": "tsc --emitDeclarationOnly"
     },
     "repository": {
         "type": "git",
@@ -65,6 +68,6 @@
         "ts-loader": "^9.2.8",
         "typescript": "^4.6.3",
         "webpack": "^5.70.0",
-        "webpack-cli": "^4.9.2"
+        "webpack-cli": "^4.10.0"
     }
 }
