@@ -4,6 +4,8 @@
         "module": "CommonJS",
         "moduleResolution": "node",
         "strict": true,
+        "declaration": true,
+        "outDir": "./dist",
         "types": [
             "brackets-model"
         ],
