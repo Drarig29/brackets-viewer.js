@@ -5,6 +5,8 @@ import { BracketsViewer } from './main';
 import { BracketsManager } from 'brackets-manager';
 import { ToI18nKey, TFunction } from './lang';
 
+export type { ToI18nKey, TFunction };
+
 declare global {
     interface Window {
         bracketsViewer: BracketsViewer,

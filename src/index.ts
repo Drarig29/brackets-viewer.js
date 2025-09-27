@@ -7,5 +7,4 @@ window.inMemoryDatabase = new InMemoryDatabase();
 window.bracketsManager = new BracketsManager(window.inMemoryDatabase);
 
 export { BracketsViewer };
-export { ToI18nKey, TFunction } from './lang';
 export * from './types';
