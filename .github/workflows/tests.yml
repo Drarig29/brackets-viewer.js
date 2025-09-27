@@ -15,5 +15,4 @@ jobs:
       - run: npm run lint
       - name: Test documentation
         run: |
-          npm install typedoc@0.25.0
           npx typedoc src/index.ts --excludePrivate --treatValidationWarningsAsErrors
