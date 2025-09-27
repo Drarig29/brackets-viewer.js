@@ -199,6 +199,8 @@ export interface Config {
     /**
      * A formula to compute the ranking of the participants on round-robin stages.
      * 
+     * See {@link RankingItem} for the possible properties on `item`.
+     * 
      * @default (item) => 3 * item.wins + 1 * item.draws + 0 * item.losses
      */
     rankingFormula?: RankingFormula,
