@@ -1,4 +1,4 @@
-import i18next, { StringMap, TOptions } from 'i18next';
+import i18next, { StringMap, TOptions, TFunction } from 'i18next';
 import LanguageDetector from 'i18next-browser-languagedetector';
 
 import { Stage, Status, FinalType, GroupType, StageType } from 'brackets-model';
@@ -7,6 +7,8 @@ import { OriginHint, RoundNameInfo } from './types';
 
 import en from './i18n/en/translation.json';
 import fr from './i18n/fr/translation.json';
+
+export type { TFunction } from 'i18next';
 
 export const locales = {
     en,
@@ -50,8 +52,6 @@ export function t<Scope extends keyof Locale, SubKey extends string & keyof Loca
 ): T['returnObjects'] extends true ? StringMap : string {
     return i18next.t(key, options);
 }
-
-export type Translator = typeof t;
 
 export type ToI18nKey<S extends string> = S extends `${infer A}_${infer B}`
     ? `${A}-${B}`
@@ -235,7 +235,7 @@ export function getBracketName(stage: Stage, type: GroupType): string | undefine
 /**
  * Returns the name of a round.
  */
-export function getRoundName({ roundNumber, roundCount }: RoundNameInfo, t: Translator): string {
+export function getRoundName({ roundNumber, roundCount }: RoundNameInfo, t: TFunction): string {
     return roundNumber === roundCount ? t('common.round-name-final') : t('common.round-name', { roundNumber });
 }
 
@@ -243,7 +243,7 @@ export function getRoundName({ roundNumber, roundCount }: RoundNameInfo, t: Tran
 /**
  * Returns the name of a round in the winner bracket of a double elimination stage.
  */
-export function getWinnerBracketRoundName({ roundNumber, roundCount }: RoundNameInfo, t: Translator): string {
+export function getWinnerBracketRoundName({ roundNumber, roundCount }: RoundNameInfo, t: TFunction): string {
     return roundNumber === roundCount ? t('common.round-name-winner-bracket-final') : t('common.round-name-winner-bracket', { roundNumber });
 }
 
@@ -251,6 +251,6 @@ export function getWinnerBracketRoundName({ roundNumber, roundCount }: RoundName
 /**
  * Returns the name of a round in the loser bracket of a double elimination stage.
  */
-export function getLoserBracketRoundName({ roundNumber, roundCount }: RoundNameInfo, t: Translator): string {
+export function getLoserBracketRoundName({ roundNumber, roundCount }: RoundNameInfo, t: TFunction): string {
     return roundNumber === roundCount ? t('common.round-name-loser-bracket-final') : t('common.round-name-loser-bracket', { roundNumber });
 }

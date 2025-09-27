@@ -7,16 +7,5 @@ window.inMemoryDatabase = new InMemoryDatabase();
 window.bracketsManager = new BracketsManager(window.inMemoryDatabase);
 
 export { BracketsViewer };
-export { ToI18nKey } from './lang';
-export {
-    Config,
-    MatchClickCallback,
-    Placement,
-    ViewerData,
-    ParticipantImage,
-    RoundNameInfo,
-    MatchWithMetadata,
-    Connection,
-    ConnectionType,
-    OriginHint,
-} from './types';
+export { ToI18nKey, TFunction } from './lang';
+export * from './types';
