@@ -78,6 +78,7 @@ export class BracketsViewer {
             showPopoverOnMatchLabelClick: config?.showPopoverOnMatchLabelClick ?? true,
             highlightParticipantOnHover: config?.highlightParticipantOnHover ?? true,
             showRankingTable: config?.showRankingTable ?? true,
+            rankingFormula: config?.rankingFormula,
         };
 
         if (config?.onMatchClick)
@@ -487,7 +488,7 @@ export class BracketsViewer {
      */
     private createRanking(matches: Match[]): HTMLElement {
         const table = dom.createTable();
-        const ranking = getRanking(matches);
+        const ranking = getRanking(matches, this.config.rankingFormula);
 
         table.append(dom.createRankingHeaders(ranking));
 

@@ -195,6 +195,13 @@ export interface Config {
     showRankingTable?: boolean,
 
     /**
+     * A formula to compute the ranking of the participants on round-robin stages.
+     * 
+     * @default (item) => 3 * item.wins + 1 * item.draws + 0 * item.losses
+     */
+    rankingFormula?: RankingFormula,
+
+    /**
      * Whether to clear any previously displayed data.
      * 
      * @default false
