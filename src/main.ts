@@ -19,6 +19,7 @@ import {
     MatchWithMetadata,
     InternalViewerData,
     MatchGameWithMetadata,
+    ToggleEvent,
 } from './types';
 
 export class BracketsViewer {
