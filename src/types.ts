@@ -131,7 +131,7 @@ export interface Config {
      * 
      * @default undefined
      */
-    customRoundName?: (...args: Parameters<RoundNameGetter>) => ReturnType<RoundNameGetter> | undefined,
+    customRoundName?: RoundNameGetter,
 
     /**
      * An optional selector to select the root element.
