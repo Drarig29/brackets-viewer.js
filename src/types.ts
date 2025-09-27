@@ -113,22 +113,30 @@ export type Side = 'opponent1' | 'opponent2';
 export interface Config {
     /**
      * A callback to be called when a match is clicked.
+     * 
+     * @default undefined
      */
     onMatchClick?: MatchClickCallback;
 
     /**
      * A callback to be called when a match's label is clicked.
+     * 
+     * @default undefined
      */
     onMatchLabelClick?: MatchClickCallback;
 
     /**
      * A function to deeply customize the names of the rounds.
      * If you just want to **translate some words**, please use `addLocale()` instead.
+     * 
+     * @default undefined
      */
     customRoundName?: (...args: Parameters<RoundNameGetter>) => ReturnType<RoundNameGetter> | undefined,
 
     /**
      * An optional selector to select the root element.
+     * 
+     * @default '.brackets-viewer'
      */
     selector?: string,
 
@@ -137,6 +145,8 @@ export interface Config {
      * - If `none`, the position is not added.
      * - If `before`, the position is prepended before the participant name. "#1 Team"
      * - If `after`, the position is appended after the participant name, in parentheses. "Team (#1)"
+     * 
+     * @default 'before'
      */
     participantOriginPlacement?: Placement,
 
@@ -144,36 +154,50 @@ export interface Config {
      * Whether to show the child count of a BoX match separately in the match label.
      * - If `false`, the match label and the child count are in the same place. (Example: "M1.1, Bo3")
      * - If `true`, the match label and the child count are in an opposite place. (Example: "M1.1   (right-->) Bo3")
+     * 
+     * @default false
      */
     separatedChildCountLabel?: boolean,
 
     /**
      * Whether to show the origin of a slot (wherever possible).
+     * 
+     * @default true
      */
     showSlotsOrigin?: boolean,
 
     /**
      * Whether to show the origin of a slot (in the lower bracket of an elimination stage).
+     * 
+     * @default true
      */
     showLowerBracketSlotsOrigin?: boolean,
 
     /** 
      * Display a popover when the label of a match with child games is clicked.
+     * 
+     * @default true
      */
     showPopoverOnMatchLabelClick?: boolean,
 
     /**
      * Whether to highlight every instance of a participant on hover.
+     * 
+     * @default true
      */
     highlightParticipantOnHover?: boolean,
 
     /**
      * Whether to show a ranking table on round-robin stages.
+     * 
+     * @default true
      */
     showRankingTable?: boolean,
 
     /**
      * Whether to clear any previously displayed data.
+     * 
+     * @default false
      */
     clear?: boolean
 }
