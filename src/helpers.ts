@@ -249,7 +249,11 @@ function processParticipant(rankingMap: RankingMap, formula: RankingFormula, cur
  * @param rankingMap The ranking map (object).
  */
 function createRanking(rankingMap: RankingMap): RankingItem[] {
-    const ranking = Object.values(rankingMap).sort((a, b) => a.points !== b.points ? b.points - a.points : b.played - a.played);
+    const ranking = Object.values(rankingMap).sort((a, b) => a.points !== b.points
+        ? b.points - a.points
+        : a.played !== b.played
+            ? b.played - a.played
+            : b.scoreDifference - a.scoreDifference);
 
     const rank = {
         value: 0,
