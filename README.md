@@ -5,7 +5,7 @@
 [![jsDelivr](https://data.jsdelivr.com/v1/package/npm/brackets-viewer/badge?style=rounded)](https://www.jsdelivr.com/package/npm/brackets-viewer)
 [![Package Quality](https://packagequality.com/shield/brackets-viewer.svg)](https://packagequality.com/#?package=brackets-viewer)
 
-A simple library to display tournament brackets (round-robin, single elimination, double elimination)
+A simple library to display tournament brackets (round-robin, single elimination, double elimination).
 
 It contains all the logic needed to display tournaments.
 
@@ -17,7 +17,7 @@ It contains all the logic needed to display tournaments.
 - Themes supported, with CSS variables (see [`./demo/themes`](/demo/themes))
 - Display participant images next to their name ([example](https://github.com/Drarig29/brackets-viewer.js/blob/668aae1ed9db41ab21665459635cd6b71cad247c/demo/with-api.html#L34-L38))
 - Do actions when a match is clicked ([example](https://github.com/Drarig29/brackets-viewer.js/blob/ed31fc4fc43336d3543411f802a8b1d9d592d467/demo/with-api.html#L53), [feature request](https://github.com/Drarig29/brackets-viewer.js/discussions/80))
-- Custom round names: do you want to say "Semi Finals" instead of "Round 2"? ([example](https://github.com/Drarig29/brackets-viewer.js/blob/ed31fc4fc43336d3543411f802a8b1d9d592d467/demo/with-api.html#L46-L52), [feature request](https://github.com/Drarig29/brackets-viewer.js/discussions/93))
+- Custom round names: do you want to say "Semi Finals" instead of "Round 2"? ([example](https://github.com/Drarig29/brackets-viewer.js/blob/e548e5ac8369d2a692366718c04b24b32190866c/demo/with-api.html#L46-L59), [feature request](https://github.com/Drarig29/brackets-viewer.js/discussions/93))
 
 ![Screenshot](screenshot.png)
 
