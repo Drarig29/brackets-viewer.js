@@ -1,6 +1,6 @@
 import './style.scss';
-import { Participant, Match, ParticipantResult, Stage, Status, GroupType, FinalType, Id } from 'brackets-model';
-import { splitBy, getRanking, getOriginAbbreviation, findRoot, completeWithBlankMatches, sortBy, isMatchGame, isMatch, splitByWithLeftovers } from './helpers';
+import { Participant, Match, ParticipantResult, Stage, Status, GroupType, FinalType, Id, type RankingItem } from 'brackets-model';
+import { splitBy, getOriginAbbreviation, findRoot, completeWithBlankMatches, sortBy, isMatchGame, isMatch, splitByWithLeftovers } from './helpers';
 import * as dom from './dom';
 import * as lang from './lang';
 import { Locale } from './lang';
@@ -9,7 +9,6 @@ import {
     Config,
     OriginHint,
     ParticipantContainers,
-    RankingItem,
     RoundNameGetter,
     ViewerData,
     ParticipantImage,
@@ -78,7 +77,7 @@ export class BracketsViewer {
             showPopoverOnMatchLabelClick: config?.showPopoverOnMatchLabelClick ?? true,
             highlightParticipantOnHover: config?.highlightParticipantOnHover ?? true,
             showRankingTable: config?.showRankingTable ?? true,
-            rankingFormula: config?.rankingFormula,
+            rankingFormula: config?.rankingFormula ?? ((item): number => 3 * item.wins + 1 * item.draws + 0 * item.losses),
         };
 
         if (config?.onMatchClick)
@@ -482,13 +481,13 @@ export class BracketsViewer {
     }
 
     /**
-     * Creates a ranking table based on matches of a round-robin stage.
+     * Creates a ranking table for a group of a round-robin stage.
      *
-     * @param matches The list of matches.
+     * @param matches The list of matches in the group.
      */
     private createRanking(matches: Match[]): HTMLElement {
         const table = dom.createTable();
-        const ranking = getRanking(matches, this.config.rankingFormula);
+        const ranking = helpers.getRanking(matches, this.config.rankingFormula!);
 
         table.append(dom.createRankingHeaders(ranking));
 

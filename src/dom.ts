@@ -1,5 +1,5 @@
-import { Match, ParticipantResult, FinalType, GroupType, Id, MatchGame } from 'brackets-model';
-import { Connection, Placement, Ranking, RankingItem } from './types';
+import { Match, ParticipantResult, FinalType, GroupType, Id, MatchGame, type RankingItem } from 'brackets-model';
+import { Connection, Placement } from './types';
 import { isMatchGame, rankingHeader } from './helpers';
 import { t } from './lang';
 
@@ -239,7 +239,7 @@ export function createCell(data: string | number): HTMLElement {
  *
  * @param ranking The object containing the ranking.
  */
-export function createRankingHeaders(ranking: Ranking): HTMLElement {
+export function createRankingHeaders(ranking: RankingItem[]): HTMLElement {
     const headers = document.createElement('tr');
     const firstItem = ranking[0];
 
