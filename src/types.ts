@@ -1,4 +1,4 @@
-import { Stage, Match, MatchGame, Participant, GroupType, FinalType, Id, StageType } from 'brackets-model';
+import { Stage, Match, MatchGame, Participant, GroupType, FinalType, StageType, RankingItem, RankingFormula } from 'brackets-model';
 import { CallbackFunction, FormConfiguration } from './form';
 import { InMemoryDatabase } from 'brackets-memory-db';
 import { BracketsViewer } from './main';
@@ -190,7 +190,7 @@ export interface Config {
     highlightParticipantOnHover?: boolean,
 
     /**
-     * Whether to show a ranking table on round-robin stages.
+     * Whether to show a ranking table in each group of a round-robin stage.
      * 
      * @default true
      */
@@ -264,23 +264,6 @@ export interface Connection {
 }
 
 /**
- * An item of the ranking.
- */
-export interface RankingItem {
-    rank: number,
-    id: Id,
-    played: number,
-    wins: number,
-    draws: number,
-    losses: number,
-    forfeits: number,
-    scoreFor: number,
-    scoreAgainst: number,
-    scoreDifference: number,
-    points: number,
-}
-
-/**
  * Contains information about a header of the ranking and its tooltip.
  */
 export interface RankingHeader {
@@ -289,24 +272,9 @@ export interface RankingHeader {
 }
 
 /**
- * A formula which computes points given a ranking row.
- */
-export type RankingFormula = (ranking: RankingItem) => number;
-
-/**
  * An object mapping ranking properties to their header.
  */
 export type RankingHeaders = Record<keyof RankingItem, RankingHeader>;
-
-/**
- * An object mapping a participant id to its row in the ranking.
- */
-export type RankingMap = Record<Id, RankingItem>;
-
-/**
- * Definition of a ranking.
- */
-export type Ranking = RankingItem[];
 
 /**
  * Structure containing all the containers for a participant.

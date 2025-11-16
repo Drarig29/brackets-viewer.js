@@ -1,5 +1,5 @@
-import { Match, ParticipantResult, GroupType, MatchGame } from 'brackets-model';
-import { RankingHeader, Ranking, RankingFormula, RankingItem, RankingMap, Side, MatchWithMetadata } from './types';
+import { Match, GroupType, MatchGame, RankingItem } from 'brackets-model';
+import { RankingHeader, Side, MatchWithMetadata } from './types';
 import { t } from './lang';
 
 /**
@@ -169,103 +169,6 @@ export function isMajorRound(roundNumber: number): boolean {
  */
 export function rankingHeader(itemName: keyof RankingItem): RankingHeader {
     return t(`ranking.${itemName}`, { returnObjects: true }) as RankingHeader;
-}
-
-/**
- * Calculates the ranking based on a list of matches and a formula.
- *
- * @param matches The list of matches.
- * @param formula The points formula to apply.
- */
-export function getRanking(matches: Match[], formula?: RankingFormula): Ranking {
-    formula = formula || (
-        (item: RankingItem): number => 3 * item.wins + 1 * item.draws + 0 * item.losses
-    );
-
-    const rankingMap: RankingMap = {};
-
-    for (const match of matches) {
-        processParticipant(rankingMap, formula, match.opponent1, match.opponent2);
-        processParticipant(rankingMap, formula, match.opponent2, match.opponent1);
-    }
-
-    return createRanking(rankingMap);
-}
-
-/**
- * Processes a participant and edits the ranking map.
- *
- * @param rankingMap The ranking map to edit.
- * @param formula The points formula to apply.
- * @param current The current participant.
- * @param other The opponent.
- */
-function processParticipant(rankingMap: RankingMap, formula: RankingFormula, current: ParticipantResult | null, other: ParticipantResult | null): void {
-    if (!current || current.id === null) return;
-
-    const state = rankingMap[current.id] || {
-        rank: 0,
-        id: 0,
-        played: 0,
-        wins: 0,
-        draws: 0,
-        losses: 0,
-        forfeits: 0,
-        scoreFor: 0,
-        scoreAgainst: 0,
-        scoreDifference: 0,
-        points: 0,
-    };
-
-    state.id = current.id;
-
-    if (current.forfeit || current.result)
-        state.played++;
-
-    if (current.result === 'win')
-        state.wins++;
-
-    if (current.result === 'draw')
-        state.draws++;
-
-    if (current.result === 'loss')
-        state.losses++;
-
-    if (current.forfeit)
-        state.forfeits++;
-
-    state.scoreFor += current.score || 0;
-    state.scoreAgainst += other && other.score || 0;
-    state.scoreDifference = state.scoreFor - state.scoreAgainst;
-
-    state.points = formula(state);
-
-    rankingMap[current.id] = state;
-}
-
-/**
- * Creates the final ranking based on a ranking map. (Sort + Total points)
- *
- * @param rankingMap The ranking map (object).
- */
-function createRanking(rankingMap: RankingMap): RankingItem[] {
-    const ranking = Object.values(rankingMap).sort((a, b) => a.points !== b.points
-        ? b.points - a.points
-        : a.played !== b.played
-            ? b.played - a.played
-            : b.scoreDifference - a.scoreDifference);
-
-    const rank = {
-        value: 0,
-        lastPoints: -1,
-    };
-
-    for (const item of ranking) {
-        item.rank = rank.lastPoints !== item.points ? ++rank.value : rank.value;
-        rank.lastPoints = item.points;
-    }
-
-    return ranking;
 }
 
 /**
