@@ -30,7 +30,7 @@
         "display"
     ],
     "author": "Corentin Girard",
-    "license": "ISC",
+    "license": "MIT",
     "bugs": {
         "url": "https://github.com/Drarig29/brackets-viewer.js/issues"
     },
